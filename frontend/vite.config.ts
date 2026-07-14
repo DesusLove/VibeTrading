@@ -14,7 +14,6 @@ const PROXY_PATHS = [
   "/live",
   "/upload",
   "/shadow-reports",
-  "^/market(?:/|$)",
 ];
 
 export default defineConfig(({ mode }) => {
@@ -39,6 +38,9 @@ export default defineConfig(({ mode }) => {
       port: 5899,
       proxy: {
         ...Object.fromEntries(PROXY_PATHS.map((p) => [p, apiProxy])),
+        // Market data — /market/history first (exact match), then /market for sub-paths
+        "/market/history": apiProxy,
+        "/market": apiProxy,
         // SPA RunDetail page — only the two-segment ``/runs/{id}``
         // form should fall back to ``index.html`` on browser navigation.
         // ``/runs/{id}/code`` and ``/runs/{id}/pine`` are API-only and

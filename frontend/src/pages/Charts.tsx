@@ -13,6 +13,43 @@ const RANGES: { label: string; value: Range }[] = [
   { label: "5Y", value: "5y" },
 ];
 
+const DAYS: Record<Range, number> = {
+  "1mo": 30,
+  "3mo": 90,
+  "6mo": 180,
+  "1y": 365,
+  "5y": 1825,
+};
+
+const CG_ID: Record<string, string> = {
+  "BTC-USD": "bitcoin",
+  "ETH-USD": "ethereum",
+};
+
+async function fetchCoinGecko(symbol: string, per: Range): Promise<PriceBar[]> {
+  const id = CG_ID[symbol];
+  if (!id) throw new Error("No public fallback");
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8_000);
+  const res = await fetch(
+    `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${DAYS[per]}`,
+    { signal: ctrl.signal },
+  );
+  clearTimeout(timer);
+  if (!res.ok) throw new Error(`CoinGecko HTTP ${res.status}`);
+  const json = await res.json();
+  const prices = json?.prices as [number, number][] | undefined;
+  if (!prices || prices.length === 0) throw new Error("No data");
+  return prices.map(([ts, price]) => ({
+    time: new Date(ts).toISOString().slice(0, 10),
+    open: price,
+    high: price,
+    low: price,
+    close: price,
+    volume: 0,
+  }));
+}
+
 export function Charts() {
   const [symbol, setSymbol] = useState("SPY");
   const [input, setInput] = useState("SPY");
@@ -30,11 +67,17 @@ export function Charts() {
       const bars = await getMarketHistory(sym, per);
       setData(bars);
       if (bars.length === 0) setError(`No data for "${sym}"`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load chart data");
-    } finally {
-      setLoading(false);
-    }
+      return;
+    } catch { /* try fallback */ }
+
+    try {
+      const bars = await fetchCoinGecko(sym, per);
+      setData(bars);
+      return;
+    } catch { /* fallback failed */ }
+
+    setError("Chart data unavailable — is the backend running?");
+    setData([]);
   };
 
   useEffect(() => {
@@ -104,7 +147,7 @@ export function Charts() {
         <div className="h-full w-full rounded-lg overflow-hidden bg-surface-muted/20 border border-border-hairline">
           {error ? (
             <div className="flex items-center justify-center h-full">
-              <div className="flex flex-col items-center gap-2 text-text-tertiary">
+              <div className="flex flex-col items-center gap-2 text-text-tertiary max-w-sm text-center">
                 <AlertCircle className="h-5 w-5" />
                 <span className="text-xs">{error}</span>
               </div>
