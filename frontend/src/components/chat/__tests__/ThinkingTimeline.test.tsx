@@ -57,7 +57,7 @@ describe("ThinkingTimeline", () => {
     // Click to expand
     await user.click(screen.getByRole("button"));
 
-    // Now expanded — should show step labels
+    // Now expanded  should show step labels
     expect(screen.getByText("Run command")).toBeInTheDocument();
   });
 
@@ -91,7 +91,7 @@ describe("ThinkingTimeline", () => {
     ];
 
     render(<ThinkingTimeline messages={msgs} isLatest />);
-    // Should be expanded immediately — "Generate code" label visible
+    // Should be expanded immediately  "Generate code" label visible
     expect(screen.getByText("Generate code")).toBeInTheDocument();
   });
 

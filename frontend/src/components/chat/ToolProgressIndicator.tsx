@@ -1,6 +1,5 @@
 import { useRef, type JSX } from "react";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { ProgressBar } from "@/components/chat/ProgressBar";
 import { localizeToolName } from "@/lib/tools";
 import type { ToolCallEntry } from "@/types/agent";
@@ -26,7 +25,7 @@ function ProgressRing({ current, total }: RingProps): JSX.Element {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-3 w-3 text-primary shrink-0"
+      className="h-3 w-3 shrink-0" style={{ color: 'hsl(var(--accent-primary))' }}
       aria-hidden="true"
     >
       <circle
@@ -71,12 +70,12 @@ function ToolRow({ entry, stepIndex, totalSteps, isHeader, connector = "none", e
   const message = progress?.message || "";
 
   const icon = entry.status === "error"
-    ? <XCircle className="h-3 w-3 text-danger shrink-0" />
+    ? <XCircle className="h-3 w-3 text-negative shrink-0" />
     : entry.status === "ok"
-      ? <CheckCircle2 className="h-3 w-3 text-success shrink-0" />
+      ? <CheckCircle2 className="h-3 w-3 shrink-0" style={{ color: 'hsl(var(--positive))' }} />
       : hasDeterminate
         ? <ProgressRing current={progress!.current!} total={progress!.total!} />
-        : <Loader2 className="h-3 w-3 animate-spin text-primary shrink-0" />;
+        : <Loader2 className="h-3 w-3 animate-spin shrink-0" style={{ color: 'hsl(var(--accent-primary))' }} />;
 
   const localized = localizeToolName(entry.tool);
   const stepLabel = isHeader
@@ -88,14 +87,14 @@ function ToolRow({ entry, stepIndex, totalSteps, isHeader, connector = "none", e
       {/* Primary row */}
       <div className="flex items-center gap-2 min-w-0 sm:flex-none">
         {connector !== "none" && (
-          <span className="text-border/60 shrink-0 w-3 text-center" aria-hidden="true">
+          <span className="shrink-0 w-3 text-center" style={{ color: 'hsl(var(--border-hairline) / 0.6)' }} aria-hidden="true">
             {connector === "branch" ? "├" : "└"}
           </span>
         )}
         {icon}
-        <span className="text-foreground truncate">{stepLabel}</span>
+        <span className="text-text-primary truncate">{stepLabel}</span>
         {entry.elapsed_s != null && (
-          <span className="ml-auto sm:ml-0 tabular-nums text-[10px] text-muted-foreground/70 shrink-0">
+          <span className="ml-auto sm:ml-0 tabular-nums text-[10px] shrink-0" style={{ color: 'hsl(var(--text-tertiary) / 0.7)' }}>
             {entry.elapsed_s.toFixed(0)}s
           </span>
         )}
@@ -104,7 +103,7 @@ function ToolRow({ entry, stepIndex, totalSteps, isHeader, connector = "none", e
       {(progress && (hasDeterminate || stage)) && (
         <div className="flex items-center gap-2 min-w-0 sm:flex-1">
           {stage && (
-            <span className="text-foreground text-xs shrink-0 truncate max-w-[40%]">{stage}</span>
+            <span className="text-xs shrink-0 truncate max-w-[40%] text-text-primary">{stage}</span>
           )}
           {hasDeterminate && (
             <ProgressBar
@@ -113,11 +112,10 @@ function ToolRow({ entry, stepIndex, totalSteps, isHeader, connector = "none", e
               height="xs"
               showCount
               ariaLabel={stage || localized}
-              className="text-muted-foreground"
             />
           )}
           {eta != null && (
-            <span className="text-[10px] text-muted-foreground/70 tabular-nums shrink-0">
+            <span className="text-[10px] tabular-nums shrink-0" style={{ color: 'hsl(var(--text-tertiary) / 0.7)' }}>
               ~{eta}s left
             </span>
           )}
@@ -125,7 +123,7 @@ function ToolRow({ entry, stepIndex, totalSteps, isHeader, connector = "none", e
       )}
       {/* Tertiary row: message */}
       {message && (
-        <div className="text-[10px] text-muted-foreground/60 truncate min-w-0 sm:basis-full">
+        <div className="text-[10px] truncate min-w-0 sm:basis-full" style={{ color: 'hsl(var(--text-secondary) / 0.6)' }}>
           {message}
         </div>
       )}
@@ -183,14 +181,14 @@ export function ToolProgressIndicator({ toolCalls }: Props): JSX.Element | null 
   };
 
   /* ---------- aggregate icon state for the header row ---------- */
-  // (Used when 2+ tools are running — header shows multi-tool aggregate.)
+  // (Used when 2+ tools are running  header shows multi-tool aggregate.)
   // Note: filtered list is `running` so all are still running by construction.
   // We still inspect entire toolCalls so an earlier error in this turn shows
   // through the aggregate.
   const anyError = toolCalls.some((tc) => tc.status === "error");
   const aggregateIcon = anyError
-    ? <XCircle className="h-3 w-3 text-danger shrink-0" />
-    : <Loader2 className="h-3 w-3 animate-spin text-primary shrink-0" />;
+    ? <XCircle className="h-3 w-3 text-negative shrink-0" />
+    : <Loader2 className="h-3 w-3 animate-spin shrink-0" style={{ color: 'hsl(var(--accent-primary))' }} />;
 
   // Display rule: ≤3 running → show all; >3 → first 2 + "… +N more".
   const showAll = running.length <= MAX_VISIBLE;
@@ -218,18 +216,18 @@ export function ToolProgressIndicator({ toolCalls }: Props): JSX.Element | null 
     );
   }
 
-  // 2+ running — header + indented rows.
+  // 2+ running  header + indented rows.
   return (
     <div
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      className={cn("min-w-0 space-y-1")}
+      className="min-w-0 space-y-1"
     >
       {/* Header row */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="flex items-center gap-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         {aggregateIcon}
-        <span className="text-foreground">{running.length} tools running</span>
+        <span className="text-text-primary">{running.length} tools running</span>
       </div>
       {/* Indented rows */}
       <div className="pl-4 space-y-1">
@@ -244,8 +242,8 @@ export function ToolProgressIndicator({ toolCalls }: Props): JSX.Element | null 
           />
         ))}
         {overflow > 0 && (
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
-            <span className="text-border/60 shrink-0 w-3 text-center" aria-hidden="true">└</span>
+          <div className="flex items-center gap-2 text-[10px]" style={{ color: 'hsl(var(--text-tertiary) / 0.6)' }}>
+            <span className="shrink-0 w-3 text-center" style={{ color: 'hsl(var(--border-hairline) / 0.6)' }} aria-hidden="true">└</span>
             <span>… +{overflow} more</span>
           </div>
         )}

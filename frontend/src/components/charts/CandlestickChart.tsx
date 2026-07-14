@@ -50,7 +50,7 @@ export function CandlestickChart({ data, markers, indicators, height = 500 }: Pr
     });
   }, []);
 
-  // Memoize base data arrays — only recompute when raw data changes
+  // Memoize base data arrays  only recompute when raw data changes
   const baseData = useMemo(() => {
     const dates = data.map(d => d.time);
     const closes = data.map(d => d.close);
@@ -61,7 +61,7 @@ export function CandlestickChart({ data, markers, indicators, height = 500 }: Pr
     return { dates, closes, highs, lows, opens, candle };
   }, [data]);
 
-  // Memoize indicator calculations — only recompute when data changes (not on overlay toggle)
+  // Memoize indicator calculations  only recompute when data changes (not on overlay toggle)
   const indicatorCache = useMemo(() => ({
     ma5: calcMA(baseData.closes, 5),
     ma10: calcMA(baseData.closes, 10),
@@ -84,7 +84,7 @@ export function CandlestickChart({ data, markers, indicators, height = 500 }: Pr
     });
   }, [indicators, baseData.dates]);
 
-  // Init chart instance — only on mount/unmount and dark mode change
+  // Init chart instance  only on mount/unmount and dark mode change
   useEffect(() => {
     if (!containerRef.current || data.length === 0) return;
     const chart = echarts.init(containerRef.current);
@@ -97,7 +97,7 @@ export function CandlestickChart({ data, markers, indicators, height = 500 }: Pr
     return () => { ro.disconnect(); chart.dispose(); chartRef.current = null; };
   }, [data.length === 0, dark]); // only re-init when going empty↔non-empty or theme changes
 
-  // Update chart options — setOption on existing instance, no dispose
+  // Update chart options  setOption on existing instance, no dispose
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart || data.length === 0) return;

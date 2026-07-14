@@ -7,7 +7,7 @@ import ja from "./locales/ja.json";
 import ko from "./locales/ko.json";
 import ar from "./locales/ar.json";
 
-// Language registry — keep in sync with the Layout switcher and README_xx.md.
+// Language registry  keep in sync with the Layout switcher and README_xx.md.
 // `dir` flags whether the language is right-to-left so the app can mirror the
 // layout (sidebar on the right, etc.) when needed.
 export const SUPPORTED_LANGUAGES = [
@@ -54,7 +54,7 @@ i18n
     // removed.
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
-    // NOTE: Intentionally NOT using nonExplicitSupportedLngs — it strips
+    // NOTE: Intentionally NOT using nonExplicitSupportedLngs  it strips
     // region codes from compound language keys like "zh-CN" which causes
     // isSupportedCode to reject them ("zh-CN" → "zh", not in supportedLngs).
     interpolation: { escapeValue: false },
@@ -62,7 +62,7 @@ i18n
       // In browsers the navigator.language gives the user's browser locale,
       // useful as a fallback when no explicit choice is saved. In Node.js
       // (SSR, tests) navigator.language reflects the *OS* locale which is
-      // meaningless for a browser-only app — skip it there.
+      // meaningless for a browser-only app  skip it there.
       order: typeof window !== "undefined"
         ? ["localStorage", "navigator"]
         : ["localStorage"],
@@ -76,7 +76,7 @@ i18n
 // without a page reload.
 applyDocumentDirection(i18n.language || "en");
 i18n.on("languageChanged", (lng) => applyDocumentDirection(lng));
-// Re-apply after async detection resolves — the synchronous call above may
+// Re-apply after async detection resolves  the synchronous call above may
 // fire before LanguageDetector finishes, causing a brief LTR flash for RTL
 // users on first visit.
 i18n.on("initialized", () => {

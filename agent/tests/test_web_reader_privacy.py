@@ -41,32 +41,38 @@ def captured(monkeypatch):
 
 
 def test_http_error_surfaces_status_and_body(captured):
+    """Test that HTTP errors from the reader include status code and body."""
     captured["resp"] = _Resp(451, "ParamValidationError: bad input")
     out = json.loads(read_url(URL))
-    assert out["status"] == "error"
-    assert "451" in out["error"]
-    assert "ParamValidationError: bad input" in out["error"]
+    assert out["status"] == "error", f"Expected error status, got: {out}"
+    assert "451" in out["error"], f"Expected status code 451 in error: {out['error']}"
+    assert "ParamValidationError: bad input" in out["error"], \
+        f"Expected error message in: {out['error']}"
 
 
 def test_exception_error_surfaces_exc_text(captured):
+    """Test that request exceptions surface the exception text."""
     captured["resp"] = RuntimeError("boom: connect failed (10.0.0.1)")
     out = json.loads(read_url(URL))
-    assert out["status"] == "error"
-    assert "boom: connect failed" in out["error"]
+    assert out["status"] == "error", f"Expected error status, got: {out}"
+    assert "boom: connect failed" in out["error"], \
+        f"Expected exception message in error: {out['error']}"
 
 
 def test_cached_snapshot_is_flagged(captured):
+    """Test that cached responses are properly flagged."""
     captured["resp"] = _Resp(200, "Title: X\n\nWarning: This is a cached snapshot\n\nbody")
     out = json.loads(read_url(URL))
-    assert out["status"] == "ok"
-    assert out.get("cached") is True
+    assert out["status"] == "ok", f"Expected ok status, got: {out}"
+    assert out.get("cached") is True, f"Expected cached=True, got: {out.get('cached')}"
 
 
 def test_fresh_response_has_no_cached_key(captured):
+    """Test that fresh responses don't include the cached flag."""
     captured["resp"] = _Resp(200, "Title: X\n\nlive body content")
     out = json.loads(read_url(URL))
-    assert out["status"] == "ok"
-    assert "cached" not in out  # additive: absent on the normal path
+    assert out["status"] == "ok", f"Expected ok status, got: {out}"
+    assert "cached" not in out, f"Fresh response should not have cached key, got: {out}"
 
 
 def test_no_cache_header_opt_in_only(captured):

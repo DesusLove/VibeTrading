@@ -10,10 +10,9 @@ function Badge({ value, good }: { value: string; good: boolean | null }) {
   return (
     <span
       className={cn(
-        "inline-block px-2 py-0.5 rounded-full text-xs font-semibold",
-        good === true && "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-        good === false && "bg-red-500/15 text-red-600 dark:text-red-400",
-        good === null && "bg-zinc-500/10 text-zinc-500",
+        good === true && "v2-badge-success",
+        good === false && "v2-badge-danger",
+        good === null && "v2-badge-neutral",
       )}
     >
       {value}
@@ -24,9 +23,9 @@ function Badge({ value, good }: { value: string; good: boolean | null }) {
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="text-center py-2">
-      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</p>
+      <p className="text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-secondary))' }}>{label}</p>
       <p className="text-sm font-bold font-mono tabular-nums">{value}</p>
-      {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
+      {sub && <p className="text-[10px]" style={{ color: 'hsl(var(--text-secondary))' }}>{sub}</p>}
     </div>
   );
 }
@@ -36,7 +35,7 @@ function pctFmt(v: number): string {
 }
 
 function MonteCarloSection({ mc }: { mc: NonNullable<ValidationData["monte_carlo"]> }) {
-  if (mc.error) return <p className="text-sm text-muted-foreground">{mc.error}</p>;
+  if (mc.error) return <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{mc.error}</p>;
   const sig = mc.p_value_sharpe < 0.05;
   return (
     <div className="space-y-3">
@@ -44,10 +43,10 @@ function MonteCarloSection({ mc }: { mc: NonNullable<ValidationData["monte_carlo
         <h4 className="text-sm font-semibold">{i18n.t("validation.monteCarlo")}</h4>
         <Badge value={sig ? i18n.t("validation.significant") : i18n.t("validation.notSignificant")} good={sig} />
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         {i18n.t("validation.monteCarloDesc", { n: mc.n_simulations.toLocaleString() })}
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 rounded-xl border border-border/60 bg-muted/20 p-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 v2-card-depth-1 p-3">
         <Stat label={i18n.t("validation.actualSharpe")} value={mc.actual_sharpe.toFixed(2)} />
         <Stat label={i18n.t("validation.pValueSharpe")} value={mc.p_value_sharpe.toFixed(4)} sub={sig ? "< 0.05" : ">= 0.05"} />
         <Stat label={i18n.t("validation.simulatedMean")} value={mc.simulated_sharpe_mean.toFixed(2)} sub={`std ${mc.simulated_sharpe_std.toFixed(2)}`} />
@@ -55,7 +54,7 @@ function MonteCarloSection({ mc }: { mc: NonNullable<ValidationData["monte_carlo
       </div>
       {/* Visual: where actual falls in distribution */}
       <div className="space-y-1">
-        <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+        <div className="flex justify-between text-[10px] font-mono" style={{ color: 'hsl(var(--text-secondary))' }}>
           <span>P5: {mc.simulated_sharpe_p5.toFixed(2)}</span>
           <span>Actual: {mc.actual_sharpe.toFixed(2)}</span>
           <span>P95: {mc.simulated_sharpe_p95.toFixed(2)}</span>
@@ -70,7 +69,7 @@ function MonteCarloSection({ mc }: { mc: NonNullable<ValidationData["monte_carlo
 }
 
 function BootstrapSection({ bs }: { bs: NonNullable<ValidationData["bootstrap"]> }) {
-  if (bs.error) return <p className="text-sm text-muted-foreground">{bs.error}</p>;
+  if (bs.error) return <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{bs.error}</p>;
   const reliable = bs.ci_lower > 0;
   return (
     <div className="space-y-3">
@@ -78,10 +77,10 @@ function BootstrapSection({ bs }: { bs: NonNullable<ValidationData["bootstrap"]>
         <h4 className="text-sm font-semibold">{i18n.t("validation.bootstrap")}</h4>
         <Badge value={reliable ? i18n.t("validation.ciAbove0") : i18n.t("validation.ciIncludes0")} good={reliable} />
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         {i18n.t("validation.bootstrapDesc", { n: bs.n_bootstrap.toLocaleString(), pct: (bs.confidence * 100).toFixed(0) + "%" })}
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 rounded-xl border border-border/60 bg-muted/20 p-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 v2-card-depth-1 p-3">
         <Stat label={i18n.t("validation.observedSharpe")} value={bs.observed_sharpe.toFixed(2)} />
         <Stat label={i18n.t("validation.ci", { pct: (bs.confidence * 100).toFixed(0) + "%" })} value={`[${bs.ci_lower.toFixed(2)}, ${bs.ci_upper.toFixed(2)}]`} />
         <Stat label={i18n.t("validation.medianSharpe")} value={bs.median_sharpe.toFixed(2)} />
@@ -89,7 +88,7 @@ function BootstrapSection({ bs }: { bs: NonNullable<ValidationData["bootstrap"]>
       </div>
       {/* CI bar */}
       <div className="space-y-1">
-        <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+        <div className="flex justify-between text-[10px] font-mono" style={{ color: 'hsl(var(--text-secondary))' }}>
           <span>{bs.ci_lower.toFixed(2)}</span>
           <span>{bs.ci_upper.toFixed(2)}</span>
         </div>
@@ -103,7 +102,7 @@ function BootstrapSection({ bs }: { bs: NonNullable<ValidationData["bootstrap"]>
 }
 
 function WalkForwardSection({ wf }: { wf: NonNullable<ValidationData["walk_forward"]> }) {
-  if (wf.error) return <p className="text-sm text-muted-foreground">{wf.error}</p>;
+  if (wf.error) return <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{wf.error}</p>;
   const consistent = wf.consistency_rate >= 0.8;
   return (
     <div className="space-y-3">
@@ -111,19 +110,19 @@ function WalkForwardSection({ wf }: { wf: NonNullable<ValidationData["walk_forwa
         <h4 className="text-sm font-semibold">{i18n.t("validation.walkForward")}</h4>
         <Badge value={i18n.t("validation.profitable", { profitable: wf.profitable_windows, total: wf.n_windows })} good={consistent ? true : wf.consistency_rate >= 0.5 ? null : false} />
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         {i18n.t("validation.walkForwardDesc", { n: wf.n_windows })}
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 rounded-xl border border-border/60 bg-muted/20 p-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 v2-card-depth-1 p-3">
         <Stat label={i18n.t("validation.consistency")} value={pctFmt(wf.consistency_rate)} />
         <Stat label={i18n.t("validation.avgReturn")} value={pctFmt(wf.return_mean)} sub={`std ${pctFmt(wf.return_std)}`} />
         <Stat label={i18n.t("validation.avgSharpe")} value={wf.sharpe_mean.toFixed(2)} sub={`std ${wf.sharpe_std.toFixed(2)}`} />
         <Stat label={i18n.t("validation.windows")} value={String(wf.n_windows)} />
       </div>
       {/* Per-window table */}
-      <table className="w-full text-xs">
+      <table className="w-full text-xs table-premium">
         <thead>
-          <tr className="border-b text-left text-muted-foreground">
+          <tr className="border-b text-left" style={{ color: 'hsl(var(--text-secondary))' }}>
             <th className="py-1.5 pr-3">#</th>
             <th className="py-1.5 pr-3">{i18n.t("validation.period2")}</th>
             <th className="py-1.5 pr-3 text-right">{i18n.t("validation.return")}</th>
@@ -137,7 +136,7 @@ function WalkForwardSection({ wf }: { wf: NonNullable<ValidationData["walk_forwa
           {wf.windows.map((w) => (
             <tr key={w.window} className="border-b last:border-0">
               <td className="py-1.5 pr-3 font-mono">{w.window}</td>
-              <td className="py-1.5 pr-3 font-mono text-muted-foreground">{w.start} ~ {w.end}</td>
+              <td className="py-1.5 pr-3 font-mono" style={{ color: 'hsl(var(--text-secondary))' }}>{w.start} ~ {w.end}</td>
               <td className={cn("py-1.5 pr-3 text-right font-mono tabular-nums", w.return > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>{pctFmt(w.return)}</td>
               <td className="py-1.5 pr-3 text-right font-mono tabular-nums">{w.sharpe.toFixed(2)}</td>
               <td className="py-1.5 pr-3 text-right font-mono tabular-nums">{pctFmt(w.max_dd)}</td>
@@ -171,11 +170,11 @@ export function ValidationPanel({ data }: Props) {
   const hasWF = !!data.walk_forward;
 
   if (!hasMC && !hasBS && !hasWF) {
-    return <p className="p-8 text-sm text-muted-foreground">{i18n.t("validation.noData")}</p>;
+    return <p className="p-8 text-sm" style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("validation.noData")}</p>;
   }
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 space-y-6 animate-fade-in">
       {hasMC && <MonteCarloSection mc={data.monte_carlo!} />}
       {hasBS && <BootstrapSection bs={data.bootstrap!} />}
       {hasWF && <WalkForwardSection wf={data.walk_forward!} />}

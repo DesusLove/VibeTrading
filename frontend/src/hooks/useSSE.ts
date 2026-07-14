@@ -1,5 +1,5 @@
 /**
- * SSE Hook — auto-reconnect + exponential backoff + LRU dedup + Last-Event-ID resume.
+ * SSE Hook  auto-reconnect + exponential backoff + LRU dedup + Last-Event-ID resume.
  */
 
 import { useCallback, useRef } from "react";

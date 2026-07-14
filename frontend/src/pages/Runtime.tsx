@@ -83,18 +83,18 @@ export function Runtime() {
   const summary = useMemo(() => summarizeRuntime(status), [status]);
 
   return (
-    <div className="min-h-screen p-6 lg:p-8">
+    <div className="min-h-screen p-6 lg:p-8 animate-fade-in">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <section className="flex flex-col gap-4 border-b pb-6 lg:flex-row lg:items-end lg:justify-between">
+        <section className="page-header animate-slide-up">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground">
+            <div className="v2-badge-accent">
               <Activity className="h-3.5 w-3.5" />
               {t("runtime.monitorBadge")}
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{t("runtime.title")}</h1>
-              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                {t("runtime.subtitlePre")} <span className="font-mono">/live/status</span>
+              <h1 className="page-header-title">{t("runtime.title")}</h1>
+              <p className="page-header-desc">
+                {t("runtime.subtitlePre")} <span className="font-mono text-guru">/live/status</span>
                 {t("runtime.subtitlePost")}
               </p>
             </div>
@@ -103,7 +103,7 @@ export function Runtime() {
             type="button"
             onClick={() => loadStatus("refresh")}
             disabled={refreshing}
-            className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition hover:bg-muted disabled:opacity-50"
+            className="v2-btn-secondary"
           >
             {refreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             {t("runtime.refresh")}
@@ -111,58 +111,61 @@ export function Runtime() {
         </section>
 
         {loading ? (
-          <div className="grid gap-3 md:grid-cols-4">
+          <div className="tile-grid-4">
             {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="h-24 animate-pulse rounded-md border bg-muted/40" />
+              <div key={item} className="h-24 skeleton-pulse animate-fade-in" style={{ animationDelay: `${item * 0.06}s` }} />
             ))}
           </div>
         ) : null}
 
         {!loading && error ? (
-          <section className="rounded-md border border-amber-500/30 bg-amber-500/5 p-5">
-            <div className="flex items-center gap-2 font-medium text-amber-700 dark:text-amber-300">
+          <section className="error-state animate-fade-in">
+            <div className="error-state-header">
               <AlertTriangle className="h-5 w-5" />
               {t("runtime.unavailableTitle")}
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-            <p className="mt-2 text-xs text-muted-foreground">{t("runtime.unavailableHint")}</p>
+            <p className="mt-2 text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{error}</p>
+            <p className="mt-2 text-xs" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("runtime.unavailableHint")}</p>
           </section>
         ) : null}
 
         {!loading && !error && status ? (
           <>
-            <section className="grid gap-3 md:grid-cols-4">
+            <section className="tile-grid-4">
               <SummaryTile
                 label={t("runtime.globalHalt")}
                 value={status.global_halted ? t("runtime.halted") : t("runtime.clear")}
                 tone={status.global_halted ? "danger" : "success"}
                 icon={status.global_halted ? OctagonX : CheckCircle2}
+                delay={0.1}
               />
-              <SummaryTile label={t("runtime.brokers")} value={String(summary.brokerCount)} tone="neutral" icon={Activity} />
+              <SummaryTile label={t("runtime.brokers")} value={String(summary.brokerCount)} tone="neutral" icon={Activity} delay={0.14} />
               <SummaryTile
                 label={t("runtime.authorized")}
                 value={String(summary.authorizedCount)}
                 tone={summary.authorizedCount > 0 ? "success" : "neutral"}
                 icon={summary.authorizedCount > 0 ? Wifi : WifiOff}
+                delay={0.18}
               />
               <SummaryTile
                 label={t("runtime.runners")}
                 value={t("runtime.running", { count: summary.runningCount })}
                 tone={summary.runningCount > 0 && !status.global_halted ? "success" : "neutral"}
                 icon={summary.runningCount > 0 ? Activity : Clock3}
+                delay={0.22}
               />
             </section>
 
             {status.brokers.length === 0 ? (
-              <section className="rounded-md border border-dashed p-8 text-center">
-                <ShieldOff className="mx-auto h-8 w-8 text-muted-foreground" />
-                <h2 className="mt-3 font-medium">{t("runtime.noProfilesTitle")}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{t("runtime.noProfilesBody")}</p>
+              <section className="empty-state animate-fade-in" style={{ animationDelay: "0.25s" }}>
+                <ShieldOff className="empty-state-icon" />
+                <h2 className="empty-state-title">{t("runtime.noProfilesTitle")}</h2>
+                <p className="empty-state-body">{t("runtime.noProfilesBody")}</p>
               </section>
             ) : (
               <section className="grid gap-4">
-                {status.brokers.map((broker) => (
-                  <BrokerRuntimeCard key={broker.auth.broker} broker={broker} globalHalted={status.global_halted} t={t} nowMs={nowMs} />
+                {status.brokers.map((broker, idx) => (
+                  <BrokerRuntimeCard key={broker.auth.broker} broker={broker} globalHalted={status.global_halted} t={t} nowMs={nowMs} delay={0.1 + idx * 0.05} />
                 ))}
               </section>
             )}
@@ -178,6 +181,7 @@ interface SummaryTileProps {
   value: string;
   tone: "success" | "danger" | "neutral";
   icon: typeof Activity;
+  delay?: number;
 }
 
 function isCurrentStatusRequest(
@@ -188,25 +192,25 @@ function isCurrentStatusRequest(
   return activeRequest?.id === requestId && activeRequest.controller === controller;
 }
 
-function SummaryTile({ label, value, tone, icon: Icon }: SummaryTileProps) {
+function SummaryTile({ label, value, tone, icon: Icon, delay = 0 }: SummaryTileProps) {
   return (
-    <div className="rounded-md border p-4">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-medium uppercase text-muted-foreground">{label}</span>
+    <div className="stat-premium animate-slide-up" style={{ animationDelay: `${delay}s` }}>
+      <div className="stat-premium-header">
+        <span className="stat-premium-label">{label}</span>
         <Icon
           className={cn(
-            "h-4 w-4",
-            tone === "success" && "text-success",
-            tone === "danger" && "text-danger",
-            tone === "neutral" && "text-muted-foreground",
+            "stat-premium-icon",
+            tone === "success" && "text-positive",
+            tone === "danger" && "text-negative",
+            tone === "neutral" && "text-tertiary",
           )}
         />
       </div>
       <div
         className={cn(
-          "mt-3 text-2xl font-semibold",
-          tone === "success" && "text-success",
-          tone === "danger" && "text-danger",
+          "stat-premium-value",
+          tone === "success" && "text-positive",
+          tone === "danger" && "text-negative",
         )}
       >
         {value}
@@ -220,11 +224,13 @@ function BrokerRuntimeCard({
   globalHalted,
   t,
   nowMs,
+  delay = 0,
 }: {
   broker: LiveBrokerStatus;
   globalHalted: boolean;
   t: TFunction;
   nowMs: number;
+  delay?: number;
 }) {
   const brokerKey = broker.auth.broker;
   const runnerAlive = broker.runner?.alive ?? false;
@@ -234,9 +240,9 @@ function BrokerRuntimeCard({
   const mandateCountdown = formatCountdown(mandate?.expires_at, t, nowMs);
 
   return (
-    <article className="rounded-md border p-4">
+    <article className="v2-card-depth-2 p-5 animate-slide-up" style={{ animationDelay: `${delay}s` }}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+        <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-semibold capitalize">{brokerKey}</h2>
             <StatusPill
@@ -249,7 +255,7 @@ function BrokerRuntimeCard({
             />
             {halted ? <StatusPill label={t("runtime.haltedPill")} tone="danger" /> : null}
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
             {broker.auth.is_live_broker ? t("runtime.recognizedProfile") : t("runtime.unknownProfile")} · {t("runtime.lastTick")}{" "}
             {formatLastTick(broker.runner?.last_tick, broker.runner?.last_tick_age_seconds, t, nowMs)}
           </p>
@@ -271,12 +277,12 @@ function BrokerRuntimeCard({
               <KeyValue label={t("runtime.limits")} value={summarizeLimits(mandate.limits, t)} />
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">{t("runtime.noMandate")}</p>
+            <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{t("runtime.noMandate")}</p>
           )}
         </RuntimePanel>
 
         <RuntimePanel title={t("runtime.riskStateTitle")} icon={risk.icon}>
-          <p className="text-sm text-muted-foreground">{risk.description}</p>
+          <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{risk.description}</p>
         </RuntimePanel>
       </div>
     </article>
@@ -285,8 +291,8 @@ function BrokerRuntimeCard({
 
 function RuntimePanel({ title, icon: Icon, children }: { title: string; icon: typeof Activity; children: ReactNode }) {
   return (
-    <section className="rounded-md border bg-muted/20 p-3">
-      <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
+    <section className="rounded-md p-4 v2-card-depth-1">
+      <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'hsl(var(--text-tertiary))' }}>
         <Icon className="h-3.5 w-3.5" />
         {title}
       </div>
@@ -298,8 +304,8 @@ function RuntimePanel({ title, icon: Icon, children }: { title: string; icon: ty
 function KeyValue({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase text-muted-foreground">{label}</div>
-      <div className="font-mono text-sm">{value || "-"}</div>
+      <div className="text-[10px] uppercase tracking-wider" style={{ color: 'hsl(var(--text-tertiary))' }}>{label}</div>
+      <div className="font-mono text-sm text-text-primary">{value || "-"}</div>
     </div>
   );
 }
@@ -308,11 +314,10 @@ function StatusPill({ label, tone }: { label: string; tone: "success" | "danger"
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded px-2 py-0.5 text-xs font-medium",
-        tone === "success" && "bg-success/10 text-success",
-        tone === "danger" && "bg-danger/10 text-danger",
-        tone === "warning" && "bg-amber-500/10 text-amber-700 dark:text-amber-300",
-        tone === "neutral" && "bg-muted text-muted-foreground",
+        tone === "success" && "v2-badge-success",
+        tone === "danger" && "v2-badge-danger",
+        tone === "warning" && "v2-badge-warning",
+        tone === "neutral" && "v2-badge-neutral",
       )}
     >
       {label}

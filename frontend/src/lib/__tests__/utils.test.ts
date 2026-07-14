@@ -5,7 +5,7 @@ describe("cn", () => {
     expect(cn("px-2", "py-1")).toBe("px-2 py-1");
   });
 
-  it("deduplicates tailwind conflicts — last wins", () => {
+  it("deduplicates tailwind conflicts  last wins", () => {
     expect(cn("px-2", "px-4")).toBe("px-4");
   });
 

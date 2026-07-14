@@ -68,7 +68,7 @@ export interface ToolCallEntry {
   /** Live elapsed seconds while the tool is running (heartbeat). */
   elapsed_s?: number;
   /**
-   * Structured progress emitted from the tool. All fields optional —
+   * Structured progress emitted from the tool. All fields optional 
    * presence of `current`/`total > 0` indicates a determinate progress signal.
    */
   progress?: {

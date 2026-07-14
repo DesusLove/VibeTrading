@@ -58,7 +58,7 @@ afterEach(() => {
 
 // ── Tests ─────────────────────────────────────────────────
 
-describe("useSSE — connect/disconnect", () => {
+describe("useSSE  connect/disconnect", () => {
   it("creates an EventSource on connect", () => {
     const { result } = renderHook(() => useSSE());
     act(() => result.current.connect("http://test/events", {}));
@@ -106,7 +106,7 @@ describe("useSSE — connect/disconnect", () => {
   });
 });
 
-describe("useSSE — event handling", () => {
+describe("useSSE  event handling", () => {
   it("dispatches typed events to handlers", () => {
     const textDeltas: unknown[] = [];
     const { result } = renderHook(() => useSSE());
@@ -193,7 +193,7 @@ describe("useSSE — event handling", () => {
   });
 });
 
-describe("useSSE — deduplication", () => {
+describe("useSSE  deduplication", () => {
   it("deduplicates events by lastEventId", () => {
     const messages: unknown[] = [];
     const { result } = renderHook(() => useSSE({ dedupeCapacity: 10 }));
@@ -240,7 +240,7 @@ describe("useSSE — deduplication", () => {
   });
 });
 
-describe("useSSE — exponential backoff", () => {
+describe("useSSE  exponential backoff", () => {
   it("schedules reconnect with exponential delay on error", () => {
     const reconnects: unknown[] = [];
     const { result } = renderHook(() =>
@@ -288,7 +288,7 @@ describe("useSSE — exponential backoff", () => {
   });
 });
 
-describe("useSSE — Last-Event-ID resume", () => {
+describe("useSSE  Last-Event-ID resume", () => {
   it("appends Last-Event-ID to reconnect URL", () => {
     const { result } = renderHook(() => useSSE());
 

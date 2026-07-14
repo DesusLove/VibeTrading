@@ -79,7 +79,7 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
           {msg.runId && (
             <Link
               to={`/runs/${msg.runId}`}
-              className="text-sm text-primary hover:underline inline-flex items-center gap-1.5 font-medium"
+              className="text-sm inline-flex items-center gap-1.5 font-medium text-guru hover:underline"
             >
               <BarChart3 className="h-3.5 w-3.5" />
               {t("runComplete.fullReport")}
@@ -89,7 +89,8 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
             <button
               onClick={handlePineClick}
               disabled={pineLoading}
-              className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1.5 font-medium disabled:opacity-50"
+              className="text-sm inline-flex items-center gap-1.5 font-medium disabled:opacity-50"
+              style={{ color: 'hsl(var(--positive))' }}
             >
               {pineLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Code2 className="h-3.5 w-3.5" />}
               Pine Script
@@ -100,7 +101,8 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
               href={`/shadow-reports/${encodeURIComponent(msg.shadowId)}?format=html`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-teal-600 dark:text-teal-400 hover:underline inline-flex items-center gap-1.5 font-medium"
+              className="text-sm inline-flex items-center gap-1.5 font-medium"
+              style={{ color: 'hsl(var(--info))' }}
             >
               <FileText className="h-3.5 w-3.5" />
               Shadow Report

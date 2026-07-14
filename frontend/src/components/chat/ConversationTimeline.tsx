@@ -56,10 +56,11 @@ export const ConversationTimeline = memo(function ConversationTimeline({ message
           className={cn(
             "rounded-full transition-all shrink-0",
             idx === activeIdx
-              ? "w-3 h-3 bg-primary shadow-sm shadow-primary/30"
-              : "w-2 h-2 bg-muted-foreground/25 hover:bg-muted-foreground/50"
-          )}
-          title={messages[idx].content.slice(0, 40)}
+              ? "w-3 h-3 bg-guru shadow-sm shadow-guru/30"
+              : "w-2 h-2 hover:bg-text-secondary/50"
+            )}
+            style={{ background: idx !== activeIdx ? 'hsl(var(--text-tertiary) / 0.25)' : undefined }}
+            title={messages[idx].content.slice(0, 40)}
         />
       ))}
     </div>

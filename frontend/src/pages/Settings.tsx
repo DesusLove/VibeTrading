@@ -18,9 +18,9 @@ interface LLMFormState {
 }
 
 const fieldClass =
-  "w-full rounded-md border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60";
-const labelClass = "text-sm font-medium";
-const hintClass = "text-xs text-muted-foreground";
+  "w-full filter-input disabled:opacity-50";
+const labelClass = "text-[10px] uppercase tracking-[0.12em] font-semibold";
+const hintClass = "text-xs";
 
 function toForm(settings: LLMSettings): LLMFormState {
   return {
@@ -206,13 +206,13 @@ export function Settings() {
   };
 
   const localApiAccessSection = (
-    <form onSubmit={submitLocalApiKey} className="rounded-lg border bg-card p-5 shadow-sm">
+    <form onSubmit={submitLocalApiKey} className="v2-card-depth-1 p-5 space-y-4 animate-fade-in d1">
       <div className="mb-4 space-y-1">
         <div className="flex items-center gap-2">
           <KeyRound className="h-4 w-4 text-primary" />
           <h2 className="text-base font-semibold">{"Local API access"}</h2>
         </div>
-        <p className="text-sm text-muted-foreground">{"For remote or private Web UI deployments, enter the server API key once in this browser. Localhost use can stay blank."}</p>
+        <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{"For remote or private Web UI deployments, enter the server API key once in this browser. Localhost use can stay blank."}</p>
       </div>
       <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
         <label className="grid gap-2">
@@ -228,13 +228,13 @@ export function Settings() {
         </label>
         <button
           type="submit"
-          className="inline-flex items-center justify-center gap-2 self-end rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          className="v2-btn-primary self-end"
         >
           <Save className="h-4 w-4" />
           {i18n.t("settings.save")}
         </button>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">{"Stored only in this browser. Leave blank to clear it."}</p>
+      <p className="mt-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{"Stored only in this browser. Leave blank to clear it."}</p>
     </form>
   );
 
@@ -243,20 +243,20 @@ export function Settings() {
       <div className="mx-auto max-w-5xl space-y-6 p-6">
         <section className="flex flex-col gap-4 border-b pb-6">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground">
+            <div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium" style={{ color: 'hsl(var(--text-secondary))' }}>
               <Settings2 className="h-3.5 w-3.5" />
               {"Settings"}
             </div>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">{"Settings"}</h1>
-              <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{"Configure model credentials and market data source tokens for this local project."}</p>
+              <p className="mt-2 max-w-3xl text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{"Configure model credentials and market data source tokens for this local project."}</p>
             </div>
           </div>
         </section>
         {localApiAccessSection}
         {/* QVERIS-INTEGRATION */}
         <QVerisSettings />
-        <div className="flex min-h-32 items-center justify-center rounded-lg border bg-card p-5 text-sm text-muted-foreground">
+        <div className="flex min-h-32 items-center justify-center rounded-lg border bg-card p-5 text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
           {settingsLoadError ? (
             <div className="text-center">
               <div className="font-medium text-foreground">{"Settings are unavailable"}</div>
@@ -293,21 +293,21 @@ export function Settings() {
   const channelBusy = channelRefreshing || channelAction !== null;
 
   const channelsSection = (
-    <section className="rounded-lg border bg-card p-5 shadow-sm">
+    <section className="v2-card-depth-1 p-5 space-y-4 animate-fade-in d2">
       <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <MessageSquareMore className="h-4 w-4 text-primary" />
             <h2 className="text-base font-semibold">{t("settings.channels.title")}</h2>
           </div>
-          <p className="max-w-3xl text-sm text-muted-foreground">{t("settings.channels.description")}</p>
+          <p className="max-w-3xl text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{t("settings.channels.description")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={refreshChannelStatus}
             disabled={channelBusy}
-            className="inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            className="v2-btn-secondary"
           >
             {channelRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             {t("settings.channels.refresh")}
@@ -316,7 +316,7 @@ export function Settings() {
             type="button"
             onClick={() => setChannelsRunning("start")}
             disabled={channelBusy || !channelStatus}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="v2-btn-primary"
           >
             {channelAction === "start" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             {t("settings.channels.start")}
@@ -325,7 +325,7 @@ export function Settings() {
             type="button"
             onClick={() => setChannelsRunning("stop")}
             disabled={channelBusy || !channelStatus}
-            className="inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            className="v2-btn-secondary"
           >
             {channelAction === "stop" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Square className="h-4 w-4" />}
             {t("settings.channels.stop")}
@@ -337,26 +337,26 @@ export function Settings() {
         <>
           <div className="mb-4 grid gap-3 md:grid-cols-4">
             <div className="rounded-md border bg-muted/20 px-3 py-2">
-              <div className="text-xs text-muted-foreground">{t("settings.channels.runtime")}</div>
+              <div className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{t("settings.channels.runtime")}</div>
               <div className="text-sm font-medium">{channelStatus.running ? t("settings.channels.running") : t("settings.channels.stopped")}</div>
             </div>
             <div className="rounded-md border bg-muted/20 px-3 py-2">
-              <div className="text-xs text-muted-foreground">{t("settings.channels.enabled")}</div>
+              <div className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{t("settings.channels.enabled")}</div>
               <div className="text-sm font-medium">{channelEnabledCount}</div>
             </div>
             <div className="rounded-md border bg-muted/20 px-3 py-2">
-              <div className="text-xs text-muted-foreground">{t("settings.channels.loaded")}</div>
+              <div className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{t("settings.channels.loaded")}</div>
               <div className="text-sm font-medium">{channelLoadedCount}</div>
             </div>
             <div className="rounded-md border bg-muted/20 px-3 py-2">
-              <div className="text-xs text-muted-foreground">{t("settings.channels.unavailable")}</div>
+              <div className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{t("settings.channels.unavailable")}</div>
               <div className="text-sm font-medium">{channelUnavailableCount}</div>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-md border">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-xs text-muted-foreground">
+            <table className="w-full text-sm table-premium">
+              <thead className="bg-muted/40 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">{t("settings.channels.channel")}</th>
                   <th className="px-3 py-2 text-left font-medium">{t("settings.channels.state")}</th>
@@ -368,22 +368,22 @@ export function Settings() {
                   <tr key={name} className="border-t">
                     <td className="px-3 py-2 align-top">
                       <div className="font-medium">{item.display_name || name}</div>
-                      <div className="text-xs text-muted-foreground">{name}</div>
+                      <div className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{name}</div>
                     </td>
                     <td className="px-3 py-2 align-top">
                       <div className="flex flex-wrap gap-1.5">
-                        <span className={`rounded-full px-2 py-0.5 text-xs ${item.enabled ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-xs ${item.enabled ? "v2-badge-success" : "v2-badge-neutral"}`}>
                           {item.enabled ? t("settings.channels.enabled") : t("settings.channels.disabled")}
                         </span>
-                        <span className={`rounded-full px-2 py-0.5 text-xs ${item.loaded ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-xs ${item.loaded ? "v2-badge-success" : "v2-badge-neutral"}`}>
                           {item.loaded ? t("settings.channels.loaded") : t("settings.channels.notLoaded")}
                         </span>
-                        <span className={`rounded-full px-2 py-0.5 text-xs ${item.running ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-xs ${item.running ? "v2-badge-success" : "v2-badge-neutral"}`}>
                           {item.running ? t("settings.channels.running") : t("settings.channels.stopped")}
                         </span>
                       </div>
                     </td>
-                    <td className="max-w-md px-3 py-2 align-top text-xs text-muted-foreground">
+                    <td className="max-w-md px-3 py-2 align-top text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
                       {item.install_hint || item.error || t("settings.channels.noRecovery")}
                     </td>
                   </tr>
@@ -393,7 +393,7 @@ export function Settings() {
           </div>
         </>
       ) : (
-        <div className="rounded-md border bg-muted/20 px-4 py-6 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border bg-muted/20 px-4 py-6 text-center text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
           {t("settings.channels.refreshFailed")}
         </div>
       )}
@@ -401,16 +401,16 @@ export function Settings() {
   );
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-6">
-      <section className="flex flex-col gap-4 border-b pb-6 lg:flex-row lg:items-end lg:justify-between">
+    <div className="mx-auto max-w-5xl space-y-8 p-6 lg:p-8 animate-fade-in">
+      <section className="page-header animate-slide-up">
         <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground">
+          <div className="v2-badge-accent">
             <Settings2 className="h-3.5 w-3.5" />
             {"Settings"}
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{"Settings"}</h1>
-            <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{"Configure model credentials and market data source tokens for this local project."}</p>
+            <h1 className="page-header-title">{"Settings"}</h1>
+            <p className="page-header-desc">{"Configure model credentials and market data source tokens for this local project."}</p>
           </div>
         </div>
       </section>
@@ -422,13 +422,13 @@ export function Settings() {
 
       {channelsSection}
 
-      <div className="space-y-2">
+      <div className="space-y-2 animate-fade-in d3">
         <h2 className="text-lg font-semibold tracking-tight">{"LLM Settings"}</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">{"Choose the model used by the agent and save it to the project-local agent/.env file."}</p>
+        <p className="max-w-3xl text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{"Choose the model used by the agent and save it to the project-local agent/.env file."}</p>
       </div>
 
-      <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
-        <section className="rounded-lg border bg-card p-5 shadow-sm">
+      <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)] animate-fade-in d4">
+        <section className="v2-card-depth-1 p-5 space-y-4">
           <div className="mb-5 flex items-center gap-2">
             <Server className="h-4 w-4 text-primary" />
             <h2 className="text-base font-semibold">{"Connection"}</h2>
@@ -446,7 +446,7 @@ export function Settings() {
                   <option key={provider.name} value={provider.name}>{provider.label}</option>
                 ))}
               </select>
-              <span className={hintClass}>{"Changing providers updates the recommended model and endpoint."}</span>
+              <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{"Changing providers updates the recommended model and endpoint."}</span>
             </label>
 
             <label className="grid gap-2">
@@ -461,14 +461,14 @@ export function Settings() {
                 <button
                   type="button"
                   onClick={() => applyProviderDefaults()}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  className="v2-btn-secondary shrink-0"
                   title={"Use provider defaults"}
                 >
                   <RotateCcw className="h-4 w-4" />
                   <span className="hidden sm:inline">{"Use provider defaults"}</span>
                 </button>
               </div>
-              <span className={hintClass}>{"Use the exact model id required by your provider."}</span>
+              <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{"Use the exact model id required by your provider."}</span>
             </label>
 
             <label className="grid gap-2">
@@ -487,7 +487,7 @@ export function Settings() {
                 {selectedProvider?.auth_type === "oauth" ? "OAuth" : "API key"}
               </span>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4" style={{ color: 'hsl(var(--text-secondary))' }} />
                 <input
                   type="password"
                   value={apiKey}
@@ -499,9 +499,9 @@ export function Settings() {
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className={hintClass}>{keyStatus}</span>
+                <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{keyStatus}</span>
                 {selectedProvider?.api_key_required ? (
-                  <label className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                  <label className="flex shrink-0 items-center gap-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
                     <input
                       type="checkbox"
                       checked={clearApiKey}
@@ -519,7 +519,7 @@ export function Settings() {
           </div>
         </section>
 
-        <section className="rounded-lg border bg-card p-5 shadow-sm">
+        <section className="v2-card-depth-1 p-5 space-y-4">
           <div className="mb-5 flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-primary" />
             <h2 className="text-base font-semibold">{"Generation"}</h2>
@@ -578,10 +578,10 @@ export function Settings() {
                 <option value="high">high</option>
                 <option value="max">max</option>
               </select>
-              <span className={hintClass}>{"How hard the model thinks before answering. Higher is more thorough but slower; leave Off for fastest replies."}</span>
+              <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{"How hard the model thinks before answering. Higher is more thorough but slower; leave Off for fastest replies."}</span>
             </label>
 
-            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
               <span className="font-medium text-foreground">{i18n.t("settings.saved")}: </span>
               <span className="break-all font-mono">{settings.env_path}</span>
             </div>
@@ -589,7 +589,7 @@ export function Settings() {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+              className="v2-btn-primary"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {saving ? i18n.t("settings.saving") : i18n.t("settings.save")}
@@ -598,13 +598,13 @@ export function Settings() {
         </section>
       </form>
 
-      <form onSubmit={submitDataSources} className="rounded-lg border bg-card p-5 shadow-sm">
+      <form onSubmit={submitDataSources} className="v2-card-depth-1 p-5 space-y-4 animate-fade-in d5">
         <div className="mb-5 space-y-1">
           <div className="flex items-center gap-2">
             <Database className="h-4 w-4 text-primary" />
             <h2 className="text-base font-semibold">{"Data Source Settings"}</h2>
           </div>
-          <p className="text-sm text-muted-foreground">{"Configure optional market data credentials used by backtests and research agents."}</p>
+          <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{"Configure optional market data credentials used by backtests and research agents."}</p>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)]">
@@ -612,7 +612,7 @@ export function Settings() {
             <label className="grid gap-2">
               <span className={labelClass}>{"Tushare token"}</span>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4" style={{ color: 'hsl(var(--text-secondary))' }} />
                 <input
                   type="password"
                   value={tushareToken}
@@ -624,8 +624,8 @@ export function Settings() {
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className={hintClass}>{"Used for China A-share, futures, fund, and macro data. If unset, the project falls back to AKShare where available."}</span>
-                <label className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{"Used for China A-share, futures, fund, and macro data. If unset, the project falls back to AKShare where available."}</span>
+                <label className="flex shrink-0 items-center gap-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
                   <input
                     type="checkbox"
                     checked={clearTushareToken}
@@ -640,7 +640,7 @@ export function Settings() {
               </div>
             </label>
 
-            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
               <span className="font-medium text-foreground">{i18n.t("settings.saved")}: </span>
               <span className="break-all font-mono">{dataSettings.env_path}</span>
             </div>
@@ -648,7 +648,7 @@ export function Settings() {
             <button
               type="submit"
               disabled={dataSaving}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+              className="v2-btn-primary"
             >
               {dataSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {dataSaving ? i18n.t("settings.saving") : "Save data source settings"}
@@ -657,12 +657,12 @@ export function Settings() {
 
           <div className="rounded-md border bg-muted/20 p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <span className="text-sm font-medium">{"BaoStock"}</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs ${dataSettings.baostock_supported ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+              <span className="stat-label">{"BaoStock"}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs ${dataSettings.baostock_supported ? "v2-badge-success" : "v2-badge-warning"}`}>
                 {dataSettings.baostock_supported ? "Loader available" : "No project loader"}
               </span>
             </div>
-            <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="space-y-2 text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
               <p>{dataSettings.baostock_message}</p>
               <p>
                 {dataSettings.baostock_installed

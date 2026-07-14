@@ -263,35 +263,33 @@ export function Compare() {
   const hasData = Boolean(leftData || rightData);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-8 lg:py-8">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-8 lg:py-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-slide-up">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="badge-primary">
-              <GitCompare className="h-3 w-3" />
-              {t("compare.compare")}
-            </span>
+          <div className="v2-badge-accent w-fit">
+            <GitCompare className="h-3.5 w-3.5" />
+            {t("compare.compare")}
           </div>
-          <h1 className="text-xl font-bold tracking-tight">{t("compare.title")}</h1>
-          <p className="text-sm text-muted-foreground/70">{t("compare.subtitle")}</p>
+          <h1 className="page-header-title">{t("compare.title")}</h1>
+          <p className="page-header-desc">{t("compare.subtitle")}</p>
         </div>
       </div>
 
       {/* Selectors */}
-      <div className="glass-card p-5">
+      <div className="premium-card p-5 animate-slide-up" style={{ animationDelay: "0.05s" }}>
         <div className="grid gap-4 lg:grid-cols-[1fr_auto_1fr] items-end">
           <div className="space-y-1.5">
-            <span className="metric-label">{t("compare.baseline")}</span>
-            <select value={leftId} onChange={(e) => setLeftId(e.target.value)} className="input-field w-full" title={leftRun?.prompt || leftId}>
+            <span className="text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("compare.baseline")}</span>
+            <select value={leftId} onChange={(e) => setLeftId(e.target.value)} className="filter-select w-full" title={leftRun?.prompt || leftId}>
               <option value="">{t("compare.select")}</option>
               {runs.map((r) => <option key={r.run_id} value={r.run_id}>{runLabel(r)} ({r.status})</option>)}
             </select>
           </div>
-          <ArrowRight className="hidden lg:block h-5 w-5 text-muted-foreground mb-2 justify-self-center shrink-0" />
+          <ArrowRight className="hidden lg:block h-5 w-5 mb-2 justify-self-center shrink-0" style={{ color: 'hsl(var(--text-tertiary))' }} />
           <div className="space-y-1.5">
-            <span className="metric-label">{t("compare.compare")}</span>
-            <select value={rightId} onChange={(e) => setRightId(e.target.value)} className="input-field w-full" title={rightRun?.prompt || rightId}>
+            <span className="text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("compare.compare")}</span>
+            <select value={rightId} onChange={(e) => setRightId(e.target.value)} className="filter-select w-full" title={rightRun?.prompt || rightId}>
               <option value="">{t("compare.select")}</option>
               {runs.map((r) => <option key={r.run_id} value={r.run_id}>{runLabel(r)} ({r.status})</option>)}
             </select>
@@ -299,14 +297,14 @@ export function Compare() {
         </div>
       </div>
 
-      {/* Loading state — show skeletons while a selected run's data is in flight */}
+      {/* Loading state  show skeletons while a selected run's data is in flight */}
       {loading && !hasData && (
-        <div className="space-y-6">
-          <div className="glass-card p-5">
-            <span className="metric-label block mb-3">{t("compare.equityDrawdown")}</span>
+        <div className="space-y-6 animate-fade-in">
+          <div className="premium-card p-5">
+            <span className="text-[10px] uppercase tracking-[0.12em] font-semibold block mb-3" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("compare.equityDrawdown")}</span>
             <SkeletonChart height={320} />
           </div>
-          <div className="glass-card overflow-hidden">
+          <div className="premium-card overflow-hidden">
             <SkeletonMetrics />
           </div>
         </div>
@@ -314,8 +312,8 @@ export function Compare() {
 
       {/* Equity curve overlay */}
       {(leftCurve.length > 0 || rightCurve.length > 0) && (
-        <div className="glass-card p-5">
-          <span className="metric-label block mb-3">{t("compare.equityDrawdown")}</span>
+        <div className="premium-card p-5 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <span className="text-[10px] uppercase tracking-[0.12em] font-semibold block mb-3" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("compare.equityDrawdown")}</span>
           <EquityChartOverlay
             leftCurve={leftCurve}
             rightCurve={rightCurve}
@@ -327,14 +325,14 @@ export function Compare() {
 
       {/* Metrics table */}
       {(leftData || rightData) && (
-        <div className="glass-card overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="overflow-hidden rounded-xl animate-fade-in" style={{ animationDelay: "0.15s" }}>
+          <table className="table-premium">
             <thead>
-              <tr className="border-b border-border/60 bg-muted/30">
-                <th className="text-left px-4 py-2.5 text-muted-foreground/70 font-medium text-[11px] uppercase tracking-wider">{t("compare.metric")}</th>
-                <th className="text-right px-4 py-2.5 text-muted-foreground/70 font-medium text-[11px] uppercase tracking-wider">{t("compare.baselineCol")}</th>
-                <th className="text-right px-4 py-2.5 text-muted-foreground/70 font-medium text-[11px] uppercase tracking-wider">{t("compare.compareCol")}</th>
-                <th className="text-right px-4 py-2.5 text-muted-foreground/70 font-medium text-[11px] uppercase tracking-wider">{t("compare.delta")}</th>
+              <tr>
+                <th>{t("compare.metric")}</th>
+                <th className="text-right">{t("compare.baselineCol")}</th>
+                <th className="text-right">{t("compare.compareCol")}</th>
+                <th className="text-right">{t("compare.delta")}</th>
               </tr>
             </thead>
             <tbody>
@@ -342,11 +340,11 @@ export function Compare() {
                 const lv = resolveMetric(leftData, key);
                 const rv = resolveMetric(rightData, key);
                 return (
-                  <tr key={key} className="border-b border-border/40 last:border-0 hover:bg-muted/20 transition-colors">
+                  <tr key={key}>
                     <td className="px-4 py-2.5 text-xs font-medium">{label}</td>
-                    <td className="px-4 py-2.5 text-right num-sm">{fmt(lv, type)}</td>
-                    <td className="px-4 py-2.5 text-right num-sm">{fmt(rv, type)}</td>
-                    <td className={cn("px-4 py-2.5 text-right num-sm font-semibold", diffClass(lv, rv, higherIsBetter))}>{diffStr(lv, rv, type)}</td>
+                    <td className="px-4 py-2.5 text-right font-mono text-sm tabular-nums">{fmt(lv, type)}</td>
+                    <td className="px-4 py-2.5 text-right font-mono text-sm tabular-nums">{fmt(rv, type)}</td>
+                    <td className={cn("px-4 py-2.5 text-right font-mono text-sm tabular-nums font-semibold", diffClass(lv, rv, higherIsBetter))}>{diffStr(lv, rv, type)}</td>
                   </tr>
                 );
               })}
@@ -356,9 +354,9 @@ export function Compare() {
       )}
 
       {!hasData && !loading && (
-        <div className="glass-card flex flex-col items-center py-16 text-muted-foreground">
-          <GitCompare className="h-12 w-12 mb-3 opacity-20" />
-          <p className="text-sm">{t("compare.selectTwoRuns")}</p>
+        <div className="empty-state animate-scale-in">
+          <GitCompare className="empty-state-icon" />
+          <h2 className="empty-state-title">{t("compare.selectTwoRuns")}</h2>
         </div>
       )}
     </div>

@@ -159,9 +159,9 @@
       "macroResearch": "Web リサーチ: マクロ見通し",
       "macroResearchDesc": "マクロ分析のために最新の Web ソースを読む",
       "analyzeBrokerExport": "ブローカー出力を分析",
-      "analyzeBrokerExportDesc": "同花顺/东财/富途/汎用 CSV を解析 — 保有日数、勝率、損益比、時間別分布",
+      "analyzeBrokerExportDesc": "同花顺/东财/富途/汎用 CSV を解析  保有日数、勝率、損益比、時間別分布",
       "diagnoseBehavior": "行動バイアスを診断",
-      "diagnoseBehaviorDesc": "処分効果、過剰取引、モメンタム追従、アンカリング — 重大度と数値エビデンス",
+      "diagnoseBehaviorDesc": "処分効果、過剰取引、モメンタム追従、アンカリング  重大度と数値エビデンス",
       "checkConnector": "選択中のコネクタを確認",
       "checkConnectorDesc": "コネクタプロファイルを表示し、選択中のものを検証",
       "analyzePortfolio": "コネクタポートフォリオを分析",
@@ -173,7 +173,7 @@
       "shadowDelta": "取り残している利益はいくら?",
       "shadowDeltaDesc": "シャドウ戦略をバックテストし、実際損益との差分を要因分解",
       "shadowReport": "シャドウレポートを生成",
-      "shadowReportDesc": "8 セクションの HTML/PDF — エクイティカーブ、市場別 Sharpe、要因分解ウォーターフォール",
+      "shadowReportDesc": "8 セクションの HTML/PDF  エクイティカーブ、市場別 Sharpe、要因分解ウォーターフォール",
       "crossMarketPortfolioPrompt": "000001.SZ、600519.SH、000858.SZ でリスクパリティポートフォリオを構築し、2024年通年でバックテスト、等ウェイトベンチマークと比較",
       "btcMacdPrompt": "000001.SZ の5分足でMACD戦略をバックテスト: 快線12、慢線26、シグナル9、直近30日",
       "usTechMaxDivPrompt": "600519.SH、000858.SZ、601318.SH、000001.SZ、600036.SH の最大分散ポートフォリオを2024年通年でバックテスト",
@@ -183,14 +183,14 @@
       "quantStrategyDeskPrompt": "[Swarm チームモード] quant_strategy_desk プリセットを使用して、CSI 300 構成銘柄で最適なモメンタム戦略を発見しバックテスト",
       "earningsReportPrompt": "アップロードした決算報告書の主要な財務指標、リスク、見通しを要約",
       "macroResearchPrompt": "最新の中央銀行金融政策報告書を読み、A株市場への影響を要約",
-      "analyzeBrokerExportPrompt": "アップロードしたトレードジャーナルを分析 — 保有統計、勝率、トップシンボル、時間別分布の完全なプロフィール",
+      "analyzeBrokerExportPrompt": "アップロードしたトレードジャーナルを分析  保有統計、勝率、トップシンボル、時間別分布の完全なプロフィール",
       "diagnoseBehaviorPrompt": "トレードジャーナルで4つの行動診断 (処分効果、過剰取引、モメンタム追従、アンカリング) を実行し、どのバイアスがPnLに最も悪影響を与えているかを示す",
       "checkConnectorPrompt": "トレーディングコネクタプロファイルをリストし、選択中のものを表示し、そのコネクタを検証。準備ができていない場合は、どのセットアップステップが不足しているか正確に教えて。注文はしないで。",
       "analyzePortfolioPrompt": "選択したトレーディングコネクタプロファイルを使用して、アカウント、ポジション、集中度、現金、ポートフォリオリスクを要約。注文はしないで。",
       "quoteTrendPrompt": "選択したトレーディングコネクタで 600519.SH のクォートと30日足バーを取得し、現在のクォートを最近のトレンドと比較して要約。読み取り専用に保つ。",
-      "trainShadowPrompt": "アップロードしたトレードジャーナルからシャドウアカウントを学習 — 抽出されたルールを表示し、自分の行動に合っているか確認",
+      "trainShadowPrompt": "アップロードしたトレードジャーナルからシャドウアカウントを学習  抽出されたルールを表示し、自分の行動に合っているか確認",
       "shadowDeltaPrompt": "過去90日間のシャドウバックテストを実行し、実際のPnLとシャドウが乖離した箇所 (ルール違反、早期退出、シグナル見逃し) を詳細に分析",
-      "shadowReportPrompt": "シャドウレポートをレンダリングしてURLを渡す — あなた vs シャドウのデルタを先頭に表示"
+      "shadowReportPrompt": "シャドウレポートをレンダリングしてURLを渡す  あなた vs シャドウのデルタを先頭に表示"
     },
     "capabilities": {
       "financeSkills": "金融スキルライブラリ",
@@ -588,7 +588,7 @@
       "alpha101": "Kakushadze (2015) の 101 個の定式 alpha シグナル。短期ホライゾンのクロスセクションシグナル。",
       "gtja191": "国泰君安証券の 191 個の Alpha。中国 A 株市場向けにチューニングされたテクニカルおよびマイクロストラクチャーシグナル。",
       "academic": "学術文献からの長期ホライズンアノマリーのキュレーション (バリュー、モメンタム、クオリティ、低ボラティリティなど)。",
-      "fundamental": "PIT セーフな SEC company facts から算出される品質・バリュー系ファクター — earnings yield、ROE、gross profitability、asset growth（filed-date 基準）。"
+      "fundamental": "PIT セーフな SEC company facts から算出される品質・バリュー系ファクター  earnings yield、ROE、gross profitability、asset growth（filed-date 基準）。"
     },
     "universeOption": {
       "csi300": "CSI 300 (中国 A 株)",
@@ -680,7 +680,7 @@
     "expired": "期限切れ",
     "limitsUnavailable": "制限情報を取得できません",
     "noActiveMandate": "有効なマンデートがありません。エージェントに提案してもらい、コミットしてからコネクタランタイムを開始してください。",
-    "haltedControlsDisabled": "停止中 — ランナー操作は無効",
+    "haltedControlsDisabled": "停止中  ランナー操作は無効",
     "runtimeActive": "マンデート内でランタイム稼働中",
     "idle": "アイドル",
     "stopRunner": "ランナーを停止",
@@ -758,7 +758,7 @@
     "featureStreaming": "リアルタイムストリーミング",
     "featureStreamingDesc": "エージェントの思考、ツール呼び出し、反復を観察",
     "featureReplay": "戦略リプレイ",
-    "featureReplayDesc": "トレードジャーナル分析 + シャドウアカウント — ルールを抽出しバックテスト、損益差分を要因分解",
+    "featureReplayDesc": "トレードジャーナル分析 + シャドウアカウント  ルールを抽出しバックテスト、損益差分を要因分解",
     "howItWorksTitle": "使い方",
     "step1Title": "1. 戦略を記述する",
     "step1Desc": "コード不要。自然言語でテストしたい内容をエージェントに伝えるだけ。",
@@ -767,7 +767,7 @@
     "step3Title": "3. 結果を確認する",
     "step3Desc": "パフォーマンス指標、エクイティカーブ、エクスポート可能な Pine Script を確認できます。",
     "step4Title": "4. 準備ができたら本番へ",
-    "step4Desc": "上限を明示したトレーディングマンデートを任意で承認 — 確認なしに注文が入ることはありません。"
+    "step4Desc": "上限を明示したトレーディングマンデートを任意で承認  確認なしに注文が入ることはありません。"
   },
   "errorBoundary": {
     "somethingWrong": "問題が発生しました"

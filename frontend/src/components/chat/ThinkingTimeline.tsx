@@ -62,23 +62,23 @@ export const ThinkingTimeline = memo(function ThinkingTimeline({ messages, isLat
     : `${t('thinking.done')} · ${t('thinking.steps', { count: stepCount })}${totalMs > 0 ? ` · ${(totalMs / 1000).toFixed(1)}s` : ""}`;
 
   return (
-    <div className="rounded-lg border border-border/40 bg-muted/5 overflow-hidden">
+    <div className="v2-card-depth-1 overflow-hidden">
       {/* Summary bar */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted/10 transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-surface-muted"
       >
         {expanded
-          ? <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
-          : <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />}
+          ? <ChevronDown className="h-3 w-3 shrink-0" style={{ color: 'hsl(var(--text-tertiary))' }} />
+          : <ChevronRight className="h-3 w-3 shrink-0" style={{ color: 'hsl(var(--text-tertiary))' }} />}
         {isRunning ? (
-          <Loader2 className="h-3 w-3 text-primary animate-spin shrink-0" />
+          <Loader2 className="h-3 w-3 text-guru animate-spin shrink-0" />
         ) : hasError ? (
-          <XCircle className="h-3 w-3 text-danger shrink-0" />
+          <XCircle className="h-3 w-3 text-negative shrink-0" />
         ) : (
-          <CheckCircle2 className="h-3 w-3 text-success/70 shrink-0" />
+          <CheckCircle2 className="h-3 w-3 shrink-0" style={{ color: 'hsl(var(--positive) / 0.7)' }} />
         )}
-        <span className={cn("text-muted-foreground", isRunning && "text-foreground")}>
+        <span className={cn(isRunning && "text-text-primary")} style={{ color: !isRunning ? 'hsl(var(--text-secondary))' : undefined }}>
           {summaryText}
         </span>
       </button>
@@ -86,7 +86,7 @@ export const ThinkingTimeline = memo(function ThinkingTimeline({ messages, isLat
       {/* Thinking preview when running but collapsed */}
       {!expanded && isRunning && latestThinking && (
         <div className="px-3 pb-2 -mt-1">
-          <p className="text-[11px] text-muted-foreground/40 line-clamp-1 pl-5 italic">
+          <p className="text-[11px] italic line-clamp-1 pl-5" style={{ color: 'hsl(var(--text-tertiary) / 0.4)' }}>
             {latestThinking.slice(-100)}
           </p>
         </div>
@@ -94,36 +94,29 @@ export const ThinkingTimeline = memo(function ThinkingTimeline({ messages, isLat
 
       {/* Expanded step list */}
       {expanded && steps.length > 0 && (
-        <div className="border-t border-border/30 px-3 py-1.5 space-y-0.5">
+        <div className="border-t px-3 py-1.5 space-y-0.5" style={{ borderColor: 'hsl(var(--border-hairline) / 0.6)' }}>
           {steps.map((step, i) => (
             <div key={`${step.tool}-${i}`} className="flex items-center gap-2 py-1 text-xs">
-              {/* Tree connector */}
-              <span className="text-border/60 shrink-0 w-3 text-center">
+              <span className="shrink-0 w-3 text-center" style={{ color: 'hsl(var(--border-hairline) / 0.6)' }}>
                 {i < steps.length - 1 ? "├" : "└"}
               </span>
-
-              {/* Status icon */}
               {step.status === "running" ? (
-                <Loader2 className="h-3 w-3 text-primary animate-spin shrink-0" />
+                <Loader2 className="h-3 w-3 text-guru animate-spin shrink-0" />
               ) : step.status === "error" ? (
-                <XCircle className="h-3 w-3 text-danger shrink-0" />
+                <XCircle className="h-3 w-3 text-negative shrink-0" />
               ) : (
-                <Circle className="h-3 w-3 text-success/50 shrink-0" fill="currentColor" />
+                <Circle className="h-3 w-3 shrink-0" fill="currentColor" style={{ color: 'hsl(var(--positive) / 0.5)' }} />
               )}
-
-              {/* Label */}
               <span className={cn(
                 "flex-1",
-                step.status === "running" ? "text-foreground" : "text-muted-foreground/60"
-              )}>
+                step.status === "running" && "text-text-primary"
+              )} style={{ color: step.status !== "running" ? 'hsl(var(--text-secondary) / 0.6)' : undefined }}>
                 {step.label}
               </span>
-
-              {/* Duration or status */}
               {step.status === "running" ? (
-                <span className="text-[10px] text-primary/60">{t('thinking.running')}</span>
+                <span className="text-[10px]" style={{ color: 'hsl(var(--accent-primary) / 0.6)' }}>{t('thinking.running')}</span>
               ) : step.elapsed_ms != null ? (
-                <span className="text-[10px] text-muted-foreground/40 tabular-nums">{(step.elapsed_ms / 1000).toFixed(1)}s</span>
+                <span className="text-[10px] tabular-nums" style={{ color: 'hsl(var(--text-tertiary) / 0.4)' }}>{(step.elapsed_ms / 1000).toFixed(1)}s</span>
               ) : null}
             </div>
           ))}
@@ -132,8 +125,8 @@ export const ThinkingTimeline = memo(function ThinkingTimeline({ messages, isLat
 
       {/* Expanded: show thinking content if any (for Q&A without tools) */}
       {expanded && steps.length === 0 && latestThinking && (
-        <div className="border-t border-border/30 px-3 py-2">
-          <p className="text-xs text-muted-foreground/50 leading-relaxed line-clamp-4">
+        <div className="border-t px-3 py-2" style={{ borderColor: 'hsl(var(--border-hairline) / 0.6)' }}>
+          <p className="text-xs leading-relaxed line-clamp-4" style={{ color: 'hsl(var(--text-secondary) / 0.5)' }}>
             {latestThinking}
           </p>
         </div>

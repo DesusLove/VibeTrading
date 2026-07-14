@@ -203,18 +203,18 @@ interface Props {
 export function WelcomeScreen({ onExample }: Props) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 text-center">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 text-center animate-fade-in">
       {/* Header */}
       <div className="space-y-3">
-        <div className="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-br from-primary/80 to-info/80 flex items-center justify-center shadow-lg">
+        <div className="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-br from-guru/80 to-guru/60 flex items-center justify-center shadow-lg shadow-glow">
           <Bot className="h-8 w-8 text-white" />
         </div>
         <div>
           <h2 className="text-2xl font-bold tracking-tight">{t('welcome.title')}</h2>
-          <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs mt-1 max-w-sm mx-auto leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
             {t('welcome.subtitle')}
           </p>
-          <p className="text-sm text-muted-foreground mt-2 max-w-md leading-relaxed mx-auto">
+          <p className="text-sm mt-2 max-w-md leading-relaxed mx-auto" style={{ color: 'hsl(var(--text-secondary))' }}>
             {t('welcome.describePrompt')}
           </p>
         </div>
@@ -225,7 +225,7 @@ export function WelcomeScreen({ onExample }: Props) {
         {CAPABILITY_CHIP_KEYS.map((key) => (
           <span
             key={key}
-            className="px-2.5 py-1 text-xs rounded-full border border-border/60 text-muted-foreground bg-muted/30"
+            className="v2-tag"
           >
             {t(key)}
           </span>
@@ -234,7 +234,7 @@ export function WelcomeScreen({ onExample }: Props) {
 
       {/* Example categories grid */}
       <div className="w-full max-w-2xl text-left space-y-4">
-        <p className="text-xs text-muted-foreground px-1">{t('welcome.tryExample')}</p>
+        <p className="text-xs px-1" style={{ color: 'hsl(var(--text-secondary))' }}>{t('welcome.tryExample')}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CATEGORIES.map((cat) => (
             <div key={cat.labelKey} className="space-y-2">
@@ -247,12 +247,12 @@ export function WelcomeScreen({ onExample }: Props) {
                   <button
                     key={ex.titleKey}
                     onClick={() => onExample(t(ex.promptKey as any))}
-                    className={`block w-full text-left px-3 py-2.5 rounded-xl border transition-colors ${cat.color}`}
+                    className={`v2-card-depth-1 w-full text-left px-3 py-2.5 ${cat.color}`}
                   >
                     <span className="text-sm font-medium text-foreground leading-snug">
                       {t(ex.titleKey as any)}
                     </span>
-                    <span className="block text-xs text-muted-foreground mt-0.5 leading-snug">
+                    <span className="block text-xs mt-0.5 leading-snug" style={{ color: 'hsl(var(--text-secondary))' }}>
                       {t(ex.descKey as any)}
                     </span>
                   </button>

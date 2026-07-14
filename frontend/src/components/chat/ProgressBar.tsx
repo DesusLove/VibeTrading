@@ -54,17 +54,18 @@ export function ProgressBar({
       />
       <div
         className={cn(
-          "bg-muted rounded-full overflow-hidden flex-1",
+          "rounded-full overflow-hidden flex-1",
           heightClass,
         )}
+        style={{ background: 'hsl(var(--surface-muted))' }}
       >
         <div
-          className="h-full bg-primary transition-all duration-300"
-          style={{ width: `${pct}%` }}
+          className="h-full transition-all duration-300"
+          style={{ width: `${pct}%`, background: 'linear-gradient(90deg, hsl(var(--accent-primary) / 0.7), hsl(var(--accent-primary)))' }}
         />
       </div>
       {showCount && (
-        <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+        <span className="text-[10px] tabular-nums shrink-0" style={{ color: 'hsl(var(--text-secondary))' }}>
           {clamped}/{total}
         </span>
       )}

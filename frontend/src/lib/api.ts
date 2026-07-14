@@ -190,7 +190,7 @@ export const api = {
   alphaCompareStreamUrl: (jobId: string) =>
     withAuthQuery(`${BASE}/alpha/compare/${encodeURIComponent(jobId)}/stream`),
 
-  // Connector runtime channel — privileged surface actions (NOT agent tools).
+  // Connector runtime channel  privileged surface actions (NOT agent tools).
   // commit is the ONLY action that writes a mandate; halt trips the kill switch.
   commitMandate: (body: CommitMandateRequest) =>
     request<CommitMandateResponse>("/mandate/commit", {
@@ -768,7 +768,7 @@ export interface AlphaCompareRow {
   ir: number;
   ic_positive_ratio: number;
   ic_count: number;
-  /** `delta_<sort>_vs_best` — gap to the top-ranked alpha on the active metric. */
+  /** `delta_<sort>_vs_best`  gap to the top-ranked alpha on the active metric. */
   [deltaKey: string]: number | string;
 }
 
@@ -971,4 +971,18 @@ export interface MessageItem {
   created_at: string;
   linked_attempt_id?: string;
   metadata?: Record<string, unknown>;
+}
+
+// ── Market Ticker ──
+
+export interface TickerItem {
+  symbol: string;
+  price: string;
+  change: string;
+  pct: string;
+  dir: "up" | "down" | "neutral";
+}
+
+export async function getTicker(signal?: AbortSignal): Promise<TickerItem[]> {
+  return request<TickerItem[]>("/market/ticker", { signal });
 }

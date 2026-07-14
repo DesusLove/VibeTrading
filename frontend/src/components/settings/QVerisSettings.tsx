@@ -42,9 +42,9 @@ interface QVerisForm {
 
 const DEFAULT_BASE_URL = "https://qveris.ai/api/v1";
 const fieldClass =
-  "w-full rounded-md border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60";
-const labelClass = "text-sm font-medium";
-const hintClass = "text-xs text-muted-foreground";
+  "w-full filter-input";
+const labelClass = "text-[10px] uppercase tracking-[0.12em] font-semibold";
+const hintClass = "text-xs";
 
 async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
   const { headers, ...rest } = options ?? {};
@@ -181,25 +181,21 @@ export function QVerisSettings() {
   const apiKeyPlaceholder = config?.api_key_masked || t("qveris.apiKeyPlaceholder");
 
   return (
-    <section className="rounded-lg border bg-card p-5 shadow-sm">
+    <section className="v2-card-depth-1 p-5 space-y-4 animate-fade-in">
       <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <SearchCheck className="h-4 w-4 text-primary" />
+            <SearchCheck className="h-4 w-4 text-guru" />
             <h2 className="text-base font-semibold">{t("qveris.title")}</h2>
           </div>
-          <p className="max-w-3xl text-sm text-muted-foreground">{t("qveris.subtitle")}</p>
+          <p className="max-w-3xl text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.subtitle")}</p>
         </div>
         <a
           href={signupUrl || undefined}
           target="_blank"
           rel="noreferrer"
           aria-disabled={!signupUrl}
-          className={`inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm transition ${
-            signupUrl
-              ? "text-muted-foreground hover:bg-muted hover:text-foreground"
-              : "pointer-events-none text-muted-foreground opacity-60"
-          }`}
+          className={signupUrl ? "v2-btn-secondary" : "v2-btn-secondary pointer-events-none opacity-60"}
         >
           <ExternalLink className="h-4 w-4" />
           {t("qveris.signupCta")}
@@ -207,7 +203,7 @@ export function QVerisSettings() {
       </div>
 
       {error ? (
-        <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+        <div className="rounded-md px-3 py-2 text-sm" style={{ border: '1px solid hsl(var(--negative) / 0.3)', background: 'hsl(var(--negative) / 0.05)', color: 'hsl(var(--negative))' }}>
           <span className="font-medium">{t("qveris.testFailed")}: </span>
           <span>{error}</span>
         </div>
@@ -215,8 +211,8 @@ export function QVerisSettings() {
 
       <form onSubmit={submit} className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)]">
         <div className="grid gap-4">
-          <label className="flex items-center justify-between gap-3 rounded-md border bg-muted/20 px-3 py-2">
-            <span className={labelClass}>{t("qveris.enabled")}</span>
+          <label className="flex items-center justify-between gap-3 rounded-md px-3 py-2" style={{ border: '1px solid hsl(var(--border-hairline))', background: 'hsl(var(--surface-muted) / 0.5)' }}>
+            <span className={labelClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.enabled")}</span>
             <input
               type="checkbox"
               checked={form.enabled}
@@ -224,13 +220,13 @@ export function QVerisSettings() {
                 const enabled = event.target.checked;
                 setForm({ ...form, enabled, mode: enabled ? "paid" : "free" });
               }}
-              className="h-4 w-4 accent-primary"
+              className="h-4 w-4 accent-guru"
               disabled={loading}
             />
           </label>
 
           <label className="grid gap-2" htmlFor={`${idPrefix}-base-url`}>
-            <span className={labelClass}>{t("qveris.baseUrl")}</span>
+            <span className={labelClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.baseUrl")}</span>
             <input
               id={`${idPrefix}-base-url`}
               value={form.base_url}
@@ -242,9 +238,9 @@ export function QVerisSettings() {
           </label>
 
           <label className="grid gap-2" htmlFor={`${idPrefix}-api-key`}>
-            <span className={labelClass}>{t("qveris.apiKey")}</span>
+            <span className={labelClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.apiKey")}</span>
             <div className="relative">
-              <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4" style={{ color: 'hsl(var(--text-tertiary))' }} />
               <input
                 id={`${idPrefix}-api-key`}
                 type="password"
@@ -256,12 +252,12 @@ export function QVerisSettings() {
                 disabled={loading}
               />
             </div>
-            <span className={hintClass}>{t("qveris.apiKeyPlaceholder")}</span>
+            <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.apiKeyPlaceholder")}</span>
           </label>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2" htmlFor={`${idPrefix}-mode`}>
-              <span className={labelClass}>{t("qveris.mode")}</span>
+              <span className={labelClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.mode")}</span>
               <select
                 id={`${idPrefix}-mode`}
                 value={form.mode}
@@ -269,7 +265,7 @@ export function QVerisSettings() {
                   const mode = event.target.value as QVerisMode;
                   setForm({ ...form, mode, enabled: mode === "paid" });
                 }}
-                className={fieldClass}
+                className="filter-select"
                 disabled={loading}
               >
                 <option value="free">{t("qveris.modeFree")}</option>
@@ -278,7 +274,7 @@ export function QVerisSettings() {
             </label>
 
             <label className="grid gap-2" htmlFor={`${idPrefix}-budget`}>
-              <span className={labelClass}>{t("qveris.budget")}</span>
+              <span className={labelClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.budget")}</span>
               <input
                 id={`${idPrefix}-budget`}
                 type="number"
@@ -289,14 +285,14 @@ export function QVerisSettings() {
                 className={fieldClass}
                 disabled={loading}
               />
-              <span className={hintClass}>{t("qveris.budgetHint")}</span>
+              <span className={hintClass} style={{ color: 'hsl(var(--text-secondary))' }}>{t("qveris.budgetHint")}</span>
             </label>
           </div>
 
           <button
             type="submit"
             disabled={loading || saving}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+            className="v2-btn-primary"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {t("qveris.save")}
@@ -304,28 +300,28 @@ export function QVerisSettings() {
         </div>
 
         <div className="grid gap-4">
-          <div className="rounded-md border bg-muted/20 p-4">
+          <div className="v2-card-depth-1 p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <span className="text-sm font-medium">{t("qveris.balance")}</span>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : null}
+              <span className="text-sm font-semibold text-text-primary">{t("qveris.balance")}</span>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" style={{ color: 'hsl(var(--text-tertiary))' }} /> : null}
             </div>
-            <div className="text-2xl font-semibold">
+            <div className="text-2xl font-semibold text-text-primary">
               {status?.remaining_credits ?? t("qveris.notConfigured")}
             </div>
-            {status?.error ? <p className="mt-2 text-xs text-destructive">{status.error}</p> : null}
+            {status?.error ? <p className="mt-2 text-xs text-negative">{status.error}</p> : null}
           </div>
 
-          <div className="rounded-md border bg-muted/20 p-4">
-            <div className="mb-3 text-sm font-medium">{t("qveris.recentUsage")}</div>
+          <div className="v2-card-depth-1 p-4">
+            <div className="mb-3 text-sm font-semibold text-text-primary">{t("qveris.recentUsage")}</div>
             {recent.length ? (
               <div className="space-y-2">
                 {recent.map((item) => (
-                  <div key={`${item.ts}-${item.tool_id}`} className="rounded-md border bg-background px-3 py-2 text-xs">
+                  <div key={`${item.ts}-${item.tool_id}`} className="v2-card-depth-1 px-3 py-2 text-xs">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-medium">{item.tool_id}</span>
-                      <span className="text-muted-foreground">{item.cost}</span>
+                      <span className="font-medium text-text-primary">{item.tool_id}</span>
+                      <span style={{ color: 'hsl(var(--text-tertiary))' }}>{item.cost}</span>
                     </div>
-                    <div className="mt-1 flex items-center justify-between gap-3 text-muted-foreground">
+                    <div className="mt-1 flex items-center justify-between gap-3" style={{ color: 'hsl(var(--text-tertiary))' }}>
                       <span>{item.ts}</span>
                       <span>{item.charge_outcome}</span>
                     </div>
@@ -333,14 +329,14 @@ export function QVerisSettings() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">{t("qveris.noUsage")}</p>
+              <p className="text-sm" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("qveris.noUsage")}</p>
             )}
           </div>
 
-          <div className="rounded-md border bg-muted/20 p-4">
-            <div className="mb-2 text-sm font-medium">{t("qveris.signupHint")}</div>
-            <div className="text-xs text-muted-foreground">{t("qveris.inviteCode")}</div>
-            <div className="mt-1 break-all font-mono text-sm">{inviteCode || t("qveris.notConfigured")}</div>
+          <div className="v2-card-depth-1 p-4">
+            <div className="mb-2 text-sm font-semibold text-text-primary">{t("qveris.signupHint")}</div>
+            <div className="text-xs" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("qveris.inviteCode")}</div>
+            <div className="mt-1 break-all font-mono text-sm text-text-primary">{inviteCode || t("qveris.notConfigured")}</div>
           </div>
         </div>
       </form>

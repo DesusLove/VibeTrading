@@ -145,15 +145,15 @@ export function RunDetail() {
     );
   }
   if (!run) return (
-    <div className="p-8 space-y-2">
-      <p className="text-red-500 font-medium">{i18n.t("runDetail.runNotFound")}</p>
-      <p className="text-sm text-muted-foreground">
+    <div className="p-8 space-y-3 animate-fade-in">
+      <p className="font-semibold text-negative">{i18n.t("runDetail.runNotFound")}</p>
+      <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
         {i18n.t("runDetail.runNotFoundDesc")}, or your browser may not have API access configured.
         Check that the API authentication key is set in Settings if accessing remotely.
       </p>
       <button
         onClick={() => navigate(-1)}
-        className="text-sm text-primary hover:underline inline-flex items-center gap-1.5"
+        className="v2-btn-secondary text-xs inline-flex items-center gap-1.5"
       >
         <ArrowLeft className="h-3.5 w-3.5" /> {i18n.t("runDetail.goBack")}
       </button>
@@ -242,24 +242,24 @@ export function RunDetail() {
   const ledgerRef = `RUN-${String(runId ? runId.slice(0, 8) : "0000").toUpperCase()}`;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full animate-fade-in">
       {/* Header */}
       <div className="border-b border-border-hairline">
         <div className="flex items-center gap-2 px-4 py-2 border-b border-border-hairline">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-6 w-6 items-center justify-center text-text-tertiary hover:text-text-primary hover:bg-surface-muted transition-colors"
+            className="flex h-6 w-6 items-center justify-center rounded-sm text-text-tertiary hover:text-text-primary hover:bg-surface-muted transition-colors"
             title={i18n.t("runDetail.goBack")}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
           </button>
-          <span className="ledger-ref">{ledgerRef}</span>
+          <span className="font-mono text-xs font-semibold text-guru">{ledgerRef}</span>
           {ok
-            ? <span className="badge-success text-[10px] px-1 py-0">Success</span>
-            : <span className="badge-danger text-[10px] px-1 py-0">Failed</span>}
-          {run.elapsed_seconds && <span className="num-2xs text-text-tertiary ml-auto">{run.elapsed_seconds.toFixed(1)}s</span>}
+            ? <span className="v2-badge-success text-[10px]">Success</span>
+            : <span className="v2-badge-danger text-[10px]">Failed</span>}
+          {run.elapsed_seconds && <span className="font-mono text-[10px]" style={{ color: 'hsl(var(--text-tertiary))' }}>{run.elapsed_seconds.toFixed(1)}s</span>}
         </div>
-        {run.prompt && <p className="px-4 py-1.5 text-xs text-text-secondary border-b border-border-hairline">{run.prompt}</p>}
+        {run.prompt && <p className="px-4 py-1.5 text-xs border-b border-border-hairline" style={{ color: 'hsl(var(--text-secondary))' }}>{run.prompt}</p>}
 
         {/* Metrics strip */}
         {run.metrics && (
@@ -281,12 +281,12 @@ export function RunDetail() {
           </div>
           <div className="flex items-center gap-1 ml-auto py-1">
             {run.trade_log && run.trade_log.length > 0 && (
-              <button onClick={() => downloadCsv(`trades_${runId}.csv`, buildTradesCsv(run.trade_log!))} className="btn-ghost btn-sm" title={i18n.t("runDetail.downloadTradesCsv")}>
+              <button onClick={() => downloadCsv(`trades_${runId}.csv`, buildTradesCsv(run.trade_log!))} className="v2-btn-secondary text-xs px-2 py-1" title={i18n.t("runDetail.downloadTradesCsv")}>
                 <Download className="h-3 w-3" /> <span className="hidden sm:inline">{i18n.t("runDetail.downloadTradesCsv")}</span>
               </button>
             )}
             {run.metrics && (
-              <button onClick={() => downloadCsv(`metrics_${runId}.csv`, buildMetricsCsv(run.metrics!))} className="btn-ghost btn-sm" title={i18n.t("runDetail.downloadMetricsCsv")}>
+              <button onClick={() => downloadCsv(`metrics_${runId}.csv`, buildMetricsCsv(run.metrics!))} className="v2-btn-secondary text-xs px-2 py-1" title={i18n.t("runDetail.downloadMetricsCsv")}>
                 <Download className="h-3 w-3" /> <span className="hidden sm:inline">{i18n.t("runDetail.downloadMetricsCsv")}</span>
               </button>
             )}
@@ -343,19 +343,19 @@ function renderMetricsStrip(metrics: Record<string, number>) {
   if (items.length === 0) return null;
 
   return (
-    <div className="metric-row divide-x divide-border-hairline overflow-x-auto">
+    <div className="flex divide-x divide-border-hairline overflow-x-auto" style={{ background: 'hsl(var(--bg-base))' }}>
       {items.map((item) => {
         if (!item) return null;
         const numeric = parseFloat(item.val);
         return (
-          <div key={item.key} className="metric-cell shrink-0">
-            <span className="metric-cell-label">{item.key.replace(/_/g, " ")}</span>
-            <span className={cn(
-              "metric-cell-value",
+          <div key={item.key} className="px-4 py-2.5 shrink-0 min-w-[100px]">
+            <div className="text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-tertiary))' }}>{item.key.replace(/_/g, " ")}</div>
+            <div className={cn(
+              "font-mono text-sm font-bold mt-0.5",
               item.key === "max_drawdown" && numeric < 0 ? "text-negative" : "",
               item.key === "total_return" && numeric > 0 ? "text-positive" : "",
               item.key === "total_return" && numeric < 0 ? "text-negative" : "",
-            )}>{item.val}</span>
+            )}>{item.val}</div>
           </div>
         );
       })}
@@ -372,7 +372,7 @@ function RunCardTab({ card }: { card: RunCard }) {
   const dataSources = card.data_sources || [];
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 animate-fade-in">
       <div className="grid gap-3 md:grid-cols-4">
         <RunCardStat label={i18n.t("runDetail.schema")} value={card.schema_version || "unknown"} />
         <RunCardStat label={i18n.t("runDetail.generated")} value={formatRunCardValue(card.generated_at)} />
@@ -381,9 +381,9 @@ function RunCardTab({ card }: { card: RunCard }) {
       </div>
 
       {warnings.length > 0 && (
-        <section className="rounded-md border border-amber-500/25 bg-amber-500/5 p-3">
-          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-300">
-            <AlertTriangle className="h-4 w-4" />
+        <section className="error-state">
+          <div className="error-state-header">
+            <AlertTriangle className="h-5 w-5" />
             {i18n.t("runDetail.warnings")}
           </div>
           <ul className="space-y-1 text-xs text-muted-foreground">
@@ -448,18 +448,18 @@ function RunCardTab({ card }: { card: RunCard }) {
 
 function RunCardStat({ label, value, tone = "normal" }: { label: string; value: string; tone?: "normal" | "warning" }) {
   return (
-    <div className="rounded-md border bg-card p-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className={cn("mt-1 truncate text-sm font-medium", tone === "warning" ? "text-amber-700 dark:text-amber-300" : "")}>{value}</div>
+    <div className="v2-card-depth-1 p-3">
+      <div className="text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-tertiary))' }}>{label}</div>
+      <div className={cn("mt-1 truncate text-sm font-bold", tone === "warning" ? "text-warning" : "")}>{value}</div>
     </div>
   );
 }
 
 function RunCardPanel({ title, icon: Icon, children }: { title: string; icon: typeof FileCheck2; children: ReactNode }) {
   return (
-    <section className="rounded-md border bg-card p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm font-medium">
-        <Icon className="h-4 w-4 text-muted-foreground" />
+    <section className="v2-card-depth-1 p-4">
+      <div className="mb-3 flex items-center gap-2 text-sm font-semibold" style={{ color: 'hsl(var(--text-secondary))' }}>
+        <Icon className="h-4 w-4" style={{ color: 'hsl(var(--text-tertiary))' }} />
         {title}
       </div>
       {children}
@@ -552,16 +552,16 @@ function ChartTab({
   return (
     <div className="p-4 space-y-4">
       {chartSymbols.length > 0 && (
-        <div className="rounded-md border bg-card p-3">
+        <div className="v2-card-depth-1 p-3">
           <div className="flex flex-wrap items-center gap-2">
-            <label className="text-xs font-medium text-muted-foreground" htmlFor="chart-symbol-select">
+            <label className="text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-tertiary))' }} htmlFor="chart-symbol-select">
               {i18n.t("runDetail.symbol")}
             </label>
             <select
               id="chart-symbol-select"
               value={chartPickerSymbol}
               onChange={(event) => onPickSymbol(event.target.value)}
-              className="h-8 rounded-md border bg-background px-2 text-sm"
+              className="filter-select h-8 text-xs"
             >
               {chartSymbols.map((symbol) => (
                 <option key={symbol} value={symbol}>{symbol}</option>
@@ -569,7 +569,7 @@ function ChartTab({
             </select>
             <button
               onClick={() => onCurrentOnly(chartPickerSymbol)}
-              className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+              className="v2-btn-secondary text-xs px-3 py-1.5"
               disabled={!chartPickerSymbol || !!loadingSymbols[chartPickerSymbol]}
             >
               {loadingSymbols[chartPickerSymbol] ? <Loader2 className="mr-1 inline h-3.5 w-3.5 animate-spin" /> : null}
@@ -577,14 +577,14 @@ function ChartTab({
             </button>
             <button
               onClick={() => onAddSymbol(chartPickerSymbol)}
-              className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+              className="v2-btn-secondary text-xs px-3 py-1.5"
               disabled={!chartPickerSymbol || !!loadingSymbols[chartPickerSymbol]}
             >
               {i18n.t("runDetail.addSymbol")}
             </button>
             <button
               onClick={() => void onLoadAll()}
-              className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+              className="v2-btn-secondary text-xs px-3 py-1.5"
               disabled={bulkLoading}
             >
               {bulkLoading ? <Loader2 className="mr-1 inline h-3.5 w-3.5 animate-spin" /> : null}
@@ -593,7 +593,7 @@ function ChartTab({
             {bulkLoading && (
               <button
                 onClick={onCancelLoadAll}
-                className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+                className="v2-btn-secondary text-xs px-3 py-1.5"
               >
                 {i18n.t("runDetail.cancelLoad")}
               </button>
@@ -605,7 +605,7 @@ function ChartTab({
                 <button
                   key={symbol}
                   onClick={() => onRemoveSymbol(symbol)}
-                  className="rounded-md bg-muted px-2 py-1 text-xs hover:bg-muted/80"
+                  className="v2-tag hover:border-negative/40 hover:text-negative"
                 >
                   {symbol} x
                 </button>
@@ -614,31 +614,31 @@ function ChartTab({
           )}
           {bulkLoading && (
             <div className="mt-3 space-y-1">
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex justify-between text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
                 <span>{i18n.t("runDetail.loadingCharts")}</span>
-                <span>{bulkProgress.done}/{bulkProgress.total}</span>
+                <span className="font-mono tabular-nums">{bulkProgress.done}/{bulkProgress.total}</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full bg-primary transition-all" style={{ width: `${progressPercent}%` }} />
+              <div className="h-1.5 overflow-hidden rounded-full" style={{ background: 'hsl(var(--surface-muted))' }}>
+                <div className="h-full rounded-full transition-all duration-300" style={{ width: `${progressPercent}%`, background: 'linear-gradient(90deg, hsl(var(--accent-primary) / 0.7), hsl(var(--accent-primary)))' }} />
               </div>
             </div>
           )}
         </div>
       )}
       {entries.length === 0 && (
-        <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+        <div className="empty-state !p-6 !text-xs" style={{ color: 'hsl(var(--text-tertiary))' }}>
           {Object.keys(loadingSymbols).length > 0 ? i18n.t("runDetail.loadingSelectedChart") : i18n.t("runDetail.pickSymbolToLoad")}
         </div>
       )}
       {entries.map(([sym, bars]) => (
         <div key={sym}>
-          <h3 className="text-sm font-medium mb-1">{sym}</h3>
+          <h3 className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--text-secondary))' }}>{sym}</h3>
           <CandlestickChart data={bars} markers={chartCache[sym]?.trade_markers?.filter(m => m.code === sym)} indicators={chartCache[sym]?.indicator_series?.[sym]} height={500} />
         </div>
       ))}
       {hasEquity && (
         <div>
-          <h3 className="text-sm font-medium mb-1">{i18n.t("runDetail.equityDrawdown")}</h3>
+          <h3 className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--text-secondary))' }}>{i18n.t("runDetail.equityDrawdown")}</h3>
           <EquityChart data={run.equity_curve!} height={280} />
         </div>
       )}

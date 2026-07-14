@@ -15,6 +15,7 @@ export default {
         "border-hairline": "hsl(var(--border-hairline))",
         "border-subtle": "hsl(var(--border-subtle))",
         accent: { DEFAULT: "hsl(var(--accent-primary))", foreground: "hsl(var(--accent-primary-foreground))" },
+        "accent-secondary": "hsl(var(--accent-secondary))",
         "surface-muted": "hsl(var(--surface-muted))",
         positive: "hsl(var(--positive))",
         negative: "hsl(var(--negative))",
@@ -34,6 +35,8 @@ export default {
         profit: "hsl(var(--positive))",
         loss: "hsl(var(--negative))",
         amber: "hsl(var(--warning))",
+        guru: "hsl(var(--accent-primary))",
+        "guru-subtle": "hsl(var(--accent-primary) / 0.08)",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
@@ -48,6 +51,12 @@ export default {
       animation: {
         "ticker-scroll": "ticker-scroll 25s linear infinite",
         "live-pulse": "live-pulse 2s ease-in-out infinite",
+        "gradient-shift": "gradient-shift 4s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 3s ease-in-out infinite",
+      },
+      backgroundImage: {
+        "guru-gradient": "linear-gradient(90deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)))",
       },
     },
   },

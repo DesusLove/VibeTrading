@@ -46,7 +46,7 @@ function groupMessages(msgs: AgentMessage[]): MsgGroup[] {
 
 const act = () => useAgentStore.getState();
 
-// i18n hook for Agent component — used inside the component below
+// i18n hook for Agent component  used inside the component below
 // (declared at module scope for helper usage is fine since t() reads from i18n singleton)
 
 /** Poll cadence for the shared `GET /live/status` snapshot. */
@@ -226,7 +226,7 @@ export function Agent() {
   const lastEventRef = useRef(0);
   const sseTimeoutMsRef = useRef(90_000);
 
-  /* tool_progress coalescing — keep latest payload per-tool, flush once per rAF. */
+  /* tool_progress coalescing  keep latest payload per-tool, flush once per rAF. */
   const pendingProgressRef = useRef<Map<string, NonNullable<ToolCallEntry["progress"]>>>(new Map());
   const progressRafRef = useRef(0);
 
@@ -253,7 +253,7 @@ export function Agent() {
   /* Shared `GET /live/status` snapshot. Owned here (single poller) and passed down
    * to RunnerStatus, so the global kill switch can be shown whenever connector runtime
    * could be active out-of-band (CLI/another session), not only off in-session SSE
-   * items (audit M2: always-available global halt — SPEC Consent §4). */
+   * items (audit M2: always-available global halt  SPEC Consent §4). */
   const [liveStatus, setLiveStatus] = useState<LiveStatus | null>(null);
   const [reasoningActive, setReasoningActive] = useState(false);
   /* The status endpoint is not wired on every backend; a 404/501 hides the panel
@@ -271,7 +271,7 @@ export function Agent() {
 
   const urlSessionId = searchParams.get("session");
 
-  /* Smart scroll — only auto-scroll when near bottom */
+  /* Smart scroll  only auto-scroll when near bottom */
   const isNearBottom = useCallback(() => {
     const el = listRef.current;
     if (!el) return true;
@@ -466,7 +466,7 @@ export function Agent() {
         if (act().status !== "streaming") act().setStatus("streaming");
         scrollToBottom();
       },
-      thinking_done: () => { touch(); /* don't flush — keep streaming text visible */ },
+      thinking_done: () => { touch(); /* don't flush  keep streaming text visible */ },
 
       tool_call: (d) => {
         touch();
@@ -541,7 +541,7 @@ export function Agent() {
 
       "attempt.created": () => {
         touch();
-        // Backend has created a new attempt — ensure streaming state is active
+        // Backend has created a new attempt  ensure streaming state is active
         // even if we connected mid-stream (SSE replay / page reload).
         if (act().status !== "streaming") act().setStatus("streaming");
       },
@@ -1141,7 +1141,7 @@ export function Agent() {
     return rows.sort((a, b) => a.sort - b.sort);
   }, [groups, liveItems]);
 
-  /* Whether connector runtime activity could be active *anywhere* — the global kill switch must be
+  /* Whether connector runtime activity could be active *anywhere*  the global kill switch must be
    * available whenever it could (audit M2 / SPEC Consent §4). Driven off both
    * in-session SSE artifacts AND the shared `/live/status` snapshot, so a runner
    * started from the CLI or another browser session still surfaces the halt button
@@ -1253,13 +1253,13 @@ export function Agent() {
             </div>
           )}
 
-          {/* Persistent streaming pulse bar — always visible while agent is working */}
+          {/* Persistent streaming pulse bar  always visible while agent is working */}
           {status === "streaming" && (
             <div className="flex items-center gap-2 px-1 pt-1">
-              <div className="h-0.5 flex-1 rounded-full bg-primary/20 overflow-hidden">
-                <div className="h-full w-1/3 bg-primary rounded-full animate-[pulse-slide_2s_ease-in-out_infinite]" />
+              <div className="h-0.5 flex-1 rounded-full bg-guru/20 overflow-hidden">
+                <div className="h-full w-1/3 bg-gradient-to-r from-guru/60 via-guru to-guru/60 rounded-full animate-[pulse-slide_2s_ease-in-out_infinite]" />
               </div>
-              <span className="text-[10px] text-muted-foreground shrink-0 tabular-nums">{t('agent.running')}</span>
+              <span className="text-[10px] font-mono font-medium text-guru shrink-0 tabular-nums">{t('agent.running')}</span>
             </div>
           )}
 
@@ -1277,9 +1277,8 @@ export function Agent() {
         <ConversationTimeline messages={messages} containerRef={listRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t p-4 bg-background/80 backdrop-blur-sm">
+      <form onSubmit={handleSubmit} className="border-t border-border-hairline p-4 bg-background/80 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto space-y-2">
-          {/* Swarm preset badge */}
           {swarmPreset && (
             <div className="flex items-center gap-1">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400 text-xs font-medium">
@@ -1466,7 +1465,7 @@ export function Agent() {
               )}
             </div>
           )}
-          {/* Persistent live runtime status panel — sits alongside the goal/mandate
+          {/* Persistent live runtime status panel  sits alongside the goal/mandate
               badges (SPEC §7.5 + audit C2). Self-hides when no broker is configured. */}
           <RunnerStatus
             status={liveStatus}
@@ -1493,7 +1492,7 @@ export function Agent() {
               {t("agent.uploading")}
             </div>
           )}
-          {/* Persistent kill switch — distinct from the per-turn Stop button
+          {/* Persistent kill switch  distinct from the per-turn Stop button
               above; disables all live order activity (SPEC Consent §4).
               Given a top border + extra top padding so this safety-critical
               control visually separates from the lighter decorative chips
@@ -1639,14 +1638,14 @@ export function Agent() {
                   : t("agent.placeholder")
               }
               aria-label={t("agent.messageInputLabel")}
-              className="flex-1 px-4 py-2.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow resize-none max-h-32 overflow-y-auto"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-border-hairline bg-background text-sm focus:outline-none focus:border-guru/40 focus:ring-[3px] focus:ring-guru/10 transition-all resize-none max-h-32 overflow-y-auto"
               disabled={status === "streaming"}
             />
             {messages.length > 0 && (
               <button
                 type="button"
                 onClick={handleExport}
-                className="px-3 py-2.5 rounded-xl border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="px-3 py-2.5 rounded-xl border border-border-hairline text-text-tertiary hover:text-guru hover:border-guru/30 transition-colors"
                 title={t('agent.exportChat')}
               >
                 <Download className="h-4 w-4" />
@@ -1656,7 +1655,7 @@ export function Agent() {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                className="px-4 py-2.5 rounded-xl bg-negative/80 text-white text-sm font-semibold hover:bg-negative transition-all"
                 title={t('agent.stopGeneration')}
               >
                 <Square className="h-4 w-4" />
@@ -1665,7 +1664,7 @@ export function Agent() {
               <button
                 type="submit"
                 disabled={goalComposerActive ? !input.trim() : (!input.trim() && !attachment)}
-                className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 hover:opacity-90 transition-opacity"
+                className="px-4 py-2.5 rounded-xl bg-guru text-guru-foreground text-sm font-semibold disabled:opacity-40 hover:bg-guru/90 hover:shadow-lg hover:shadow-guru/20 transition-all"
                 title={t("agent.send")}
                 aria-label={t("agent.send")}
               >

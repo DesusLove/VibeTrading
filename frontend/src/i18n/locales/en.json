@@ -149,7 +149,7 @@
       "optionsGreeksDesc": "Black-Scholes pricing with Delta/Gamma/Theta/Vega",
       "optionsGreeksPrompt": "Calculate option Greeks using Black-Scholes: spot=100, strike=105, risk-free rate=3%, vol=25%, expiry=90 days, analyze Delta/Gamma/Theta/Vega",
       "valueCommittee": "Value Investing Committee",
-      "valueCommitteeDesc": "Buffett / Munger / Duan Yongping / Li Lu — four-master debate on one stock",
+      "valueCommitteeDesc": "Buffett / Munger / Duan Yongping / Li Lu  four-master debate on one stock",
       "valueCommitteePrompt": "Use run_swarm with the value_investing_committee preset to analyze Tencent (00700.HK): Buffett on moat & price, Munger on inversion, Duan Yongping on business & management, Li Lu on 10-year certainty, then the chair synthesizes consensus and contradictions",
       "bottleneckHunter": "Supply-Chain Bottleneck Hunter",
       "bottleneckHunterDesc": "Find hidden Layer 2/3 choke-point winners in a super-trend",
@@ -159,7 +159,7 @@
       "thesisTrackerPrompt": "Use the thesis-tracker skill to build an investment thesis for Kweichow Moutai (600519.SH): 5-sentence core thesis, falsifiable assumptions, red lines, and valuation anchors, verified with financial_rigor",
       "valuationCheck": "Exact Valuation Check",
       "valuationCheckDesc": "Verify PE / PB / ROE / market cap with exact decimal arithmetic (no float drift)",
-      "valuationCheckPrompt": "Use the financial_rigor tool to verify Kweichow Moutai's valuation: price 1500, EPS 68.6, book value per share 180 — compute PE, PB, ROE exactly, then a three-scenario valuation (growth 12%/8%/0%, PE 22/18/14, 3 years)",
+      "valuationCheckPrompt": "Use the financial_rigor tool to verify Kweichow Moutai's valuation: price 1500, EPS 68.6, book value per share 180  compute PE, PB, ROE exactly, then a three-scenario valuation (growth 12%/8%/0%, PE 22/18/14, 3 years)",
       "investmentCommittee": "Investment Committee Review",
       "investmentCommitteeDesc": "Multi-agent debate: long vs short, risk review, PM decision",
       "investmentCommitteePrompt": "[Swarm Team Mode] Use the investment_committee preset to evaluate whether to go long or short on 600519.SH given current market conditions",
@@ -173,10 +173,10 @@
       "macroResearchDesc": "Macro analysis and A-share market outlook",
       "macroResearchPrompt": "Read the latest central bank monetary policy report and summarize its impact on the A-share market",
       "analyzeBrokerExport": "Analyze My Broker Export",
-      "analyzeBrokerExportDesc": "Parse 同花顺/东财/富途/generic CSV — holding days, win rate, PnL ratio, hourly distribution",
-      "analyzeBrokerExportPrompt": "Analyze the trade journal I just uploaded — full profile with holding stats, win rate, top symbols, and hourly distribution",
+      "analyzeBrokerExportDesc": "Parse 同花顺/东财/富途/generic CSV  holding days, win rate, PnL ratio, hourly distribution",
+      "analyzeBrokerExportPrompt": "Analyze the trade journal I just uploaded  full profile with holding stats, win rate, top symbols, and hourly distribution",
       "diagnoseBehavior": "Diagnose My Behavior Biases",
-      "diagnoseBehaviorDesc": "Disposition effect, overtrading, chasing momentum, anchoring — severity + numeric evidence",
+      "diagnoseBehaviorDesc": "Disposition effect, overtrading, chasing momentum, anchoring  severity + numeric evidence",
       "diagnoseBehaviorPrompt": "Run the 4 behavior diagnostics on my trade journal (disposition, overtrading, chasing, anchoring) and tell me which bias hurts my PnL most",
       "checkConnector": "Check Selected Connector",
       "checkConnectorDesc": "List connector profiles and verify the selected one",
@@ -189,13 +189,13 @@
       "quoteTrendPrompt": "Use the selected trading connector to fetch a 600519.SH quote and 30 daily bars, then summarize the current quote versus the recent trend. Keep it read-only.",
       "trainShadow": "Train My Shadow from Journal",
       "trainShadowDesc": "Extract your strategy rules from a broker CSV and persist a Shadow profile",
-      "trainShadowPrompt": "Train my shadow account from the trading journal I just uploaded — show the extracted rules and confirm they look like my behavior",
+      "trainShadowPrompt": "Train my shadow account from the trading journal I just uploaded  show the extracted rules and confirm they look like my behavior",
       "shadowDelta": "How Much Am I Leaving on the Table?",
       "shadowDeltaDesc": "Backtest your shadow strategy and attribute delta vs. your actual PnL",
       "shadowDeltaPrompt": "Run a shadow backtest for the last 90 days and break down where my PnL diverged from the shadow (rule violations, early exits, missed signals)",
       "shadowReport": "Generate Shadow Report",
-      "shadowReportDesc": "8-section HTML/PDF — equity curve, per-market Sharpe, attribution waterfall",
-      "shadowReportPrompt": "Render the shadow report and give me the URL — lead with the you-vs-shadow delta"
+      "shadowReportDesc": "8-section HTML/PDF  equity curve, per-market Sharpe, attribution waterfall",
+      "shadowReportPrompt": "Render the shadow report and give me the URL  lead with the you-vs-shadow delta"
     },
     "capabilities": {
       "financeSkills": "Finance Skills Library",
@@ -557,7 +557,7 @@
     "category": "Category",
     "headToHeadCompare": "Head-to-head compare",
     "compareAlphas": "Compare alphas side by side",
-    "compareDesc": "Benches just the alphas you pick on a universe and period, then ranks them by IC / IR with the gap to the leader — far faster than benching a whole zoo when you only care about a shortlist.",
+    "compareDesc": "Benches just the alphas you pick on a universe and period, then ranks them by IC / IR with the gap to the leader  far faster than benching a whole zoo when you only care about a shortlist.",
     "alphaIds": "Alpha ids",
     "selected": "{{count}} selected",
     "alphaIdsHint": "Separate ids with commas or spaces. Tip: tick alphas in the catalogue and hit \"Compare\" to prefill this.",
@@ -593,7 +593,7 @@
       "alpha101": "The 101 formulaic alphas from Kakushadze (2015); short-horizon cross-sectional signals.",
       "gtja191": "Guotai Junan Securities' 191 alphas; technical and microstructure signals tuned to China A-share markets.",
       "academic": "Curated long-horizon anomalies from the academic literature (value, momentum, quality, low-vol, etc.).",
-      "fundamental": "Quality and value factors computed from PIT-safe SEC company facts — earnings yield, ROE, gross profitability, asset growth (filed-date anchored)."
+      "fundamental": "Quality and value factors computed from PIT-safe SEC company facts  earnings yield, ROE, gross profitability, asset growth (filed-date anchored)."
     },
     "universeOption": {
       "csi300": "CSI 300 (China A)",
@@ -685,7 +685,7 @@
     "expired": "expired",
     "limitsUnavailable": "limits unavailable",
     "noActiveMandate": "No active mandate. Ask the agent to propose one, then commit it before starting the connector runtime.",
-    "haltedControlsDisabled": "Halted — runner controls disabled",
+    "haltedControlsDisabled": "Halted  runner controls disabled",
     "runtimeActive": "Runtime active inside mandate",
     "idle": "Idle",
     "stopRunner": "Stop runner",
@@ -738,7 +738,10 @@
     "copy": "Copy",
     "timeoutHint": "Execution timed out. Try simplifying the strategy or reducing the number of assets.",
     "apiFailedHint": "API call failed. Please retry later.",
-    "executionFailedHint": "Execution failed. Click to retry."
+    "executionFailedHint": "Execution failed. Click to retry.",
+    "you": "You",
+    "assistant": "Assistant",
+    "error": "Error"
   },
   "pineViewer": {
     "pineScript": "Pine Script v6",
@@ -754,7 +757,7 @@
   },
   "home": {
     "title": "AI-Powered Quant Strategy Research",
-    "subtitle": "Describe a trading strategy in natural language. The agent generates code, runs backtests, and optimizes — all in real time.",
+    "subtitle": "Describe a trading strategy in natural language. The agent generates code, runs backtests, and optimizes  all in real time.",
     "startResearch": "Start Research",
     "featureAgent": "AI Agent",
     "featureAgentDesc": "Natural language strategy generation with ReAct reasoning",
@@ -763,16 +766,16 @@
     "featureStreaming": "Real-time Streaming",
     "featureStreamingDesc": "Watch the agent think, call tools, and iterate",
     "featureReplay": "Strategy Replay",
-    "featureReplayDesc": "Trade journal analyzer + Shadow Account — extract your rules, backtest them, attribute PnL delta",
+    "featureReplayDesc": "Trade journal analyzer + Shadow Account  extract your rules, backtest them, attribute PnL delta",
     "howItWorksTitle": "How it works",
     "step1Title": "1. Describe your strategy",
-    "step1Desc": "Tell the agent what you want to test, in plain language — no code required.",
+    "step1Desc": "Tell the agent what you want to test, in plain language  no code required.",
     "step2Title": "2. Watch it research and backtest",
     "step2Desc": "The agent plans, pulls market data, and runs the backtest live, so you can follow every step.",
     "step3Title": "3. Review the results",
     "step3Desc": "See performance metrics, the equity curve, and exportable Pine Script for the strategy.",
     "step4Title": "4. Go live when you're ready",
-    "step4Desc": "Optionally approve a trading mandate with explicit limits — nothing trades without your confirmation."
+    "step4Desc": "Optionally approve a trading mandate with explicit limits  nothing trades without your confirmation."
   },
   "errorBoundary": {
     "somethingWrong": "Something went wrong"

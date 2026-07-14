@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { api, type RunListItem } from "@/lib/api";
 import { formatMetricVal } from "@/lib/formatters";
-import { cn } from "@/lib/utils";
+
 
 const REPORT_SCAN_LIMIT = 100;
 
@@ -82,71 +82,50 @@ export function Reports() {
   }, [runs, query, statusFilter, startDate, endDate, sortMode]);
 
   return (
-    <div className="min-h-screen p-6 lg:p-8">
+    <div className="min-h-screen p-6 lg:p-8 animate-fade-in">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <section className="flex flex-col gap-4 border-b pb-6 lg:flex-row lg:items-end lg:justify-between">
+        <section className="page-header animate-slide-up">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground">
+            <div className="v2-badge-accent">
               <FileText className="h-3.5 w-3.5" />
               {t("reports.badge")}
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{t("reports.title")}</h1>
-              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{t("reports.subtitle")}</p>
+              <h1 className="page-header-title">{t("reports.title")}</h1>
+              <p className="page-header-desc">{t("reports.subtitle")}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => void loadReports("refresh")}
             disabled={refreshing}
-            className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition hover:bg-muted disabled:opacity-50"
+            className="v2-btn-secondary"
           >
             {refreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             {t("reports.refresh")}
           </button>
         </section>
 
-        <section className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_160px_150px_150px_170px]">
-          <label className="relative block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <section className="filter-bar animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <label className="relative flex-1 min-w-[200px]">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'hsl(var(--text-tertiary))' }} />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("reports.searchPlaceholder")}
-              className="w-full rounded-md border bg-background py-2 pl-9 pr-3 text-sm outline-none transition focus:border-primary"
+              className="filter-input w-full pl-9"
             />
           </label>
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="rounded-md border bg-background px-3 py-2 text-sm"
-          >
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="filter-select">
             {statusOptions.map((status) => (
               <option key={status} value={status}>
                 {status === "all" ? t("reports.allStatuses") : status}
               </option>
             ))}
           </select>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
-            className="rounded-md border bg-background px-3 py-2 text-sm"
-            aria-label={t("reports.startDate")}
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(event) => setEndDate(event.target.value)}
-            className="rounded-md border bg-background px-3 py-2 text-sm"
-            aria-label={t("reports.endDate")}
-          />
-          <select
-            value={sortMode}
-            onChange={(event) => setSortMode(event.target.value as SortMode)}
-            className="rounded-md border bg-background px-3 py-2 text-sm"
-            aria-label={t("reports.sort")}
-          >
+          <input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} className="filter-input" aria-label={t("reports.startDate")} />
+          <input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} className="filter-input" aria-label={t("reports.endDate")} />
+          <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="filter-select" aria-label={t("reports.sort")}>
             <option value="created_desc">{t("reports.sortNewest")}</option>
             <option value="created_asc">{t("reports.sortOldest")}</option>
             <option value="return_desc">{t("reports.sortReturn")}</option>
@@ -154,33 +133,33 @@ export function Reports() {
           </select>
         </section>
 
-        <div className="text-sm text-muted-foreground">
+        <div className="text-xs animate-fade-in" style={{ color: 'hsl(var(--text-secondary))', animationDelay: "0.12s" }}>
           {t("reports.count", { shown: filtered.length, total: runs.length })}
         </div>
 
         {loading ? (
           <div className="grid gap-3">
             {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="h-28 animate-pulse rounded-md border bg-muted/40" />
+              <div key={item} className="h-28 skeleton-pulse animate-fade-in" style={{ animationDelay: `${item * 0.06}s` }} />
             ))}
           </div>
         ) : null}
 
         {!loading && error ? (
-          <section className="rounded-md border border-amber-500/30 bg-amber-500/5 p-5">
-            <div className="flex items-center gap-2 font-medium text-amber-700 dark:text-amber-300">
+          <section className="error-state animate-fade-in">
+            <div className="error-state-header">
               <AlertTriangle className="h-5 w-5" />
               {t("reports.unavailable")}
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+            <p className="mt-2 text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{error}</p>
           </section>
         ) : null}
 
         {!loading && !error && filtered.length === 0 ? (
-          <section className="rounded-md border border-dashed p-8 text-center">
-            <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-            <h2 className="mt-3 font-medium">{runs.length === 0 ? t("reports.emptyTitle") : t("reports.noMatchesTitle")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+          <section className="empty-state animate-scale-in">
+            <FileText className="empty-state-icon" />
+            <h2 className="empty-state-title">{runs.length === 0 ? t("reports.emptyTitle") : t("reports.noMatchesTitle")}</h2>
+            <p className="empty-state-body">
               {runs.length === 0 ? t("reports.emptyBody") : t("reports.noMatchesBody")}
             </p>
           </section>
@@ -188,8 +167,8 @@ export function Reports() {
 
         {!loading && !error && filtered.length > 0 ? (
           <section className="grid gap-3">
-            {filtered.map((run) => (
-              <ReportRow key={run.run_id} run={run} />
+            {filtered.map((run, idx) => (
+              <ReportRow key={run.run_id} run={run} delay={0.15 + idx * 0.03} />
             ))}
           </section>
         ) : null}
@@ -198,50 +177,46 @@ export function Reports() {
   );
 }
 
-function ReportRow({ run }: { run: RunListItem }) {
+function ReportRow({ run, delay = 0 }: { run: RunListItem; delay?: number }) {
   const { t } = useTranslation();
   return (
-    <article className="rounded-md border p-4 transition hover:border-primary/40 hover:bg-muted/30">
+    <article className="v2-card-depth-1 p-4 animate-slide-up" style={{ animationDelay: `${delay}s` }}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2.5 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge status={run.status} />
-            <Link to={`/runs/${run.run_id}`} className="truncate font-mono text-sm font-medium hover:text-primary">
+            <Link to={`/runs/${run.run_id}`} className="truncate font-mono text-sm font-medium hover:text-guru transition-colors">
               {run.run_id}
             </Link>
-            <span className="text-xs text-muted-foreground">{formatRunDate(run.created_at)}</span>
+            <span className="text-xs" style={{ color: 'hsl(var(--text-tertiary))' }}>{formatRunDate(run.created_at)}</span>
           </div>
-          <p className="line-clamp-2 text-sm text-muted-foreground">{run.prompt || t("reports.noPrompt")}</p>
+          <p className="line-clamp-2 text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>{run.prompt || t("reports.noPrompt")}</p>
           <div className="flex flex-wrap gap-1.5">
             {(run.codes || []).slice(0, 6).map((code) => (
-              <span key={code} className="rounded border px-2 py-0.5 font-mono text-xs text-muted-foreground">
-                {code}
-              </span>
+              <span key={code} className="v2-tag">{code}</span>
             ))}
             {run.start_date || run.end_date ? (
-              <span className="rounded border px-2 py-0.5 text-xs text-muted-foreground">
-                {run.start_date || "?"} {t("reports.to")} {run.end_date || "?"}
-              </span>
+              <span className="v2-tag">{run.start_date || "?"} {t("reports.to")} {run.end_date || "?"}</span>
             ) : null}
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 lg:items-end">
-          <div className="grid grid-cols-2 gap-2 text-right sm:flex sm:flex-wrap sm:justify-end">
-            <MetricPill label={t("reports.return")} value={formatOptionalMetric("total_return", run.total_return)} />
-            <MetricPill label={t("reports.sharpe")} value={formatOptionalMetric("sharpe", run.sharpe)} />
+        <div className="flex flex-col gap-3 lg:items-end shrink-0">
+          <div className="flex gap-2">
+            <div className="rounded-md px-3 py-1.5 text-right v2-card-depth-1">
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("reports.return")}</div>
+              <div className="font-mono text-sm font-semibold">{formatOptionalMetric("total_return", run.total_return)}</div>
+            </div>
+            <div className="rounded-md px-3 py-1.5 text-right v2-card-depth-1">
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'hsl(var(--text-tertiary))' }}>{t("reports.sharpe")}</div>
+              <div className="font-mono text-sm font-semibold">{formatOptionalMetric("sharpe", run.sharpe)}</div>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 lg:justify-end">
-            <Link
-              to={`/runs/${run.run_id}`}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:opacity-90"
-            >
+          <div className="flex gap-2">
+            <Link to={`/runs/${run.run_id}`} className="v2-btn-primary text-xs px-3 py-1.5">
               {t("reports.fullReport")} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-            <Link
-              to="/compare"
-              className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition hover:bg-muted"
-            >
+            <Link to="/compare" className="v2-btn-secondary text-xs px-3 py-1.5">
               <GitCompare className="h-3.5 w-3.5" />
               {t("reports.compare")}
             </Link>
@@ -255,25 +230,16 @@ function ReportRow({ run }: { run: RunListItem }) {
 function StatusBadge({ status }: { status: string }) {
   const normalized = status.toLowerCase();
   const ok = ["success", "done", "completed", "complete"].includes(normalized);
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium",
-        ok ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
-      )}
-    >
-      {ok ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+  return ok ? (
+    <span className="v2-badge-success">
+      <CheckCircle2 className="h-3 w-3" />
       {status || "unknown"}
     </span>
-  );
-}
-
-function MetricPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border px-3 py-1.5">
-      <div className="text-[11px] uppercase text-muted-foreground">{label}</div>
-      <div className="font-mono text-sm font-medium">{value}</div>
-    </div>
+  ) : (
+    <span className="v2-badge-neutral">
+      <XCircle className="h-3 w-3" />
+      {status || "unknown"}
+    </span>
   );
 }
 

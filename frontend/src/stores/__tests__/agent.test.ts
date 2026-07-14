@@ -6,7 +6,7 @@ beforeEach(() => {
   resetFactories();
 });
 
-describe("agent store — initial state", () => {
+describe("agent store  initial state", () => {
   it("has correct defaults", () => {
     const s = useAgentStore.getState();
     expect(s.messages).toEqual([]);

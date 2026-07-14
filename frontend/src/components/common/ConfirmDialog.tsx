@@ -47,26 +47,28 @@ export function ConfirmDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'hsl(0 0% 0% / 0.5)' }}
       onClick={onCancel}
     >
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
-        className="w-full max-w-sm rounded-2xl border bg-background p-4 shadow-lg"
+        className="w-full max-w-sm rounded-2xl p-4 shadow-lg"
+        style={{ border: '1px solid hsl(var(--border-hairline))', background: 'hsl(var(--bg-elevated))' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="confirm-dialog-title" className="text-sm font-semibold text-foreground">
+        <h2 id="confirm-dialog-title" className="text-sm font-semibold text-text-primary">
           {title}
         </h2>
-        {description && <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{description}</p>}
+        {description && <p className="mt-1 text-xs leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>{description}</p>}
         {children && <div className="mt-3">{children}</div>}
         <div className="mt-4 flex justify-end gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="v2-btn-secondary text-xs px-3 py-1.5"
           >
             {cancelLabel}
           </button>
@@ -74,12 +76,7 @@ export function ConfirmDialog({
             ref={confirmRef}
             type="button"
             onClick={onConfirm}
-            className={[
-              "rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90",
-              tone === "destructive"
-                ? "bg-destructive text-destructive-foreground"
-                : "bg-primary text-primary-foreground",
-            ].join(" ")}
+            className={tone === "destructive" ? "v2-btn-negative text-xs px-3 py-1.5" : "v2-btn-primary text-xs px-3 py-1.5"}
           >
             {confirmLabel}
           </button>

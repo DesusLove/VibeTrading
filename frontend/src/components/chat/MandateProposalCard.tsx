@@ -23,7 +23,7 @@ interface Props {
 }
 
 function formatUsd(value: number): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "";
   return `$${value.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 }
 
@@ -73,24 +73,24 @@ function ProfileTile({
   return (
     <div
       className={[
-        "rounded-xl border p-3 transition-colors",
+        "rounded-xl p-3 transition-colors v2-card-depth-1",
         active
-          ? "border-primary/60 bg-primary/5"
-          : "border-border/60 bg-muted/20 hover:border-primary/40",
+          ? "border-guru/60 bg-guru/5"
+          : "hover:border-guru/40",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 font-mono text-[11px] font-semibold text-primary">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full font-mono text-[11px] font-semibold text-guru" style={{ background: 'hsl(var(--accent-primary) / 0.1)' }}>
             {profile.ordinal}
           </span>
-          <span className="text-sm font-semibold text-foreground">{profile.label}</span>
+          <span className="text-sm font-semibold text-text-primary">{profile.label}</span>
         </div>
         <button
           type="button"
           onClick={onAdjustToggle}
           disabled={disabled}
-          className="inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+          className="v2-btn-secondary text-[11px] px-2 py-0.5"
           title={i18n.t("mandate.adjustTitle")}
         >
           <SlidersHorizontal className="h-3 w-3" />
@@ -100,29 +100,29 @@ function ProfileTile({
 
       <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
         <div className="col-span-2">
-          <dt className="text-muted-foreground">{i18n.t("mandate.universe")}</dt>
-          <dd className="font-medium text-foreground">{formatUniverse(profile.universe)}</dd>
+          <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.universe")}</dt>
+          <dd className="font-medium text-text-primary">{formatUniverse(profile.universe)}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">{i18n.t("mandate.maxOrder")}</dt>
-          <dd className="font-mono font-medium text-foreground">{formatUsd(profile.max_order_usd)}</dd>
+          <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.maxOrder")}</dt>
+          <dd className="font-mono font-medium text-text-primary">{formatUsd(profile.max_order_usd)}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">{i18n.t("mandate.dailyCap")}</dt>
-          <dd className="font-mono font-medium text-foreground">{profile.daily_trade_cap} trades/day</dd>
+          <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.dailyCap")}</dt>
+          <dd className="font-mono font-medium text-text-primary">{profile.daily_trade_cap} trades/day</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">{i18n.t("mandate.leverage")}</dt>
-          <dd className="font-medium text-foreground">{formatLeverage(profile.leverage)}</dd>
+          <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.leverage")}</dt>
+          <dd className="font-medium text-text-primary">{formatLeverage(profile.leverage)}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">{i18n.t("mandate.instruments")}</dt>
-          <dd className="font-medium text-foreground">{profile.instruments.join(", ") || "—"}</dd>
+          <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.instruments")}</dt>
+          <dd className="font-medium text-text-primary">{profile.instruments.join(", ") || ""}</dd>
         </div>
       </dl>
 
       {profile.notes && (
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{profile.notes}</p>
+        <p className="mt-2 text-[11px] leading-relaxed" style={{ color: 'hsl(var(--text-tertiary))' }}>{profile.notes}</p>
       )}
 
       {adjusting ? (
@@ -142,13 +142,13 @@ function ProfileTile({
               }
             }}
             placeholder={i18n.t("mandate.adjustPlaceholder")}
-            className="w-full rounded-lg border bg-background px-3 py-1.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/30"
+            className="filter-input w-full"
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onAdjustCancel}
-              className="inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="v2-btn-secondary text-[11px] px-2 py-1"
             >
               <X className="h-3 w-3" />
               {i18n.t("mandate.cancel")}
@@ -157,7 +157,7 @@ function ProfileTile({
               type="button"
               onClick={submit}
               disabled={!adjustText.trim()}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+              className="v2-btn-primary text-[11px] px-2 py-1"
             >
               <Check className="h-3 w-3" />
               {i18n.t("mandate.sendAdjustment")}
@@ -169,7 +169,7 @@ function ProfileTile({
           type="button"
           onClick={onCommit}
           disabled={disabled}
-          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+          className="v2-btn-primary mt-3 w-full text-xs px-3 py-1.5"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
           {busy ? i18n.t("mandate.committing") : i18n.t("mandate.commit", { label: profile.label })}
@@ -183,7 +183,7 @@ function ProfileTile({
  * Renders a connector-runtime mandate proposal (SPEC Consent §1/§2).
  *
  * Each profile tile shows concrete numbers (universe, max order, daily cap, leverage,
- * instruments). Committing calls `api.commitMandate` — a privileged surface action,
+ * instruments). Committing calls `api.commitMandate`  a privileged surface action,
  * never `api.sendMessage`. "Adjust" sends a natural-language message back to the agent
  * to re-render a fresh proposal. Once committed, the card collapses to a compact badge.
  */
@@ -232,7 +232,7 @@ export const MandateProposalCard = memo(function MandateProposalCard({ proposal,
       <div className="flex gap-3">
         <AgentAvatar />
         <div className="flex-1 min-w-0">
-          <span className="inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-lg bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          <span className="inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-positive" style={{ background: 'hsl(var(--positive) / 0.1)' }}>
             <ShieldCheck className="h-3 w-3 shrink-0" />
             <span className="shrink-0">
               Mandate {committed.selected_ordinal != null ? `#${committed.selected_ordinal} ` : ""}active
@@ -242,7 +242,7 @@ export const MandateProposalCard = memo(function MandateProposalCard({ proposal,
             )}
             {dailyCap != null && <span className="shrink-0 font-mono text-[11px]">· {dailyCap}/day</span>}
             {expires && (
-              <span className="shrink-0 text-[10px] text-muted-foreground">
+              <span className="shrink-0 text-[10px]" style={{ color: 'hsl(var(--text-tertiary))' }}>
                 · expires {expires.toLocaleDateString()}
               </span>
             )}
@@ -257,22 +257,22 @@ export const MandateProposalCard = memo(function MandateProposalCard({ proposal,
   return (
     <div className="flex gap-3">
       <AgentAvatar />
-      <div className="flex-1 min-w-0 space-y-3 rounded-2xl border border-primary/20 bg-background/95 p-4 shadow-sm">
+      <div className="flex-1 min-w-0 space-y-3 rounded-2xl p-4 shadow-sm" style={{ border: '1px solid hsl(var(--accent-primary) / 0.2)', background: 'hsl(var(--bg-base) / 0.95)' }}>
         <div className="flex items-start gap-2">
           {isReauth ? (
-            <ShieldAlert className="h-4 w-4 shrink-0 text-amber-500" />
+            <ShieldAlert className="h-4 w-4 shrink-0" style={{ color: 'hsl(var(--warning))' }} />
           ) : (
-            <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
+            <ShieldCheck className="h-4 w-4 shrink-0 text-guru" />
           )}
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-sm font-semibold text-text-primary">
               {isReauth ? i18n.t("mandate.reauthMandate") : i18n.t("mandate.runtimeMandate")}
             </p>
             {proposal.intent_normalized && (
-              <p className="text-xs text-muted-foreground">{proposal.intent_normalized}</p>
+              <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>{proposal.intent_normalized}</p>
             )}
             {proposal.account && (
-              <p className="mt-0.5 text-[11px] text-muted-foreground">
+              <p className="mt-0.5 text-[11px]" style={{ color: 'hsl(var(--text-secondary))' }}>
                 {proposal.account.broker} · {proposal.account.type} account · funded by {proposal.account.funded_by}
               </p>
             )}
@@ -301,7 +301,7 @@ export const MandateProposalCard = memo(function MandateProposalCard({ proposal,
           ))}
         </div>
 
-        <div className="grid gap-1.5 border-t border-border/60 pt-2 text-[11px] text-muted-foreground">
+        <div className="grid gap-1.5 pt-2 text-[11px]" style={{ borderTop: '1px solid hsl(var(--border-hairline) / 0.6)', color: 'hsl(var(--text-tertiary))' }}>
           {proposal.funding_note && (
             <p className="flex items-start gap-1.5">
               <Wallet className="mt-0.5 h-3 w-3 shrink-0" />
@@ -331,25 +331,25 @@ export const MandateProposalCard = memo(function MandateProposalCard({ proposal,
           if (ordinal != null) handleCommit(ordinal);
         }}
       >
-        {pendingProfile && (
-          <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 rounded-lg border bg-muted/20 p-2.5 text-[11px]">
+          {pendingProfile && (
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 rounded-lg p-2.5 text-[11px] v2-card-depth-1">
             <div className="col-span-2">
-              <dt className="text-muted-foreground">{i18n.t("mandate.universe")}</dt>
-              <dd className="font-medium text-foreground">{formatUniverse(pendingProfile.universe)}</dd>
+              <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.universe")}</dt>
+              <dd className="font-medium text-text-primary">{formatUniverse(pendingProfile.universe)}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">{i18n.t("mandate.maxOrder")}</dt>
-              <dd className="font-mono font-medium text-foreground">{formatUsd(pendingProfile.max_order_usd)}</dd>
+              <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.maxOrder")}</dt>
+              <dd className="font-mono font-medium text-text-primary">{formatUsd(pendingProfile.max_order_usd)}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">{i18n.t("mandate.dailyCap")}</dt>
-              <dd className="font-mono font-medium text-foreground">
+              <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.dailyCap")}</dt>
+              <dd className="font-mono font-medium text-text-primary">
                 {i18n.t("mandate.tradesPerDay", { count: pendingProfile.daily_trade_cap })}
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">{i18n.t("mandate.leverage")}</dt>
-              <dd className="font-medium text-foreground">{formatLeverage(pendingProfile.leverage)}</dd>
+              <dt style={{ color: 'hsl(var(--text-tertiary))' }}>{i18n.t("mandate.leverage")}</dt>
+              <dd className="font-medium text-text-primary">{formatLeverage(pendingProfile.leverage)}</dd>
             </div>
           </dl>
         )}

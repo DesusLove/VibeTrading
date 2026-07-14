@@ -34,35 +34,33 @@ export function Correlation() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-8 lg:py-8">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 lg:px-8 lg:py-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="badge-primary">
-              <GitCompare className="h-3 w-3" />
-              {t("correlation.title")}
-            </span>
+      <div className="page-header animate-slide-up">
+        <div className="space-y-3">
+          <div className="v2-badge-accent">
+            <GitCompare className="h-3.5 w-3.5" />
+            {t("correlation.title")}
           </div>
-          <h1 className="text-xl font-bold tracking-tight">{t("correlation.title")}</h1>
-          <p className="text-sm text-muted-foreground/70">{t("correlation.assetCodesHint")}</p>
+          <h1 className="page-header-title">{t("correlation.title")}</h1>
+          <p className="page-header-desc">{t("correlation.assetCodesHint")}</p>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="glass-card p-5 space-y-4">
-        <span className="metric-label">{t("correlation.assetCodes")}</span>
+      <div className="premium-card p-5 space-y-4 animate-slide-up" style={{ animationDelay: "0.05s" }}>
+        <span className="stat-premium-label">{t("correlation.assetCodes")}</span>
         <input
           type="text"
           value={codes}
           onChange={(e) => setCodes(e.target.value)}
           placeholder="000001.SZ,600519.SH,000858.SZ,601318.SH"
-          className="input-field w-full"
+          className="filter-input w-full"
         />
 
         <div className="flex flex-wrap items-end gap-6">
           <div className="flex flex-col gap-1.5">
-            <span className="metric-label">{t("correlation.windowDays")}</span>
+            <span className="stat-premium-label">{t("correlation.windowDays")}</span>
             <div className="flex gap-1.5">
               {WINDOWS.map((w) => (
                 <button
@@ -70,10 +68,8 @@ export function Correlation() {
                   type="button"
                   onClick={() => setDays(w)}
                   className={cn(
-                    "rounded-lg border px-3 py-1.5 text-xs font-mono transition-all",
-                    days === w
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "text-muted-foreground hover:border-primary hover:text-foreground"
+                    "v2-btn-secondary text-xs px-3 py-1.5",
+                    days === w && "v2-btn-primary text-xs px-3 py-1.5"
                   )}
                 >
                   {w}d
@@ -83,7 +79,7 @@ export function Correlation() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <span className="metric-label">{t("correlation.method")}</span>
+            <span className="stat-premium-label">{t("correlation.method")}</span>
             <div className="flex gap-1.5">
               {(["pearson", "spearman"] as const).map((m) => (
                 <button
@@ -91,10 +87,8 @@ export function Correlation() {
                   type="button"
                   onClick={() => setMethod(m)}
                   className={cn(
-                    "rounded-lg border px-3 py-1.5 text-xs capitalize transition-all",
-                    method === m
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "text-muted-foreground hover:border-primary hover:text-foreground"
+                    "v2-btn-secondary text-xs px-3 py-1.5 capitalize",
+                    method === m && "v2-btn-primary text-xs px-3 py-1.5"
                   )}
                 >
                   {t(`correlation.method_${m}`)}
@@ -107,7 +101,7 @@ export function Correlation() {
             type="button"
             onClick={compute}
             disabled={loading}
-            className="btn-primary"
+            className="v2-btn-primary"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? t("correlation.loading") : t("correlation.compute")}
@@ -117,14 +111,16 @@ export function Correlation() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-lg border border-loss/30 bg-loss/10 p-4">
-          <p className="text-sm text-loss">{error}</p>
+        <div className="error-state animate-fade-in">
+          <div className="error-state-header">
+            <span>{error}</span>
+          </div>
         </div>
       )}
 
       {/* Chart */}
       {labels.length > 0 && (
-        <div className="glass-card p-5">
+        <div className="v2-card-depth-1 p-5 animate-fade-in" style={{ animationDelay: "0.1s" }}>
           <CorrelationMatrix labels={labels} matrix={matrix} height={520} />
         </div>
       )}

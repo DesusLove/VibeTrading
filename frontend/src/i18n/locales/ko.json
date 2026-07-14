@@ -159,9 +159,9 @@
       "macroResearch": "웹 리서치: 매크로 전망",
       "macroResearchDesc": "매크로 분석을 위해 최신 웹 소스를 읽기",
       "analyzeBrokerExport": "내 브로커 내보내기 분석",
-      "analyzeBrokerExportDesc": "동화순/동차/푸도우/범용 CSV 파싱 — 보유일수, 승률, 손익비, 시간대별 분포",
+      "analyzeBrokerExportDesc": "동화순/동차/푸도우/범용 CSV 파싱  보유일수, 승률, 손익비, 시간대별 분포",
       "diagnoseBehavior": "내 행동 편향 진단",
-      "diagnoseBehaviorDesc": "처분 효과, 과매매, 모멘텀 추격, 닻 고정 — 심각도 + 수치 증거",
+      "diagnoseBehaviorDesc": "처분 효과, 과매매, 모멘텀 추격, 닻 고정  심각도 + 수치 증거",
       "checkConnector": "선택한 커넥터 확인",
       "checkConnectorDesc": "커넥터 프로필을 나열하고 선택한 항목을 검증",
       "analyzePortfolio": "커넥터 포트폴리오 분석",
@@ -173,7 +173,7 @@
       "shadowDelta": "놓치고 있는 수익은 얼마일까?",
       "shadowDeltaDesc": "섀도우 전략을 백테스트하고 실제 PnL과의 차이를 귀인 분석",
       "shadowReport": "섀도우 리포트 생성",
-      "shadowReportDesc": "8개 섹션 HTML/PDF — 자산 곡선, 시장별 Sharpe, 귀인 워터폴",
+      "shadowReportDesc": "8개 섹션 HTML/PDF  자산 곡선, 시장별 Sharpe, 귀인 워터폴",
       "crossMarketPortfolioPrompt": "000001.SZ, 600519.SH, 000858.SZ로 리스크 패리티 포트폴리오를 구축하고 2024년 전체 백테스트하여 등가중 벤치마크와 비교",
       "btcMacdPrompt": "000001.SZ 5분봉으로 MACD 전략 백테스트: 단기선12, 장기선26, 시그널9, 최근 30일",
       "usTechMaxDivPrompt": "600519.SH, 600858.SZ, 601318.SH, 000001.SZ, 600036.SH의 최대 분산 포트폴리오를 2024년 전체 백테스트",
@@ -183,14 +183,14 @@
       "quantStrategyDeskPrompt": "[Swarm 팀 모드] quant_strategy_desk 프리셋을 사용하여 CSI 300 구성 종목에서 최적의 모멘텀 전략을 찾아 백테스트",
       "earningsReportPrompt": "업로드한 실적 보고서의 주요 재무 지표, 리스크, 전망을 요약",
       "macroResearchPrompt": "최신 중앙은행 통화 정책 보고서를 읽고 A주 시장에 미치는 영향을 요약",
-      "analyzeBrokerExportPrompt": "방금 업로드한 매매 일지를 분석 — 보유 통계, 승률, 주요 종목, 시간대별 분포의 전체 프로필",
+      "analyzeBrokerExportPrompt": "방금 업로드한 매매 일지를 분석  보유 통계, 승률, 주요 종목, 시간대별 분포의 전체 프로필",
       "diagnoseBehaviorPrompt": "매매 일지에 4가지 행동 진단(처분 효과, 과매매, 모멘텀 추격, 닻 고정)을 실행하고 어떤 편향이 PnL에 가장 해로운지 알려주세요",
       "checkConnectorPrompt": "내 트레이딩 커넥터 프로필을 나열하고 선택된 것을 보여준 다음 해당 커넥터를 확인하세요. 준비되지 않았다면 어떤 설정 단계가 누락되었는지 정확히 알려주세요. 주문하지 마세요.",
       "analyzePortfolioPrompt": "선택한 트레이딩 커넥터 프로필을 사용하여 내 계좌, 포지션, 집중도, 현금, 포트폴리오 리스크를 요약하세요. 주문하지 마세요.",
       "quoteTrendPrompt": "선택한 트레이딩 커넥터로 600519.SH의 시세와 30일 일봉을 가져온 다음 현재 시세를 최근 추세와 비교하여 요약하세요. 읽기 전용으로 유지하세요.",
-      "trainShadowPrompt": "방금 업로드한 매매 일지에서 내 섀도우 계좌를 학습 — 추출된 규칙을 보여주고 내 행동과 일치하는지 확인",
+      "trainShadowPrompt": "방금 업로드한 매매 일지에서 내 섀도우 계좌를 학습  추출된 규칙을 보여주고 내 행동과 일치하는지 확인",
       "shadowDeltaPrompt": "지난 90일간의 섀도우 백테스트를 실행하고 실제 PnL이 섀도우와 갈라진 부분(규칙 위반, 조기 퇴장, 시그널 놓침)을 세분화하여 분석",
-      "shadowReportPrompt": "섀도우 리포트를 렌더링하고 URL을 제공 — 내 PnL vs 섀도우 델타를 선두에 표시"
+      "shadowReportPrompt": "섀도우 리포트를 렌더링하고 URL을 제공  내 PnL vs 섀도우 델타를 선두에 표시"
     },
     "capabilities": {
       "financeSkills": "금융 스킬 라이브러리",
@@ -588,7 +588,7 @@
       "alpha101": "Kakushadze(2015)의 101개 공식 alpha 시그널. 단기 횡단면 시그널.",
       "gtja191": "궈타이쥔안증권의 191개 Alpha. 중국 A주 시장에 최적화된 기술적 및 마이크로스트럭처 시그널.",
       "academic": "학술 문헌에서 선별된 장기 이상 현상(가치, 모멘텀, 품질, 저변동성 등).",
-      "fundamental": "PIT-safe SEC company facts로 계산되는 퀄리티·밸류 팩터 — earnings yield, ROE, gross profitability, asset growth (filed-date 기준)."
+      "fundamental": "PIT-safe SEC company facts로 계산되는 퀄리티·밸류 팩터  earnings yield, ROE, gross profitability, asset growth (filed-date 기준)."
     },
     "universeOption": {
       "csi300": "CSI 300 (중국 A주)",
@@ -680,7 +680,7 @@
     "expired": "만료됨",
     "limitsUnavailable": "한도 정보 없음",
     "noActiveMandate": "활성 mandate가 없습니다. 에이전트에 제안을 요청한 다음, 커넥터 런타임을 시작하기 전에 커밋하세요.",
-    "haltedControlsDisabled": "정지됨 — 러너 제어 비활성화",
+    "haltedControlsDisabled": "정지됨  러너 제어 비활성화",
     "runtimeActive": "mandate 내에서 런타임 활성",
     "idle": "유휴",
     "stopRunner": "러너 중지",
@@ -758,7 +758,7 @@
     "featureStreaming": "실시간 스트리밍",
     "featureStreamingDesc": "에이전트의 사고, 도구 호출, 반복 과정을 지켜보세요",
     "featureReplay": "전략 리플레이",
-    "featureReplayDesc": "매매 일지 분석 + 섀도우 계좌 — 규칙 추출, 백테스트, PnL 차이 귀인 분석",
+    "featureReplayDesc": "매매 일지 분석 + 섀도우 계좌  규칙 추출, 백테스트, PnL 차이 귀인 분석",
     "howItWorksTitle": "사용 방법",
     "step1Title": "1. 전략을 설명하세요",
     "step1Desc": "코드 없이 자연어로 테스트하고 싶은 내용을 에이전트에게 전달하세요.",
@@ -767,7 +767,7 @@
     "step3Title": "3. 결과를 확인하세요",
     "step3Desc": "성과 지표, 자산 곡선, 내보내기 가능한 Pine Script를 확인할 수 있습니다.",
     "step4Title": "4. 준비되면 실전으로",
-    "step4Desc": "한도가 명시된 거래 mandate를 선택적으로 승인하세요 — 확인 없이는 어떤 주문도 실행되지 않습니다."
+    "step4Desc": "한도가 명시된 거래 mandate를 선택적으로 승인하세요  확인 없이는 어떤 주문도 실행되지 않습니다."
   },
   "errorBoundary": {
     "somethingWrong": "문제가 발생했습니다"

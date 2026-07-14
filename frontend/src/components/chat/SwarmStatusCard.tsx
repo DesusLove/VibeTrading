@@ -69,17 +69,17 @@ function StatusIcon({ status }: { status: SwarmAgentDisplayStatus }) {
 function runTone(status: SwarmRunStatus["status"]): string {
   switch (status) {
     case "completed":
-      return "text-emerald-600 dark:text-emerald-400";
+      return "text-positive";
     case "failed":
-      return "text-destructive";
+      return "text-negative";
     case "cancelled":
-      return "text-muted-foreground";
+      return "text-text-tertiary";
     case "running":
-      return "text-primary";
+      return "text-guru";
     case "pending":
     case "unknown":
     default:
-      return "text-muted-foreground";
+      return "text-text-tertiary";
   }
 }
 
@@ -91,10 +91,10 @@ export const SwarmStatusCard = memo(function SwarmStatusCard({ status }: Props) 
   const layerCurrent = Math.min(status.currentLayer + 1, layerTotal);
 
   return (
-    <div className="panel p-3 space-y-3">
+    <div className="v2-card-depth-1 p-3 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <Users className="h-3.5 w-3.5 shrink-0 text-accent" />
+          <Users className="h-3.5 w-3.5 shrink-0 text-guru" />
           <span className="truncate text-xs font-semibold text-text-primary">{status.preset}</span>
           <span className={["shrink-0 text-[10px] font-medium capitalize", runTone(status.status)].join(" ")}>
             {status.status.replace(/_/g, " ")}

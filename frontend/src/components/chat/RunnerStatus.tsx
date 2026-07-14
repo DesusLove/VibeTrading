@@ -25,7 +25,7 @@ interface Props {
   /** Shared `GET /live/status` snapshot, polled once by the parent (Agent.tsx).
    * `null` until the first poll resolves. */
   status: LiveStatus | null;
-  /** True when the status endpoint is not wired on this backend (404/501) — hide. */
+  /** True when the status endpoint is not wired on this backend (404/501)  hide. */
   unavailable?: boolean;
   /** When true, every broker's halted banner reflects the global kill switch. */
   halted?: boolean;
@@ -34,7 +34,7 @@ interface Props {
 }
 
 function formatUsd(value: number | undefined): string {
-  if (value == null || !Number.isFinite(value)) return "—";
+  if (value == null || !Number.isFinite(value)) return "";
   return `$${value.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 }
 
@@ -53,7 +53,7 @@ function formatRelative(value: string | number | null | undefined): string {
 }
 
 function formatCountdown(iso: string | undefined): { label: string; expired: boolean; soon: boolean } {
-  if (!iso) return { label: "—", expired: false, soon: false };
+  if (!iso) return { label: "", expired: false, soon: false };
   const target = new Date(iso).getTime();
   if (!Number.isFinite(target)) return { label: "unknown", expired: false, soon: false };
   const deltaSec = Math.round((target - Date.now()) / 1000);
@@ -138,17 +138,17 @@ function BrokerRow({
   }, [brokerKey, busy, runnerAlive, onRefresh]);
 
   return (
-    <div className="grid gap-2 rounded-lg border bg-muted/20 p-2.5">
+    <div className="grid gap-2 v2-card-depth-1 p-2.5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <span className="truncate text-xs font-semibold capitalize text-foreground">{brokerKey}</span>
           {authorized ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="v2-badge-success">
               <ShieldCheck className="h-2.5 w-2.5" />
               Authorized
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            <span className="v2-badge-neutral">
               <CircleSlash className="h-2.5 w-2.5" />
               Not connected
             </span>
@@ -165,11 +165,11 @@ function BrokerRow({
             <PlugZap className="h-3 w-3 shrink-0" />
             Connect this profile to enable connector runtime
           </div>
-          <p className="text-[10px] leading-relaxed text-muted-foreground">
+          <p className="text-[10px] leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
             {authorizeInstruction}
           </p>
           {authorizeNote && (
-            <p className="text-[10px] leading-relaxed text-muted-foreground">
+            <p className="text-[10px] leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
               {authorizeNote}
             </p>
           )}
@@ -178,16 +178,16 @@ function BrokerRow({
         <>
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-md border bg-background/60 p-2">
-              <div className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                <CircleDot className={["h-2.5 w-2.5", runnerAlive ? "text-emerald-500" : "text-muted-foreground"].join(" ")} />
+              <div className="flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-secondary))' }}>
+                <CircleDot className={["h-2.5 w-2.5", runnerAlive ? "text-emerald-500" : ""].join(" ")} />
                 Runner
               </div>
-              <div className={["mt-0.5 text-xs font-semibold", runnerAlive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"].join(" ")}>
+              <div className={["mt-0.5 text-xs font-semibold", runnerAlive ? "text-emerald-600 dark:text-emerald-400" : ""].join(" ")}>
                 {runnerAlive ? "Running" : "Stopped"}
               </div>
             </div>
             <div className="rounded-md border bg-background/60 p-2">
-              <div className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <div className="flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-secondary))' }}>
                 <Activity className="h-2.5 w-2.5" />
                 Last tick
               </div>
@@ -200,20 +200,19 @@ function BrokerRow({
           {mandate ? (
             <div className="rounded-md border bg-background/60 p-2">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <div className="flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] font-semibold" style={{ color: 'hsl(var(--text-secondary))' }}>
                   <ShieldCheck className="h-2.5 w-2.5" />
                   Active mandate
                 </div>
                 {mandate.expires_at && (
-                  <span
-                    className={[
-                      "inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium",
-                      countdown.expired
-                        ? "bg-destructive/10 text-destructive"
-                        : countdown.soon
-                          ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                          : "bg-muted text-muted-foreground",
-                    ].join(" ")}
+<span
+                      className={
+                        countdown.expired
+                          ? "v2-badge-danger"
+                          : countdown.soon
+                            ? "v2-badge-warning"
+                            : "v2-badge-neutral"
+                      }
                     title={`Expires ${new Date(mandate.expires_at).toLocaleString()}`}
                   >
                     <Clock className="h-2.5 w-2.5" />
@@ -226,19 +225,19 @@ function BrokerRow({
               </div>
             </div>
           ) : (
-            <div className="rounded-md border border-dashed bg-background/40 p-2 text-[10px] text-muted-foreground">
+            <div className="rounded-md border border-dashed bg-background/40 p-2 text-[10px]" style={{ color: 'hsl(var(--text-secondary))' }}>
               No active mandate. Ask the agent to propose one, then commit it before starting the connector runtime.
             </div>
           )}
 
           <div className="flex items-center justify-between gap-2">
             {halted ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-destructive">
+              <span className="v2-badge-danger">
                 <OctagonX className="h-3 w-3" />
-                Halted — runner controls disabled
+                Halted  runner controls disabled
               </span>
             ) : (
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[10px]" style={{ color: 'hsl(var(--text-secondary))' }}>
                 {runnerAlive ? "Runtime active inside mandate" : "Idle"}
               </span>
             )}
@@ -247,7 +246,7 @@ function BrokerRow({
               onClick={toggleRunner}
               disabled={busy || halted || !mandate}
               className={[
-                "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-medium transition-colors disabled:opacity-40",
+                "v2-btn-secondary text-[11px] px-2 py-1",
                 runnerAlive
                   ? "border-destructive/40 text-destructive hover:bg-destructive/10"
                   : "border-primary/40 text-primary hover:bg-primary/10",
@@ -286,27 +285,27 @@ export const RunnerStatus = memo(function RunnerStatus({ status, unavailable, ha
   const authorizedCount = status.brokers.filter((b) => b.auth.oauth_token_present).length;
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-2 animate-fade-in">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex max-w-full items-center gap-1.5 justify-self-start rounded-lg bg-primary/10 px-2.5 py-1 text-left text-xs font-medium text-primary transition-colors hover:bg-primary/15"
+        className="v2-btn-secondary text-xs px-2 py-1 max-w-full justify-self-start text-left"
         aria-label={i18n.t("runnerStatus.connectorRuntime")}
         aria-expanded={open}
       >
         <Activity className="h-3 w-3 shrink-0" />
         <span className="shrink-0">{i18n.t("runnerStatus.connectorRuntime")}</span>
-        <span className="truncate text-muted-foreground">
+        <span className="truncate" style={{ color: 'hsl(var(--text-secondary))' }}>
           {authorizedCount > 0 ? i18n.t("runnerStatus.connected", { count: authorizedCount }) : i18n.t("runnerStatus.noConnector")}
         </span>
         {anyRunning && !isHalted && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+          <span className="v2-badge-success">
             <CircleDot className="h-2.5 w-2.5" />
             {i18n.t("runnerStatus.running")}
           </span>
         )}
         {isHalted && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+          <span className="v2-badge-danger">
             <OctagonX className="h-2.5 w-2.5" />
             {i18n.t("runnerStatus.halted")}
           </span>
@@ -315,7 +314,7 @@ export const RunnerStatus = memo(function RunnerStatus({ status, unavailable, ha
       </button>
 
       {open && (
-        <div className="grid gap-2 rounded-xl border border-primary/20 bg-background/95 p-3 shadow-sm">
+        <div className="grid gap-2 v2-card-depth-1 p-3">
           {status.brokers.map((broker) => (
             <BrokerRow key={broker.auth.broker} broker={broker} halted={isHalted || broker.halted} onRefresh={onRefresh} />
           ))}

@@ -12,7 +12,7 @@ export function ConnectionBanner({ status, retryAttempt }: Props) {
   if (status !== "reconnecting") return null;
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] bg-warning/10 text-warning border-b border-warning/30">
+    <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] text-warning border-b" style={{ background: 'hsl(38 85% 50% / 0.08)', borderColor: 'hsl(38 85% 50% / 0.2)' }}>
       <RefreshCw className="h-3 w-3 animate-spin shrink-0" />
       <span className="num-xs">{t('connection.reconnecting', { attempt: retryAttempt || 1 })}</span>
     </div>
