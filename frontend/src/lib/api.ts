@@ -986,3 +986,7 @@ export interface TickerItem {
 export async function getTicker(signal?: AbortSignal): Promise<TickerItem[]> {
   return request<TickerItem[]>("/market/ticker", { signal });
 }
+
+export async function getMarketHistory(symbol: string, period = "1y"): Promise<PriceBar[]> {
+  return request<PriceBar[]>(`/market/history?symbol=${encodeURIComponent(symbol)}&period=${period}`);
+}

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
-import { Activity, BarChart3, Bot, Check, ChevronDown, FileText, GitCompare, Languages, Moon, Sun, Plus, Trash2, Pencil, ChevronsLeft, ChevronsRight, Settings, Layers, Loader2, Menu, X, Wifi } from "lucide-react";
+import { Activity, BarChart3, Bot, Check, ChevronDown, FileText, GitCompare, Languages, Moon, Sun, Plus, Trash2, Pencil, ChevronsLeft, ChevronsRight, Settings, Layers, Loader2, Menu, X, Wifi, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useBinanceTicker } from "@/hooks/useBinanceTicker";
@@ -21,6 +21,7 @@ export function Layout() {
     { to: "/alpha-zoo", icon: Layers, label: t('layout.alphaZoo') },
     { to: "/settings", icon: Settings, label: t('layout.settings') },
     { to: "/correlation", icon: GitCompare, label: t('layout.correlation') },
+    { to: "/charts", icon: TrendingUp, label: t('layout.charts') },
   ];
 
   const [ticker, setTicker] = useState<TickerItem[]>(STATIC_FALLBACK);
@@ -395,7 +396,7 @@ export function Layout() {
           </div>
 
           <ConnectionBanner status={sseStatus} retryAttempt={sseRetryAttempt} />
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto relative">
             <Outlet />
           </main>
 

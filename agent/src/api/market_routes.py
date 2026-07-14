@@ -107,3 +107,33 @@ async def get_ticker() -> list[dict[str, Any]]:
             logger.debug("Timeout or error fetching symbol")
 
     return results
+
+
+@router.get("/history")
+async def get_history(symbol: str = "SPY", period: str = "1y") -> list[dict[str, Any]]:
+    """Historical OHLC data via yfinance."""
+    try:
+        ticker = yf.Ticker(symbol)
+        df = await asyncio.wait_for(
+            asyncio.to_thread(ticker.history, period=period),
+            timeout=15.0,
+        )
+        if df.empty:
+            return []
+        records: list[dict[str, Any]] = []
+        for idx, row in df.iterrows():
+            records.append({
+                "time": idx.strftime("%Y-%m-%d"),
+                "open": round(float(row["Open"]), 4),
+                "high": round(float(row["High"]), 4),
+                "low": round(float(row["Low"]), 4),
+                "close": round(float(row["Close"]), 4),
+                "volume": int(row["Volume"]),
+            })
+        return records
+    except asyncio.TimeoutError:
+        logger.warning("Timeout fetching history for %s", symbol)
+        return []
+    except Exception as exc:
+        logger.warning("Failed to fetch history for %s: %s", symbol, exc)
+        return []

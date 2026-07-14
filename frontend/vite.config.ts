@@ -14,7 +14,7 @@ const PROXY_PATHS = [
   "/live",
   "/upload",
   "/shadow-reports",
-  "/market",
+  "^/market(?:/|$)",
 ];
 
 export default defineConfig(({ mode }) => {
