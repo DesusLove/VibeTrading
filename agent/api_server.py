@@ -23,6 +23,12 @@ from src.ui_services import build_run_analysis, load_run_context  # noqa: F401
 
 # UTF-8 on Windows
 import sys as _sys
+
+import __main__ as _main_mod
+
+_sys.modules.setdefault("api_server", _main_mod)
+_sys.modules.setdefault("agent.api_server", _main_mod)
+
 for _s in ("stdout", "stderr"):
     _r = getattr(getattr(_sys, _s, None), "reconfigure", None)
     if callable(_r):

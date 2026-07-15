@@ -1,45 +1,54 @@
 type N = number | null;
 
 export function calcMA(data: number[], period: number): N[] {
-  return data.map((_, i) => {
-    if (i < period - 1) return null;
-    let s = 0;
-    for (let j = i - period + 1; j <= i; j++) s += data[j];
-    return s / period;
-  });
+  const out: N[] = new Array(data.length).fill(null);
+  if (data.length < period) return out;
+  let sum = 0;
+  for (let i = 0; i < period; i++) sum += data[i];
+  out[period - 1] = sum / period;
+  for (let i = period; i < data.length; i++) {
+    sum += data[i] - data[i - period];
+    out[i] = sum / period;
+  }
+  return out;
 }
 
 export function calcEMA(data: number[], period: number): N[] {
   const k = 2 / (period + 1);
-  const out: N[] = [];
-  let ema: number | null = null;
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      out.push(null);
-    } else if (ema === null) {
-      let s = 0;
-      for (let j = 0; j < period; j++) s += data[j];
-      ema = s / period;
-      out.push(ema);
-    } else {
-      ema = data[i] * k + ema * (1 - k);
-      out.push(ema);
-    }
+  const out: N[] = new Array(data.length).fill(null);
+  if (data.length < period) return out;
+  let sum = 0;
+  for (let i = 0; i < period; i++) sum += data[i];
+  let ema = sum / period;
+  out[period - 1] = ema;
+  for (let i = period; i < data.length; i++) {
+    ema = data[i] * k + ema * (1 - k);
+    out[i] = ema;
   }
   return out;
 }
 
 export function calcBOLL(data: number[], period = 20, mult = 2) {
   const mid = calcMA(data, period);
-  const upper: N[] = [];
-  const lower: N[] = [];
-  for (let i = 0; i < data.length; i++) {
-    if (mid[i] === null) { upper.push(null); lower.push(null); continue; }
-    let sq = 0;
-    for (let j = i - period + 1; j <= i; j++) sq += (data[j] - mid[i]!) ** 2;
-    const std = Math.sqrt(sq / period);
-    upper.push(mid[i]! + mult * std);
-    lower.push(mid[i]! - mult * std);
+  const upper: N[] = new Array(data.length).fill(null);
+  const lower: N[] = new Array(data.length).fill(null);
+  if (data.length < period) return { upper, mid, lower };
+
+  let sumSq = 0;
+  for (let i = 0; i < period; i++) sumSq += data[i] ** 2;
+  const sum = mid[period - 1]! * period;
+  let s2 = sumSq - (sum * sum) / period;
+  const std = Math.sqrt(Math.max(0, s2) / period);
+  upper[period - 1] = mid[period - 1]! + mult * std;
+  lower[period - 1] = mid[period - 1]! - mult * std;
+
+  for (let i = period; i < data.length; i++) {
+    sumSq += data[i] ** 2 - data[i - period] ** 2;
+    const newSum = mid[i]! * period;
+    s2 = sumSq - (newSum * newSum) / period;
+    const s = Math.sqrt(Math.max(0, s2) / period);
+    upper[i] = mid[i]! + mult * s;
+    lower[i] = mid[i]! - mult * s;
   }
   return { upper, mid, lower };
 }
@@ -95,12 +104,23 @@ export function calcKDJ(highs: number[], lows: number[], closes: number[], perio
   const j: N[] = new Array(n).fill(null);
   if (n < period) return { k, d, j };
 
+  let hiWin: number[] = [];
+  let loWin: number[] = [];
+
   let pk = 50, pd = 50;
-  for (let i = period - 1; i < n; i++) {
+  for (let i = 0; i < n; i++) {
+    hiWin.push(highs[i]);
+    loWin.push(lows[i]);
+    if (hiWin.length > period) {
+      hiWin.shift();
+      loWin.shift();
+    }
+    if (i < period - 1) continue;
+
     let hi = -Infinity, lo = Infinity;
-    for (let p = i - period + 1; p <= i; p++) {
-      if (highs[p] > hi) hi = highs[p];
-      if (lows[p] < lo) lo = lows[p];
+    for (let p = 0; p < period; p++) {
+      if (hiWin[p] > hi) hi = hiWin[p];
+      if (loWin[p] < lo) lo = loWin[p];
     }
     const rsv = hi === lo ? 50 : ((closes[i] - lo) / (hi - lo)) * 100;
     pk = (pk * 2 + rsv) / 3;

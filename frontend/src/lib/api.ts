@@ -351,7 +351,7 @@ export interface RunDetailParams {
 }
 
 export interface PriceBar {
-  time: string;
+  time: string | number;
   timestamp?: string;
   code?: string;
   open: number;
@@ -362,7 +362,7 @@ export interface PriceBar {
 }
 
 export interface TradeMarker {
-  time: string;
+  time: string | number;
   timestamp?: string;
   code?: string;
   side: "BUY" | "SELL";
@@ -480,7 +480,7 @@ export interface BacktestMetrics {
 
 
 export interface IndicatorPoint {
-  time: string;
+  time: string | number;
   value: number;
 }
 

@@ -1,58 +1,66 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Search, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { getMarketHistory, type PriceBar } from "@/lib/api";
 import { CandlestickChart } from "@/components/charts/CandlestickChart";
 
-type Range = "1mo" | "3mo" | "6mo" | "1y" | "5y";
+type Range = "1m" | "5m" | "15m" | "30m" | "1h" | "4h" | "24h" | "1mo" | "1y";
 
 const RANGES: { label: string; value: Range }[] = [
+  { label: "1m", value: "1m" },
+  { label: "5m", value: "5m" },
+  { label: "15m", value: "15m" },
+  { label: "30m", value: "30m" },
+  { label: "1h", value: "1h" },
+  { label: "4h", value: "4h" },
+  { label: "24h", value: "24h" },
   { label: "1M", value: "1mo" },
-  { label: "3M", value: "3mo" },
-  { label: "6M", value: "6mo" },
   { label: "1Y", value: "1y" },
-  { label: "5Y", value: "5y" },
 ];
 
-const DAYS: Record<Range, number> = {
-  "1mo": 30,
-  "3mo": 90,
-  "6mo": 180,
-  "1y": 365,
-  "5y": 1825,
-};
-
-const CG_ID: Record<string, string> = {
-  "BTC-USD": "bitcoin",
-  "ETH-USD": "ethereum",
-};
-
-async function fetchCoinGecko(symbol: string, per: Range): Promise<PriceBar[]> {
-  const id = CG_ID[symbol];
-  if (!id) throw new Error("No public fallback");
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 8_000);
-  const res = await fetch(
-    `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${DAYS[per]}`,
-    { signal: ctrl.signal },
-  );
-  clearTimeout(timer);
-  if (!res.ok) throw new Error(`CoinGecko HTTP ${res.status}`);
-  const json = await res.json();
-  const prices = json?.prices as [number, number][] | undefined;
-  if (!prices || prices.length === 0) throw new Error("No data");
-  return prices.map(([ts, price]) => ({
-    time: new Date(ts).toISOString().slice(0, 10),
-    open: price,
-    high: price,
-    low: price,
-    close: price,
-    volume: 0,
-  }));
-}
+const SYMBOLS = [
+  { group: "Indices", items: [
+    { label: "S&P 500", value: "SPY" },
+    { label: "NASDAQ", value: "QQQ" },
+    { label: "Dow Jones", value: "DIA" },
+    { label: "Russell 2000", value: "IWM" },
+    { label: "VIX", value: "^VIX" },
+  ]},
+  { group: "Crypto", items: [
+    { label: "Bitcoin", value: "BTC-USD" },
+    { label: "Ethereum", value: "ETH-USD" },
+    { label: "Solana", value: "SOL-USD" },
+    { label: "XRP", value: "XRP-USD" },
+    { label: "Cardano", value: "ADA-USD" },
+    { label: "Dogecoin", value: "DOGE-USD" },
+  ]},
+  { group: "Stocks", items: [
+    { label: "Apple", value: "AAPL" },
+    { label: "Microsoft", value: "MSFT" },
+    { label: "Google", value: "GOOGL" },
+    { label: "Amazon", value: "AMZN" },
+    { label: "NVIDIA", value: "NVDA" },
+    { label: "Meta", value: "META" },
+    { label: "Tesla", value: "TSLA" },
+    { label: "Berkshire B", value: "BRK-B" },
+    { label: "JPMorgan", value: "JPM" },
+    { label: "Vanguard S&P", value: "VOO" },
+  ]},
+  { group: "Forex", items: [
+    { label: "EUR/USD", value: "EURUSD=X" },
+    { label: "GBP/USD", value: "GBPUSD=X" },
+    { label: "USD/JPY", value: "USDJPY=X" },
+  ]},
+  { group: "Commodities", items: [
+    { label: "Gold", value: "GC=F" },
+    { label: "Crude Oil", value: "CL=F" },
+    { label: "Silver", value: "SI=F" },
+    { label: "Copper", value: "HG=F" },
+  ]},
+];
 
 export function Charts() {
   const [symbol, setSymbol] = useState("SPY");
-  const [input, setInput] = useState("SPY");
+  const [custom, setCustom] = useState("");
   const [period, setPeriod] = useState<Range>("1y");
   const [data, setData] = useState<PriceBar[]>([]);
   const [loading, setLoading] = useState(false);
@@ -67,17 +75,12 @@ export function Charts() {
       const bars = await getMarketHistory(sym, per);
       setData(bars);
       if (bars.length === 0) setError(`No data for "${sym}"`);
-      return;
-    } catch { /* try fallback */ }
-
-    try {
-      const bars = await fetchCoinGecko(sym, per);
-      setData(bars);
-      return;
-    } catch { /* fallback failed */ }
-
-    setError("Chart data unavailable — is the backend running?");
-    setData([]);
+    } catch {
+      setError("Chart data unavailable — is the backend running?");
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -96,27 +99,49 @@ export function Charts() {
     return () => ro.disconnect();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCustom = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = input.trim().toUpperCase();
-    if (trimmed && trimmed !== symbol) {
-      setSymbol(trimmed);
-    }
+    const trimmed = custom.trim().toUpperCase();
+    if (trimmed) setSymbol(trimmed);
   };
 
   return (
     <div className="absolute inset-0 flex flex-col">
-      {/* Controls */}
-      <div className="shrink-0 flex items-center gap-3 px-6 pt-5 pb-2">
-        <form onSubmit={handleSubmit} className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
+      <div className="shrink-0 flex items-center gap-3 px-6 pt-5 pb-2 flex-wrap">
+        {/* Symbol selector dropdown */}
+        <div className="relative">
+          <select
+            value={symbol}
+            onChange={(e) => setSymbol(e.target.value)}
+            className="w-44 px-2.5 py-1.5 rounded text-xs font-mono bg-surface-muted border border-border-hairline text-text-primary focus:outline-none focus:border-accent-primary/50 transition-colors appearance-none cursor-pointer"
+          >
+            {SYMBOLS.map((group) => (
+              <optgroup key={group.group} label={group.group}>
+                {group.items.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label} ({item.value})</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+
+        {/* Custom symbol input */}
+        <form onSubmit={handleCustom} className="flex items-center gap-1">
           <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Search symbol…"
-            className="w-44 pl-8 pr-3 py-1.5 rounded text-xs font-mono bg-surface-muted border border-border-hairline text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent-primary/50 transition-colors"
+            value={custom}
+            onChange={(e) => setCustom(e.target.value)}
+            placeholder="Any symbol…"
+            className="w-24 px-2 py-1.5 rounded text-xs font-mono bg-surface-muted border border-border-hairline text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent-primary/50 transition-colors"
           />
+          <button
+            type="submit"
+            className="px-2 py-1.5 rounded text-[10px] font-mono bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 transition-colors"
+          >
+            Go
+          </button>
         </form>
+
+        <div className="w-px h-4 bg-border-hairline" />
 
         <div className="flex gap-0.5">
           {RANGES.map((r) => (
@@ -142,7 +167,6 @@ export function Charts() {
         )}
       </div>
 
-      {/* Chart */}
       <div ref={containerRef} className="flex-1 min-h-0 px-6 pb-6">
         <div className="h-full w-full rounded-lg overflow-hidden bg-surface-muted/20 border border-border-hairline">
           {error ? (
@@ -156,7 +180,7 @@ export function Charts() {
             <CandlestickChart data={data} height={chartHeight} />
           ) : !loading ? (
             <div className="flex items-center justify-center h-full text-text-tertiary text-xs">
-              Enter a symbol to view chart
+              Select a symbol to view chart
             </div>
           ) : null}
         </div>
