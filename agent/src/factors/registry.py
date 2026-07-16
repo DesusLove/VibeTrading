@@ -1,3 +1,5 @@
+from typing import Any, Literal
+
 """Alpha registry: AST-scan zoo modules, validate metadata, lazy-import on compute.
 
 Design contract (frozen — referenced by W3 zoo-porting agents):
@@ -19,7 +21,6 @@ Module path derivation: ``f"src.factors.zoo.{zoo_id}.{alpha_id_short}"``. Both
 honour a ``py_module`` field from any data file.
 """
 
-from __future__ import annotations
 
 import ast
 import importlib
@@ -29,9 +30,9 @@ import re
 import sys
 import threading
 from dataclasses import dataclass
+from datetime import UTC
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -398,7 +399,7 @@ class Registry:
 
     def export_manifest(self) -> dict[str, Any]:
         """Return a JSON-serialisable snapshot for wiki rendering."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         zoos: dict[str, list[dict[str, Any]]] = {}
         for a in self._alphas.values():
@@ -410,7 +411,7 @@ class Registry:
                 }
             )
         return {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "zoos": [
                 {"zoo_id": zoo_id, "alphas": sorted(items, key=lambda x: x["id"])}
                 for zoo_id, items in sorted(zoos.items())
@@ -428,7 +429,7 @@ class Registry:
 # Registry() directly; the singleton is only for the default bundled zoo.
 # ---------------------------------------------------------------------------
 
-_registry_cache: "Registry | None" = None
+_registry_cache: Registry | None = None
 _registry_cache_lock = threading.Lock()
 
 
@@ -448,6 +449,7 @@ def get_default_registry() -> Registry:
 
 def reset_default_registry() -> None:
     """Drop the cached registry (test hook; do not call in production)."""
+
     global _registry_cache
     with _registry_cache_lock:
         _registry_cache = None

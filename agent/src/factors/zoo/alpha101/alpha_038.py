@@ -10,7 +10,6 @@ Formula (paper appendix): (-1*rank(ts_rank(close,10))) * rank(close/open)
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 38.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ __alpha_meta__ = {
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     open_ = panel["open"]
 

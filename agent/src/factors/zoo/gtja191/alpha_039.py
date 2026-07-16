@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #39 - 量价反转排名
@@ -9,7 +10,7 @@
 Formula: ((RANK(DECAYLINEAR(DELTA(CLOSE,2),8)) - RANK(DECAYLINEAR(CORR(((VWAP*0.3)+(OPEN*0.7)),SUM(MEAN(VOLUME,180),37),14),12)))*-1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 39."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

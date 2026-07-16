@@ -1,3 +1,5 @@
+from typing import Any
+
 #!/usr/bin/env python3
 """新浪财经 A 股监管处罚记录抓取脚本（独立 stdlib 实现）。
 
@@ -14,7 +16,6 @@
 输出：JSON 到 stdout；失败时返回 {"source": "unavailable", "error": "..."}。
 """
 
-from __future__ import annotations
 
 import argparse
 import gzip
@@ -24,7 +25,6 @@ import sys
 import time
 import unicodedata
 from html.parser import HTMLParser
-from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -352,6 +352,7 @@ class _RecordParser(HTMLParser):
     - 状态机以 `<thead>` 为记录起点；遇到下一个 `<thead>` 落盘上一条。
     - 记录内的 `<tr>` 抓取 `<strong>KEY</strong>` 与同行第一个 `<td>VALUE</td>`。
     """
+
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)

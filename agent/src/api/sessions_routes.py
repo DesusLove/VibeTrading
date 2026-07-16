@@ -1,15 +1,15 @@
+from typing import Any
+
 """Session and goal HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_sessions_routes(app)``.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import re
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class CreateSessionRequest(BaseModel):
     """Create session request body."""
     title: str = Field("", description="Session title")
-    config: Optional[Dict[str, Any]] = Field(None, description="Session config")
+    config: dict[str, Any | None] = Field(None, description="Session config")
 
 
 class SessionResponse(BaseModel):
@@ -35,7 +35,7 @@ class SessionResponse(BaseModel):
     status: str
     created_at: str
     updated_at: str
-    last_attempt_id: Optional[str] = None
+    last_attempt_id: str | None = None
 
 
 class SendMessageRequest(BaseModel):
@@ -50,21 +50,21 @@ class MessageResponse(BaseModel):
     role: str
     content: str
     created_at: str
-    linked_attempt_id: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    linked_attempt_id: str | None = None
+    metadata: dict[str, Any | None] = None
 
 
 class CreateGoalRequest(BaseModel):
     """Create or replace a finance research goal."""
 
     objective: str = Field(..., min_length=1, max_length=5000)
-    criteria: List[str] = Field(default_factory=list)
+    criteria: list[str] = Field(default_factory=list)
     ui_summary: str = ""
     protocol: str = "thesis_review"
     risk_tier: str = "research_general"
-    token_budget: Optional[int] = Field(None, ge=1)
-    turn_budget: Optional[int] = Field(None, ge=1)
-    time_budget_seconds: Optional[int] = Field(None, ge=1)
+    token_budget: int | None = Field(None, ge=1)
+    turn_budget: int | None = Field(None, ge=1)
+    time_budget_seconds: int | None = Field(None, ge=1)
 
 
 class UpdateGoalRequest(BaseModel):
@@ -72,8 +72,8 @@ class UpdateGoalRequest(BaseModel):
 
     goal_id: str = Field(..., min_length=1)
     expected_goal_id: str = Field(..., min_length=1)
-    objective: Optional[str] = Field(None, min_length=1, max_length=5000)
-    ui_summary: Optional[str] = Field(None, max_length=500)
+    objective: str | None = Field(None, min_length=1, max_length=5000)
+    ui_summary: str | None = Field(None, max_length=500)
 
 
 class AddGoalEvidenceRequest(BaseModel):
@@ -82,41 +82,41 @@ class AddGoalEvidenceRequest(BaseModel):
     goal_id: str = Field(..., min_length=1)
     expected_goal_id: str = Field(..., min_length=1)
     text: str = Field(..., min_length=1, max_length=10000)
-    criterion_id: Optional[str] = None
-    claim_id: Optional[str] = None
+    criterion_id: str | None = None
+    claim_id: str | None = None
     evidence_type: str = "evidence"
-    tool_call_id: Optional[str] = None
-    run_id: Optional[str] = None
-    source_provider: Optional[str] = None
-    source_type: Optional[str] = None
-    source_uri: Optional[str] = None
-    symbol_universe: List[str] = Field(default_factory=list)
-    benchmark: List[str] = Field(default_factory=list)
-    timeframe: Optional[str] = None
-    method: Optional[str] = None
-    assumptions: Dict[str, Any] = Field(default_factory=dict)
-    artifact_path: Optional[str] = None
-    artifact_hash: Optional[str] = None
-    data_as_of: Optional[str] = None
-    confidence: Optional[str] = None
-    caveat: Optional[str] = None
-    contradicts_claim_ids: List[str] = Field(default_factory=list)
+    tool_call_id: str | None = None
+    run_id: str | None = None
+    source_provider: str | None = None
+    source_type: str | None = None
+    source_uri: str | None = None
+    symbol_universe: list[str] = Field(default_factory=list)
+    benchmark: list[str] = Field(default_factory=list)
+    timeframe: str | None = None
+    method: str | None = None
+    assumptions: dict[str, Any] = Field(default_factory=dict)
+    artifact_path: str | None = None
+    artifact_hash: str | None = None
+    data_as_of: str | None = None
+    confidence: str | None = None
+    caveat: str | None = None
+    contradicts_claim_ids: list[str] = Field(default_factory=list)
 
 
 class GoalSnapshotResponse(BaseModel):
     """Finance research goal snapshot."""
 
-    goal: Dict[str, Any]
-    claims: List[Dict[str, Any]]
-    criteria: List[Dict[str, Any]]
-    evidence: List[Dict[str, Any]]
+    goal: dict[str, Any]
+    claims: list[dict[str, Any]]
+    criteria: list[dict[str, Any]]
+    evidence: list[dict[str, Any]]
     evidence_count: int = 0
 
 
 class AddGoalEvidenceResponse(BaseModel):
     """Response after appending goal evidence."""
 
-    evidence: Dict[str, Any]
+    evidence: dict[str, Any]
     snapshot: GoalSnapshotResponse
 
 
@@ -125,7 +125,7 @@ class GoalAuditRowRequest(BaseModel):
 
     criterion_id: str = Field(..., min_length=1)
     result: str = Field(..., min_length=1)
-    evidence_ids: List[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
     notes: str = ""
 
 
@@ -135,27 +135,27 @@ class UpdateGoalStatusRequest(BaseModel):
     goal_id: str = Field(..., min_length=1)
     expected_goal_id: str = Field(..., min_length=1)
     status: str = Field(..., min_length=1)
-    audit: List[GoalAuditRowRequest] = Field(default_factory=list)
-    recap: Optional[str] = None
+    audit: list[GoalAuditRowRequest] = Field(default_factory=list)
+    recap: str | None = None
 
 
 class UpdateGoalStatusResponse(BaseModel):
     """Response after changing a goal status."""
 
-    goal: Dict[str, Any]
+    goal: dict[str, Any]
     snapshot: GoalSnapshotResponse
 
 
 class UpdateGoalResponse(BaseModel):
     """Response after editing a goal."""
 
-    goal: Dict[str, Any]
+    goal: dict[str, Any]
     snapshot: GoalSnapshotResponse
 
 
 class UpdateSessionRequest(BaseModel):
     """Session update fields."""
-    title: Optional[str] = None
+    title: str | None = None
 
 
 # ============================================================================
@@ -186,7 +186,7 @@ _PROPOSAL_TOOL_NAME = "propose_mandate_profiles"
 _PROPOSAL_ID_RE = re.compile(r'"proposal_id"\s*:\s*"(mp_[0-9a-f]{32})"')
 
 
-def _load_full_proposal(proposal_id: str) -> Optional[Dict[str, Any]]:
+def _load_full_proposal(proposal_id: str) -> dict[str, Any | None]:
     """Reload a persisted mandate proposal by id, broker-agnostic."""
     try:
         from src.live.paths import live_root
@@ -203,7 +203,7 @@ def _load_full_proposal(proposal_id: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _mandate_proposal_frame_from_tool_result(event: Any) -> Optional[str]:
+def _mandate_proposal_frame_from_tool_result(event: Any) -> str | None:
     """Build a mandate.proposal SSE frame from a propose-tool tool_result."""
     data = getattr(event, "data", None)
     if getattr(event, "event_type", None) != "tool_result" or not isinstance(data, dict):
@@ -230,7 +230,7 @@ def _mandate_proposal_frame_from_tool_result(event: Any) -> Optional[str]:
 _LIVE_ACTION_ID_RE = re.compile(r'"audit_id"\s*:\s*"(la_[0-9a-zA-Z]+)"')
 
 
-def _load_live_action_record(audit_id: str) -> Optional[Dict[str, Any]]:
+def _load_live_action_record(audit_id: str) -> dict[str, Any | None]:
     """Reload a redacted live-action record from the ledger by audit_id."""
     try:
         from src.live.paths import live_root
@@ -252,7 +252,7 @@ def _load_live_action_record(audit_id: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _live_action_frame_from_tool_result(event: Any) -> Optional[str]:
+def _live_action_frame_from_tool_result(event: Any) -> str | None:
     """Build a live.action SSE frame from an order-guard tool_result."""
     data = getattr(event, "data", None)
     if getattr(event, "event_type", None) != "tool_result" or not isinstance(data, dict):
@@ -344,7 +344,7 @@ def register_sessions_routes(app: FastAPI) -> None:
             last_attempt_id=session.last_attempt_id,
         )
 
-    @app.get("/sessions", response_model=List[SessionResponse], dependencies=[Depends(require_auth)])
+    @app.get("/sessions", response_model=list[SessionResponse], dependencies=[Depends(require_auth)])
     async def list_sessions(limit: int = Query(50, ge=1, le=200)):
         """List sessions."""
         svc = _host_get_session_service()
@@ -490,6 +490,7 @@ def register_sessions_routes(app: FastAPI) -> None:
         _host_validate_path_param(session_id, "session_id")
         svc, _session = _get_existing_session_or_404(session_id)
         from dataclasses import asdict
+
         from src.goal import EvidenceInput, StaleGoalError
 
         goal_store = _get_goal_store()
@@ -610,7 +611,7 @@ def register_sessions_routes(app: FastAPI) -> None:
             raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
         if req.title is not None:
             session.title = req.title
-        session.updated_at = datetime.now(timezone.utc).isoformat()
+        session.updated_at = datetime.now(UTC).isoformat()
         svc.store.update_session(session)
         return {"status": "updated", "session_id": session_id}
 
@@ -643,7 +644,7 @@ def register_sessions_routes(app: FastAPI) -> None:
             return {"status": "no_active_loop"}
         return {"status": "cancelled"}
 
-    @app.get("/sessions/{session_id}/messages", response_model=List[MessageResponse], dependencies=[Depends(require_auth)])
+    @app.get("/sessions/{session_id}/messages", response_model=list[MessageResponse], dependencies=[Depends(require_auth)])
     async def get_messages(session_id: str, limit: int = Query(100, ge=1, le=1000)):
         """List messages for a session."""
         _host_validate_path_param(session_id, "session_id")
@@ -668,10 +669,11 @@ def register_sessions_routes(app: FastAPI) -> None:
     async def session_events(
         session_id: str,
         request: Request,
-        last_event_id: Optional[str] = Query(None, alias="Last-Event-ID"),
-        replay: Optional[str] = Query(None),
+        last_event_id: str | None = Query(None, alias="Last-Event-ID"),
+        replay: str | None = Query(None),
     ):
         """SSE stream for agent events."""
+
         _host_validate_path_param(session_id, "session_id")
         svc = _host_get_session_service()
         if not svc:

@@ -1,13 +1,14 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """Swarm HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_swarm_routes(app, ...)``.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Awaitable, Callable
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
@@ -25,8 +26,8 @@ def _get_swarm_runtime():
     if _swarm_runtime is not None:
         return _swarm_runtime
     from src.config import load_swarm_agent_config
-    from src.swarm.store import SwarmStore
     from src.swarm.runtime import SwarmRuntime
+    from src.swarm.store import SwarmStore
 
     # Adjust path: this file is at agent/src/api/, so parent.parent.parent = agent/
     swarm_dir = Path(__file__).resolve().parent.parent.parent / ".swarm" / "runs"
@@ -205,6 +206,7 @@ def register_swarm_routes(
 
         Creates a new run with the same preset and user_vars as the original.
         """
+
         _host_validate_path_param(run_id, "run_id")
         runtime = _get_swarm_runtime()
         loaded = runtime._store.load_run(run_id)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated read/write classification for Dhan SDK operations.
 
 Keys are the connector's own operation names. Order-mutating SDK calls are
@@ -5,7 +6,7 @@ pinned WRITE so the live gate never treats them as plain reads; anything
 unlisted and not a known read is treated as WRITE (fail-closed) by the gate.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

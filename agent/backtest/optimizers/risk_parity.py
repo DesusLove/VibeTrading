@@ -1,9 +1,10 @@
+from typing import Any
+
 """Risk parity: equalize marginal risk contributions.
 
 Iterative refinement so w_i * MRC_i is approximately equal across assets.
 """
 
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd

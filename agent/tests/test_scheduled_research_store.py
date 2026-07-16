@@ -1,10 +1,11 @@
+from __future__ import annotations
 """Tests for the scheduled research job store.
 
 Covers: happy-path CRUD, atomic persistence, invalid schedule rejection,
 idempotent upsert, and empty-store behaviour.
 """
 
-from __future__ import annotations
+
 
 import time
 from pathlib import Path
@@ -13,7 +14,6 @@ import pytest
 
 from src.scheduled_research.models import JobStatus, ScheduledResearchJob, validate_schedule
 from src.scheduled_research.store import CorruptStoreError, ScheduledResearchJobStore
-
 
 # ---------------------------------------------------------------------------
 # Helpers

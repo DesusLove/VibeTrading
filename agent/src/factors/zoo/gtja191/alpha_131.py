@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: DELAT in report typo = DELTA.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -60,6 +59,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     c = panel["close"]
     v = panel["volume"]
     vw = vwap(panel, "equity_cn")

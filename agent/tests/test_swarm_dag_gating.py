@@ -12,7 +12,6 @@ Post-fix: B is marked ``TaskStatus.blocked``, no ``task_started`` for B, and
 ``task_blocked`` event is emitted.
 """
 
-from __future__ import annotations
 
 import json
 import threading
@@ -127,6 +126,7 @@ def test_blocked_downstream_emits_task_blocked_event(tmp_path, risk_fails):
 
 def test_run_marked_failed_when_downstream_blocked(tmp_path, risk_fails):
     """The whole run must be RunStatus.failed when any task is blocked."""
+
     from src.swarm.models import RunStatus
 
     store, runtime, run = _make_run(tmp_path)

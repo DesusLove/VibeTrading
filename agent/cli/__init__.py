@@ -20,7 +20,6 @@ etc. To preserve that surface we re-export every public name from
 helpers from ``cli._legacy`` directly.
 """
 
-from __future__ import annotations
 
 from cli import _legacy as _legacy
 from cli.main import main
@@ -79,8 +78,10 @@ def cmd_init() -> int:
 # tmp); cli.cmd_list()`` would silently read the unpatched ``_legacy.RUNS_DIR``.
 import functools as _functools  # noqa: E402
 
+
 def _make_synced_legacy_wrapper(legacy_fn):  # noqa: ANN001
     """Wrap ``legacy_fn`` so the package-level monkeypatch sync fires first."""
+
 
     @_functools.wraps(legacy_fn)
     def _wrapper(*args, **kwargs):

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Graceful bottleneck import with env-var override.
 
 Bottleneck provides C-compiled moving-window operators (move_argmax,
@@ -15,9 +17,6 @@ so ``ts_rank`` uses numpy ``sliding_window_view`` instead.
 is read through :func:`get_env_config` instead of at import time.
 """
 
-from __future__ import annotations
-
-from typing import Any
 
 # numpy sliding_window_view — always available (numpy >= 1.20)
 from numpy.lib.stride_tricks import sliding_window_view
@@ -59,6 +58,7 @@ def _ensure_bottleneck() -> None:
 
 def __getattr__(name: str) -> Any:
     """Lazily resolve ``HAS_BOTTLENECK`` and ``bn`` on first attribute access."""
+
     if name == "HAS_BOTTLENECK":
         _ensure_bottleneck()
         return _has_bottleneck

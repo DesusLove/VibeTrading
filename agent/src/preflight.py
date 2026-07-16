@@ -5,12 +5,10 @@ Non-critical failures are warnings (degraded functionality),
 LLM provider failure is critical (blocks startup).
 """
 
-from __future__ import annotations
 
 import os
 from dataclasses import dataclass
 from importlib.util import find_spec
-from typing import List, Optional
 
 from rich.console import Console
 from rich.table import Table
@@ -259,7 +257,7 @@ _STATUS_DISPLAY = {
 }
 
 
-def run_preflight(console: Optional[Console] = None) -> List[CheckResult]:
+def run_preflight(console: Console | None = None) -> list[CheckResult]:
     """Run all preflight checks and print results.
 
     Args:
@@ -268,6 +266,7 @@ def run_preflight(console: Optional[Console] = None) -> List[CheckResult]:
     Returns:
         List of check results.
     """
+
     if console is None:
         console = Console()
 
@@ -281,7 +280,7 @@ def run_preflight(console: Optional[Console] = None) -> List[CheckResult]:
         _check_content_filter_threshold,
     ]
 
-    results: List[CheckResult] = []
+    results: list[CheckResult] = []
     for check_fn in checks:
         results.append(check_fn())
 

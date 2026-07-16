@@ -10,7 +10,6 @@ ladder (annotations -> curated map -> default-deny); UNKNOWN is treated as WRITE
 (fail-closed), so an unrecognized broker tool is never exposed ungated.
 """
 
-from __future__ import annotations
 
 import logging
 
@@ -200,6 +199,7 @@ def wrap_live_broker_tools(
         The wrappers with order-placing tools gated, and (when halted) with the
         order tools omitted. Order is preserved.
     """
+
     broker = _broker_for(server_name, url)
     curated = _BROKER_CURATED_MAPS.get(broker)
     halted = halt_flag_set(broker)

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Trade journal format adapters.
 
 Each parser normalizes one broker export format into a list of TradeRecord.
@@ -7,11 +9,9 @@ Encoding fallback order for CSV: utf-8 → utf-8-sig → gbk → gb2312.
 Excel (.xlsx/.xls) always opens as utf-8 internally via openpyxl/xlrd.
 """
 
-from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -359,6 +359,7 @@ def parse_file(path: str | Path) -> tuple[FormatName, list[TradeRecord]]:
 
 def records_to_dataframe(records: list[TradeRecord]) -> pd.DataFrame:
     """Convert records to a standardized DataFrame (datetime column parsed)."""
+
     if not records:
         return pd.DataFrame(columns=[f.name for f in TradeRecord.__dataclass_fields__.values()])
     df = pd.DataFrame([asdict(r) for r in records])

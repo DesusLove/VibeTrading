@@ -48,13 +48,13 @@ except ImportError as e:
         "Matrix dependencies not installed. Run: pip install vibe-trading-ai[matrix]"
     ) from e
 
+from pydantic import BaseModel
+
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir, get_runtime_subdir
+from src.channels.utils import get_media_dir, get_runtime_subdir, safe_filename
 from src.config.paths import get_data_dir
-from pydantic import BaseModel
-from src.channels.utils import safe_filename
 from src.utils.logging_bridge import redirect_lib_logging
 
 TYPING_NOTICE_TIMEOUT_MS = 30_000
@@ -299,7 +299,7 @@ class MatrixChannel(BaseChannel):
             if self.session_path.exists():
                 self.logger.info("Found session.json at {}; attempting to use existing session...", self.session_path)
                 try:
-                    with open(self.session_path, "r", encoding="utf-8") as f:
+                    with open(self.session_path, encoding="utf-8") as f:
                         session = json.load(f)
                     self.client.user_id = self.config.user_id
                     self.client.access_token = session["access_token"]
@@ -348,7 +348,7 @@ class MatrixChannel(BaseChannel):
             try:
                 await asyncio.wait_for(asyncio.shield(self._sync_task),
                                        timeout=self.config.sync_stop_grace_seconds)
-            except (asyncio.TimeoutError, asyncio.CancelledError):
+            except (TimeoutError, asyncio.CancelledError):
                 self._sync_task.cancel()
                 with suppress(asyncio.CancelledError):
                     await self._sync_task
@@ -901,7 +901,7 @@ class MatrixChannel(BaseChannel):
                     return bytes(chunks)
         except _MediaTooLargeError:
             raise
-        except (aiohttp.ClientError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, aiohttp.ClientError, OSError):
             self.logger.warning("download failed for {}", mxc_url, exc_info=True)
             return None
 

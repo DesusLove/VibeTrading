@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only financial-statements tool: three statements + key indicators.
 
 Pulls a single stock's balance sheet, income statement, cash-flow statement, or
@@ -22,11 +24,9 @@ envelope and never raises for a recoverable per-request failure — a bad symbol
 or a transient HTTP error is reported inside the envelope.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json, resolve_secid
 from backtest.loaders.sec_edgar_client import cik_for, get_company_facts
@@ -461,6 +461,7 @@ class FinancialStatementsTool(BaseTool):
             when the per-market fetch failed for every requested code (so a
             nested fetch error is never masked by a top-level ``ok: true``).
         """
+
         code = kwargs.get("code")
         if not isinstance(code, str) or not code.strip():
             return _error("code must be a non-empty symbol string")

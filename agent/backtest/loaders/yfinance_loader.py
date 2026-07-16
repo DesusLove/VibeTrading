@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Dict, List, Optional, Union
 
 import pandas as pd
 import yfinance as yf
@@ -83,7 +82,7 @@ def _to_yfinance_exclusive_end(end_date: str) -> str:
 
 
 def _download_history(
-    tickers: Union[List[str], str],
+    tickers: list[str, str],
     start_date: str,
     end_date: str,
     interval: str,
@@ -230,13 +229,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV history keyed by the original project symbols.
 
         Args:
@@ -258,16 +257,16 @@ class DataLoader:
         yf_interval = _to_yfinance_interval(requested_interval)
         yf_end_date = _to_yfinance_exclusive_end(end_date)
 
-        symbol_groups: Dict[str, List[str]] = defaultdict(list)
+        symbol_groups: dict[str, list[str]] = defaultdict(list)
         for code in codes:
             symbol_groups[_to_yfinance_symbol(code)].append(code)
 
         unique_symbols = list(symbol_groups.keys())
-        results: Dict[str, pd.DataFrame] = {}
+        results: dict[str, pd.DataFrame] = {}
 
         # Serve cached symbols first so a fully-cached request skips the bulk
         # download entirely; only uncached symbols hit the network.
-        pending: List[str] = []
+        pending: list[str] = []
         for symbol in unique_symbols:
             cached = loader_cache_get(
                 source=self.name,

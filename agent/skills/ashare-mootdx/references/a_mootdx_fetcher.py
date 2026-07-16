@@ -6,9 +6,9 @@ Usage:
     from a_mootdx_fetcher import fetch_daily, fetch_realtime, batch_fetch_daily
 """
 import logging
-from mootdx.quotes import Quotes
+
 import pandas as pd
-from typing import Optional, List
+from mootdx.quotes import Quotes
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: LOWDAY -> ts_argmin (0-based); (20 - argmin)/20 * 100.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     l = panel["low"]
     am = ts_argmin(l, 20)
     out = (20.0 - am) / 20.0 * 100.0

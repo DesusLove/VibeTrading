@@ -1,9 +1,9 @@
+from typing import Literal
+
 """Structured agent config schema for MCP client integration."""
 
-from __future__ import annotations
 
 import json
-from typing import Literal
 from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -107,7 +107,7 @@ def live_broker_key_for_url(url: str) -> str | None:
 
 
 def live_broker_key_for_entry(
-    server_key: str, server: "MCPServerConfig | MCPServerConfigOverride"
+    server_key: str, server: MCPServerConfig | MCPServerConfigOverride
 ) -> str | None:
     """Resolve the canonical broker key for a config entry.
 
@@ -125,7 +125,7 @@ def live_broker_key_for_entry(
     return live_broker_key_for_url(getattr(server, "url", "") or "")
 
 
-def is_live_broker_entry(server_key: str, server: "MCPServerConfig | MCPServerConfigOverride") -> bool:
+def is_live_broker_entry(server_key: str, server: MCPServerConfig | MCPServerConfigOverride) -> bool:
     """Return whether a configured MCP server is a live broker.
 
     Detection is by config key (``LIVE_BROKER_SERVER_KEYS``) OR by URL host
@@ -143,7 +143,7 @@ def is_live_broker_entry(server_key: str, server: "MCPServerConfig | MCPServerCo
 
 
 def _allows_readonly_wildcard_probe(
-    server_key: str, server: "MCPServerConfig | MCPServerConfigOverride"
+    server_key: str, server: MCPServerConfig | MCPServerConfigOverride
 ) -> bool:
     """Return whether a live broker may use ``enabled_tools=["*"]``.
 
@@ -371,7 +371,7 @@ class MCPServerConfig(ConfigBase):
         return "stdio"
 
     @model_validator(mode="after")
-    def validate_transport_config(self) -> "MCPServerConfig":
+    def validate_transport_config(self) -> MCPServerConfig:
         """Validate transport-specific MCP server configuration.
 
         Returns:
@@ -449,7 +449,7 @@ class AgentConfig(ConfigBase):
     channels: ChannelsConfig = Field(default_factory=ChannelsConfig)
 
     @model_validator(mode="after")
-    def validate_live_broker_servers(self) -> "AgentConfig":
+    def validate_live_broker_servers(self) -> AgentConfig:
         """Reject wildcard allowlists on live-broker MCP server entries.
 
         A live-broker channel places real orders, so a wildcard
@@ -487,6 +487,7 @@ class AgentConfig(ConfigBase):
 
 class AgentConfigOverride(ConfigBase):
     """Partial top-level config override used for runtime layering."""
+
 
     model_config = ConfigDict(
         alias_generator=_to_camel,

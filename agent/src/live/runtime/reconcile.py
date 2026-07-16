@@ -1,3 +1,6 @@
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any
+
 """Crash recovery + position reconciliation (SPEC.md §7.5 component 5).
 
 This is the hardest piece of the persistent runtime and has **no reference-agent
@@ -42,15 +45,13 @@ client-order-id is broker-specific; see ``_client_order_id`` for the mapping
 TODO that needs the real broker catalog.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import os
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
 
 from src.live.mandate.store import load_mandate
 from src.live.paths import broker_dir
@@ -185,7 +186,7 @@ class ReconcileReport:
 
 def _utc_now_iso_ms() -> str:
     """Return the current UTC time as an ISO-8601 string with ms precision."""
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+    return datetime.now(UTC).isoformat(timespec="milliseconds")
 
 
 def _client_order_id(recorded_order: Mapping[str, Any]) -> str | None:
@@ -568,6 +569,7 @@ def _persist_state(
         balance: Broker-truth balance snapshot.
         ts: ISO-8601 UTC timestamp to stamp the state with.
     """
+
     payload = {
         "schema_version": RUNTIME_STATE_SCHEMA_VERSION,
         "broker": broker,

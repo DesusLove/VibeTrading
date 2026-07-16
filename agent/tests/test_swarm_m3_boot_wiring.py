@@ -21,7 +21,6 @@ Tests use ``tmp_path`` to redirect the runtime root so they never touch the
 real ``~/.vibe-trading`` directory of whoever is running the suite.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -197,6 +196,7 @@ def test_load_swarm_agent_config_loads_swarm_specific_file(
     ``swarm_specific`` server name we pinned in the file is the one that
     surfaces on the returned ``AgentConfig.mcp_servers`` mapping.
     """
+
     monkeypatch.delenv("VIBE_TRADING_SWARM_AGENT_CONFIG", raising=False)
     runtime_root = tmp_path / "runtime"
     _write_agent_json(runtime_root / "swarm-agent.json", "swarm_specific")

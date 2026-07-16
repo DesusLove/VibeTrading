@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #25 - 条件成交量压力
@@ -9,7 +10,7 @@
 Formula: ((-1*RANK((DELTA(CLOSE,7)*(1-RANK(DECAYLINEAR((VOLUME/MEAN(VOLUME,20)),9))))))*(1+RANK(SUM(RET,250))))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 25."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

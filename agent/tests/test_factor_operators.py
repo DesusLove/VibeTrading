@@ -4,7 +4,6 @@ Tests verify that the fast paths (bottleneck / numpy stride) produce
 identical results to the original pandas rolling().apply() fallback.
 """
 
-from __future__ import annotations
 
 import importlib
 import os
@@ -290,6 +289,7 @@ class TestBackend:
 
     def test_disable_env_var(self):
         """VIBE_TRADING_DISABLE_BOTTLENECK=1 should disable bottleneck."""
+
         _reload_base_with_bottleneck(False)
         from src.factors._backend import HAS_BOTTLENECK
 

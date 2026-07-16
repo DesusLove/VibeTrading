@@ -8,7 +8,6 @@ import pytest
 
 from src.agent.skills import Skill, SkillsLoader, _parse_frontmatter
 
-
 # ---------------------------------------------------------------------------
 # _parse_frontmatter
 # ---------------------------------------------------------------------------

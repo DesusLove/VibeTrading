@@ -13,12 +13,10 @@ Covers:
 - _parse_env_bool (EnvBool BeforeValidator)
 """
 
-from __future__ import annotations
 
 import concurrent.futures
 
 import pytest
-from pydantic import ValidationError
 
 from src.config.accessor import (
     _parse_bool,
@@ -27,8 +25,8 @@ from src.config.accessor import (
     reset_env_config,
 )
 from src.config.env_schema import (
-    APIConfig,
     AgentTuningConfig,
+    APIConfig,
     DataConfig,
     EnvConfig,
     LLMConfig,
@@ -36,7 +34,6 @@ from src.config.env_schema import (
     SwarmConfig,
     _parse_env_bool,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixture: reset singleton + clean env before each test
@@ -451,6 +448,7 @@ class TestGetEnvOr:
 
 class TestSubModelDirectConstruction:
     """Verify sub-models can be constructed directly with kwargs."""
+
 
     def test_llm_config_direct(self) -> None:
         cfg = LLMConfig(langchain_provider="anthropic", timeout_seconds=60)

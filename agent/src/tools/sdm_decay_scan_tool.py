@@ -1,11 +1,12 @@
-"""BaseTool wrapper for batch decay monitoring scan across active artifacts."""
-
-from __future__ import annotations
-
-import json
 from typing import Any
 
+"""BaseTool wrapper for batch decay monitoring scan across active artifacts."""
+
+
+import json
+
 from src.agent.tools import BaseTool
+from src.strategy_store._shared import get_store as _get_store
 from src.strategy_store.decay import DecayEvaluator
 from src.strategy_store.metrics import compute_decay_metrics, has_decay_inputs
 from src.strategy_store.models import (
@@ -13,7 +14,6 @@ from src.strategy_store.models import (
     ArtifactType,
     DecaySnapshot,
 )
-from src.strategy_store._shared import get_store as _get_store
 
 
 def _ok(payload: dict[str, Any]) -> str:
@@ -58,6 +58,7 @@ class SdmDecayScanTool(BaseTool):
 
     def execute(self, **kwargs: Any) -> str:
         """Scan active artifacts for decay and return a summary."""
+
         try:
             store = _get_store()
             evaluator = DecayEvaluator()

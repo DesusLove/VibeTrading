@@ -15,7 +15,6 @@ value-weighted excess return of the market portfolio. We approximate the
 per-stock market-factor exposure as the 21-day total return cross-sectionally
 z-scored, suitable for ranking long-short portfolios.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -54,6 +53,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return 21-day return cross-sectional z-score per stock."""
+
     close = panel['close']
     ret = safe_div(delta(close, 21), close.shift(21))
     return _cross_sectional_zscore(ret)

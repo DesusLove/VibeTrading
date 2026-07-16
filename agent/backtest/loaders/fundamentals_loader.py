@@ -1,3 +1,5 @@
+from typing import Any
+
 """Translate sparse SEC facts into PIT-safe daily fundamental panels.
 
 The loader's core invariant is point-in-time safety: values become visible on
@@ -10,12 +12,10 @@ companyfacts can mix true-quarter, year-to-date, and annual facts, so upstream
 schema normalization may still be needed for issuer-specific precision.
 """
 
-from __future__ import annotations
 
 import importlib
 import logging
 from collections.abc import Iterable
-from typing import Any
 
 import pandas as pd
 
@@ -359,6 +359,7 @@ def _derived_field(schema: Any, field: str) -> Any | None:
 
 def _spec_get(derived: Any, key: str) -> Any:
     """Read a derived-field spec entry from either a mapping or an object."""
+
     if isinstance(derived, dict):
         return derived.get(key)
     return getattr(derived, key, None)

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Web search tool: free multi-engine search via ddgs (no API key).
 
 `ddgs` (the successor to `duckduckgo_search`) is a metasearch aggregator: it can
@@ -9,16 +11,13 @@ ddgs fall through a throttled engine to the next one, with a short retry/backoff
 on top for transient failures.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-import os
 import time
-from typing import Any
 
 from src.agent.tools import BaseTool
-from src.config.accessor import _parse_bool, get_env_config
+from src.config.accessor import get_env_config
 from src.security.scanner import with_security_warnings
 
 logger = logging.getLogger(__name__)
@@ -180,6 +179,7 @@ class WebSearchTool(BaseTool):
             JSON envelope with status, query, the backend list used, and results
             (or an actionable error message on persistent failure).
         """
+
         query = kwargs["query"]
         max_results = min(int(kwargs.get("max_results", 5)), 10)
         backends = (get_env_config().agent_tuning.vibe_trading_search_backends or _DEFAULT_BACKENDS).strip() or "auto"

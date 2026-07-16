@@ -1,9 +1,10 @@
+from collections.abc import Callable
+from typing import Any
+
 """AgentLoop regressions for active research goal context."""
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
 
 from src.agent.loop import AgentLoop
 from src.goal import GoalStore
@@ -133,6 +134,7 @@ def test_agent_loop_continues_active_incomplete_goal(tmp_path: Path, monkeypatch
 
 def test_agent_loop_continues_active_covered_goal_to_force_audit(tmp_path: Path, monkeypatch) -> None:
     """Covered criteria still need a terminal status audit before the loop stops."""
+
     from src.goal import EvidenceInput
 
     monkeypatch.setattr("src.agent.loop.GOAL_MAX_CONTINUATIONS", 1)

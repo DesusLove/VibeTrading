@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #1 - 量价秩相关
@@ -9,7 +10,7 @@
 Formula: (-1 * CORR(RANK(DELTA(LOG(VOLUME), 1)), RANK(((CLOSE - OPEN) / OPEN)), 6))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 1."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import time
 
-
 _TURN_STARTED_AT: dict[str, float] = {}
 
 

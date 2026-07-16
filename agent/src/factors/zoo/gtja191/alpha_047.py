@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #47 - 收益变化乘积
@@ -9,7 +10,7 @@
 Formula: SMA((TSMAX(HIGH,6)-CLOSE)/(TSMAX(HIGH,6)-TSMIN(LOW,6))*100,9,1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 47."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

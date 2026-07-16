@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #91
@@ -9,7 +10,7 @@
 Formula: ((-1*RANK((CLOSE-MAX(CLOSE,5))))*RANK(CORR(MEAN(VOLUME,40),LOW,5)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 91."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

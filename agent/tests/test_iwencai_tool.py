@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the iWenCai (问财) natural-language A-share search tool.
 
 No request leaves the process: the HTTP boundary
@@ -5,10 +7,8 @@ No request leaves the process: the HTTP boundary
 module) is mocked so the real auth/parsing/envelope path runs offline.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -21,6 +21,7 @@ _KEY_ENV = "VIBE_TRADING_IWENCAI_KEY"
 
 def _robot_payload() -> dict[str, Any]:
     """An iWenCai robot-data response nesting two security rows."""
+
     return {
         "data": {
             "answer": [

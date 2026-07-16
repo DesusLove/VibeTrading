@@ -12,15 +12,14 @@ P03-B: ``mcp_server.run_swarm`` called ``start_run`` without
 could not execute their own scripts.
 """
 
-from __future__ import annotations
 
 import logging
 import threading
 
+import src.swarm.runtime as rt
 from src.swarm.models import SwarmAgentSpec, SwarmRun, SwarmTask, WorkerResult
 from src.swarm.store import SwarmStore, swarm_runs_root
 from src.tools import build_filtered_registry, path_utils
-import src.swarm.runtime as rt
 
 
 # ---- P03-A: single source of truth -----------------------------------------
@@ -60,6 +59,7 @@ def test_filtered_registry_warns_when_requested_tool_dropped(caplog):
 def test_execute_run_propagates_include_shell_tools(tmp_path, monkeypatch):
     """mcp_server now passes include_shell_tools into start_run; pin that the
     runtime forwards it all the way to run_worker."""
+
     captured: dict[str, object] = {}
 
     def fake_worker(*args, **kwargs):

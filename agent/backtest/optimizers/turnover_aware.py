@@ -1,3 +1,5 @@
+from typing import Any
+
 """Turnover-aware optimizer: mean-variance utility with an L1 turnover penalty.
 
 Solves, per rebalance date::
@@ -23,9 +25,6 @@ returns only the positions frame, so callers who want the turnover series must
 instantiate ``TurnoverAwareOptimizer`` directly.
 """
 
-from __future__ import annotations
-
-from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -59,7 +58,7 @@ class TurnoverAwareOptimizer(BaseOptimizer):
 
     def _build_context(
         self, window: pd.DataFrame, active: List[str]
-    ) -> "Dict[str, Any] | None":
+    ) -> Dict[str, Any] | None:
         """Mean vector, covariance, and active codes for the current window."""
         mu = window.mean().values
         cov = window.cov().values
@@ -122,6 +121,7 @@ def optimize(
     turnover_penalty: float = 0.0,
 ) -> pd.DataFrame:
     """Module-level entry: turnover-penalized mean-variance positions."""
+
     return TurnoverAwareOptimizer(
         lookback=lookback,
         risk_aversion=risk_aversion,

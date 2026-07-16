@@ -5,7 +5,6 @@ fund_daily(), indices need index_daily(), HK needs hk_daily(). US/crypto
 are unsupported and should warn+skip.
 """
 
-from __future__ import annotations
 
 import os
 from unittest.mock import MagicMock
@@ -21,7 +20,6 @@ from backtest.loaders.tushare import (
     _is_index,
     _is_us_equity,
 )
-
 
 # ---------------------------------------------------------------------------
 # Predicate tests
@@ -319,6 +317,7 @@ _skip_e2e = _token in ("", "your-tushare-token")
 @pytest.mark.skipif(_skip_e2e, reason="TUSHARE_TOKEN not set")
 class TestTushareE2E:
     """Real API calls — requires TUSHARE_TOKEN env var."""
+
 
     def _fetch(self, codes: list[str]) -> dict[str, pd.DataFrame]:
         loader = DataLoader()

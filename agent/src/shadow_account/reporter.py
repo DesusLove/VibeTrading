@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shadow Account — 8-section report rendering (HTML + optional PDF).
 
 The pipeline:
@@ -16,13 +18,11 @@ Design:
       only decides *what* data to feed them.
 """
 
-from __future__ import annotations
 
 import logging
 from base64 import b64encode
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -332,4 +332,5 @@ def embed_image_as_data_uri(path: Path) -> str:
 # Keep this helper exported to simplify downstream inspection.
 def result_as_dict(result: ShadowBacktestResult) -> dict[str, Any]:
     """Dict-serialize a backtest result (handy for frontend debugging)."""
+
     return asdict(result)

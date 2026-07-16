@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any
+
 """Advisory interface and gate integration tests (#317).
 
 Covers the PreTradeAdvisoryInterface contract, MockAdvisory behavior,
@@ -5,13 +8,12 @@ AdvisoryOrchestrator fail-open semantics, and LiveOrderGuardTool advisory
 wiring (disabled by default, enabled with env var, observational only).
 """
 
-from __future__ import annotations
+
 
 import json
 from dataclasses import FrozenInstanceError
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -84,7 +86,7 @@ def _spec() -> MCPRemoteToolSpec:
 
 
 def _mandate(**caps_overrides: Any) -> Mandate:
-    created = datetime.now(timezone.utc)
+    created = datetime.now(UTC)
     caps: dict[str, Any] = {
         "account_funding_usd": 5000.0,
         "max_order_notional_usd": 750.0,

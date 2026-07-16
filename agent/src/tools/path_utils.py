@@ -15,9 +15,7 @@ Three helpers, three threat models:
 All helpers raise ``ValueError`` on rejection — callers already expect this.
 """
 
-from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from src.config.accessor import get_env_config
@@ -348,6 +346,7 @@ def safe_run_id(run_id: str) -> Path:
     Raises:
         ValueError: If the run id is empty, path-shaped, or not found.
     """
+
     _rejects_unc(run_id)
     candidate = Path(run_id)
     if (

@@ -1,9 +1,11 @@
+from collections.abc import AsyncIterator
+from typing import Any
+
 """SSE event bus with support for last_event_id recovery and buffering.
 
 V5: Fixes the thread-safety issue caused by calling queue.put_nowait() on asyncio.Queue from a background thread.
 """
 
-from __future__ import annotations
 
 import asyncio
 import json
@@ -14,7 +16,6 @@ import uuid
 
 logger = logging.getLogger(__name__)
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, List, Optional
 
 
 @dataclass
@@ -29,9 +30,9 @@ class SSEEvent:
         timestamp: Event timestamp.
     """
 
-    event_id: Optional[str] = field(default_factory=lambda: uuid.uuid4().hex[:16])
+    event_id: str | None = field(default_factory=lambda: uuid.uuid4().hex[:16])
     event_type: str = "message"
-    data: Dict[str, Any] = field(default_factory=dict)
+    data: dict[str, Any] = field(default_factory=dict)
     session_id: str = ""
     timestamp: float = field(default_factory=time.time)
 
@@ -71,10 +72,10 @@ class EventBus:
             max_buffer_size: Maximum number of buffered events per session.
         """
         self.max_buffer_size = max_buffer_size
-        self._buffers: Dict[str, List[SSEEvent]] = {}
-        self._subscribers: Dict[str, List[asyncio.Queue]] = {}
+        self._buffers: dict[str, list[SSEEvent]] = {}
+        self._subscribers: dict[str, list[asyncio.Queue]] = {}
         self._lock = threading.Lock()
-        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._loop: asyncio.AbstractEventLoop | None = None
 
     def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
         """Set the asyncio event loop, usually during api_server startup.
@@ -128,7 +129,7 @@ class EventBus:
         self,
         session_id: str,
         event_type: str,
-        data: Optional[Dict[str, Any]] = None,
+        data: dict[str, Any | None] = None,
     ) -> SSEEvent:
         """Build and publish an event in one step.
 
@@ -151,10 +152,10 @@ class EventBus:
     def replay(
         self,
         session_id: str,
-        last_event_id: Optional[str] = None,
+        last_event_id: str | None = None,
         *,
         replay_all: bool = False,
-    ) -> List[SSEEvent]:
+    ) -> list[SSEEvent]:
         """Replay buffered session events for reconnect recovery.
 
         Args:
@@ -172,7 +173,7 @@ class EventBus:
             if not last_event_id:
                 return list(buffer) if replay_all else []  # First connect: history loaded via REST by default.
             found = False
-            result: List[SSEEvent] = []
+            result: list[SSEEvent] = []
             for event in buffer:
                 if found:
                     result.append(event)
@@ -185,7 +186,7 @@ class EventBus:
     async def subscribe(
         self,
         session_id: str,
-        last_event_id: Optional[str] = None,
+        last_event_id: str | None = None,
         *,
         replay_all: bool = False,
     ) -> AsyncIterator[SSEEvent]:
@@ -216,7 +217,7 @@ class EventBus:
                 try:
                     event = await asyncio.wait_for(queue.get(), timeout=30.0)
                     yield event
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     yield SSEEvent(
                         event_id=None,
                         event_type="heartbeat",
@@ -235,5 +236,6 @@ class EventBus:
         Args:
             session_id: Session ID.
         """
+
         with self._lock:
             self._buffers.pop(session_id, None)

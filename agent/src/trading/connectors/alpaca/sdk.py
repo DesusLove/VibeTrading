@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only Alpaca connector via the official ``alpaca-py`` SDK.
 
 Wraps ``TradingClient`` (account/positions/orders) and
@@ -11,13 +14,11 @@ key pair. A paper key cannot reach the live host, so the configured profile —
 recorded as ``paper`` in every payload — is the authoritative discriminator.
 """
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -62,7 +63,7 @@ class AlpacaConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "AlpacaConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> AlpacaConfig:
         """Build a config from a JSON-like mapping, normalizing the profile."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
@@ -87,7 +88,7 @@ class AlpacaConfig:
         secret_key: str | None = None,
         profile: str | None = None,
         feed: str | None = None,
-    ) -> "AlpacaConfig":
+    ) -> AlpacaConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if api_key is not None:
@@ -119,7 +120,7 @@ class AlpacaConfig:
 _OVERRIDE_KEYS = ("api_key", "secret_key", "profile", "feed")
 
 
-def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> "AlpacaConfig":
+def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> AlpacaConfig:
     """Resolve config: saved file ← profile defaults ← CLI overrides."""
     base = asdict(load_config())
     for key, value in dict(profile_config or {}).items():
@@ -242,8 +243,8 @@ def get_open_orders(config: AlpacaConfig | None = None, *, include_executions: b
     cfg = config or load_config()
     client = _trading_client(cfg)
     _require_alpaca()
-    from alpaca.trading.requests import GetOrdersRequest  # type: ignore
     from alpaca.trading.enums import QueryOrderStatus  # type: ignore
+    from alpaca.trading.requests import GetOrdersRequest  # type: ignore
 
     open_req = GetOrdersRequest(status=QueryOrderStatus.OPEN)
     open_orders = client.get_orders(filter=open_req)
@@ -553,6 +554,7 @@ def _missing_fields(cfg: AlpacaConfig) -> list[str]:
 
 def _public_config(cfg: AlpacaConfig) -> dict[str, Any]:
     """Config snapshot with secrets redacted."""
+
     data = asdict(cfg)
     if data.get("secret_key"):
         data["secret_key"] = "***redacted***"

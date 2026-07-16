@@ -32,7 +32,7 @@ want the dataclass shape can still import it for inspection/testing).
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -75,11 +75,11 @@ class ZooSignalEngine:
             coexist with ``top_n`` for long-short signals. Must be positive.
     """
 
-    alpha_ids: Tuple[str, ...]
-    weights: Optional[Tuple[float, ...]] = None
+    alpha_ids: tuple[str, ...]
+    weights: tuple[float, ...] | None = None
     standardize: bool = True
-    top_n: Optional[int] = None
-    bottom_n: Optional[int] = None
+    top_n: int | None = None
+    bottom_n: int | None = None
     # Optional injected registry (chiefly for tests); when ``None`` we lazily
     # construct ``Registry()`` on first compute_signal call. Typed as ``Any``
     # to avoid dataclass forward-ref resolution at class-creation time when
@@ -113,8 +113,8 @@ class ZooSignalEngine:
         weights=None,
         *,
         standardize: bool = True,
-        top_n: Optional[int] = None,
-        bottom_n: Optional[int] = None,
+        top_n: int | None = None,
+        bottom_n: int | None = None,
         registry: Any = None,
     ) -> "ZooSignalEngine":
         """Build an engine that pulls alphas from the (bundled) Alpha Zoo.

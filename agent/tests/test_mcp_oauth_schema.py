@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Unit tests for the MCP OAuth schema + ``_build_client`` OAuth wiring.
 
 Covers:
@@ -13,7 +14,7 @@ Covers:
   (``.auth is None``; transport types and fields untouched).
 """
 
-from __future__ import annotations
+
 
 import pytest
 from fastmcp.client.auth import OAuth

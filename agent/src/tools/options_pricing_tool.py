@@ -1,10 +1,10 @@
+from typing import Any
+
 """Options pricing tool: Black-Scholes theoretical price and Greeks."""
 
-from __future__ import annotations
 
 import json
 import math
-from typing import Any
 
 import numpy as np
 from scipy.stats import norm
@@ -132,6 +132,7 @@ class OptionsPricingTool(BaseTool):
         Returns:
             JSON string containing price, delta, gamma, theta, vega.
         """
+
         spot = float(kwargs["spot"])
         strike = float(kwargs["strike"])
         expiry_days = float(kwargs["expiry_days"])

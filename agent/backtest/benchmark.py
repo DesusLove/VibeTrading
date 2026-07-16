@@ -4,21 +4,18 @@ Provides a lightweight, zero-dependency way to fetch benchmark reference
 data given a set of strategy codes and a data source.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 import pandas as pd
 
 from backtest.loaders.yfinance_loader import DataLoader as YfinanceLoader
 
-
 # -------------------------------------------------------------------
 # Benchmark map: market type → default ticker
 # -------------------------------------------------------------------
 
-MARKET_BENCHMARKS: dict[str, Optional[str]] = {
+MARKET_BENCHMARKS: dict[str, str | None] = {
     "us_equity":  "SPY",
     "hk_equity":  "HK.03100",   # Hang Seng China Enterprises ETF
     "a_share":    "000300.SH",  # CSI 300 (China A-share core index)
@@ -41,8 +38,8 @@ def resolve_benchmark(
     start_date:   str,
     end_date:     str,
     interval:     str = "1D",
-    explicit:     Optional[str] = None,
-) -> Optional[BenchmarkResult]:
+    explicit:     str | None = None,
+) -> BenchmarkResult | None:
     """Resolve the appropriate benchmark ticker and fetch its return series.
 
     Args:
@@ -86,8 +83,8 @@ def resolve_benchmark(
 def _resolve_ticker(
     codes:     list[str],
     source:    str,
-    explicit:  Optional[str],
-) -> Optional[str]:
+    explicit:  str | None,
+) -> str | None:
     """Pick the benchmark ticker to use."""
 
     if explicit:
@@ -136,6 +133,7 @@ def _fetch_benchmark(
     interval:   str,
 ) -> pd.DataFrame:
     """Fetch benchmark OHLCV data via yfinance (single symbol, no auth)."""
+
     loader = YfinanceLoader()
     result = loader.fetch([ticker], start_date, end_date, interval=interval)
 

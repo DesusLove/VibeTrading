@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the ``financial_rigor`` agent tool.
 
 Covers the pure core routines (exact decimal, safe arithmetic, valuation
@@ -6,11 +8,9 @@ contract, ``execute`` happy/error paths, calc injection rejection, and that
 the tool is auto-discovered into the default registry.
 """
 
-from __future__ import annotations
 
 import json
 import math
-from typing import Any
 
 import pytest
 
@@ -134,6 +134,7 @@ def test_benford_unreliable_below_50_samples() -> None:
 
 def _benford_conforming_sample(n: int = 1000) -> list[int]:
     """Build a list whose leading-digit distribution tracks Benford's law."""
+
     expected = {d: math.log10(1 + 1 / d) for d in range(1, 10)}
     out: list[int] = []
     for d in range(1, 10):

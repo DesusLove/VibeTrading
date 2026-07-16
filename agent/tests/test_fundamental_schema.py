@@ -14,7 +14,6 @@ from backtest.loaders._fundamental_schema import (
     resolve_field,
 )
 
-
 EXPECTED_RAW_FIELDS = {
     "revenue",
     "cogs",

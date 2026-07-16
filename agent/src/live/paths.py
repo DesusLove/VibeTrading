@@ -13,7 +13,6 @@ Layout (see the live-trading SPEC §2)::
     <runtime_root>/live/audit.jsonl              # live-action ledger (append-only)
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -44,6 +43,7 @@ def broker_dir(broker: str) -> Path:
         ValueError: If ``broker`` is empty/whitespace or contains a path
             separator or ``..`` segment (a broker key is never a path).
     """
+
     key = broker.strip().lower()
     if not key:
         raise ValueError("broker key must not be empty")

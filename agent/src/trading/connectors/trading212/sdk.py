@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only Trading 212 connector via the public REST API.
 
 Wraps Trading 212's account cash/info, portfolio, open-order, order-history,
@@ -12,12 +15,10 @@ placement and cancellation are disabled for every profile until Trading 212
 offers a structural paper/demo safety boundary this connector can verify.
 """
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Mapping
 from urllib.parse import urljoin
 
 import requests
@@ -70,7 +71,7 @@ class Trading212Config:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "Trading212Config":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> Trading212Config:
         """Build a config from a JSON-like mapping, normalizing profile/URL."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "live-readonly").strip().lower()
@@ -95,7 +96,7 @@ class Trading212Config:
         api_secret: str | None = None,
         profile: str | None = None,
         base_url: str | None = None,
-    ) -> "Trading212Config":
+    ) -> Trading212Config:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if api_key is not None:
@@ -460,6 +461,7 @@ def _missing_fields(config: Trading212Config) -> list[str]:
 
 def _public_config(config: Trading212Config) -> dict[str, Any]:
     """Config snapshot with the API key redacted."""
+
     data = asdict(config)
     if data.get("api_key"):
         data["api_key"] = data["api_key"][:4] + "***"

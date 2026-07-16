@@ -6,9 +6,7 @@ HTTP boundary (``throttled_get_json``) so the real client parsing runs while no
 request leaves the process.
 """
 
-from __future__ import annotations
 
-from typing import List
 from unittest.mock import patch
 
 import pandas as pd
@@ -18,8 +16,9 @@ from backtest.loaders import eastmoney_client
 from backtest.loaders.eastmoney_loader import DataLoader, _to_compact_date
 
 
-def _client_rows() -> List[dict]:
+def _client_rows() -> list[dict]:
     """Two ascending bars in eastmoney_client.fetch_kline output shape."""
+
     return [
         {
             "trade_date": "2024-01-02",
@@ -128,7 +127,7 @@ class TestFetchWithMockedClient:
         def _resolve(symbol: str) -> str | None:
             return "1.600519" if symbol == "600519.SH" else "0.000001"
 
-        def _fetch_kline(secid: str, **_kwargs: object) -> List[dict]:
+        def _fetch_kline(secid: str, **_kwargs: object) -> list[dict]:
             if secid == "0.000001":
                 raise RuntimeError("eastmoney boom")
             return _client_rows()

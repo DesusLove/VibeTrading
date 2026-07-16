@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any
+
 """API tests for ``POST /alpha/compare`` + its SSE stream.
 
 Deterministic by construction — no network, no flaky background-timing:
@@ -14,9 +17,7 @@ Loopback ``TestClient`` (127.0.0.1) bypasses dev-mode auth, matching the
 convention in ``test_goal_api.py`` / ``test_security_auth_api.py``.
 """
 
-from __future__ import annotations
 
-from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient

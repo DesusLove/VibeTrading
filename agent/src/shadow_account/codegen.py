@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shadow Account — code generation (rules → signal_engine.py + config.json).
 
 Inputs are always a ``ShadowProfile`` (contract-stable). Outputs are:
@@ -9,13 +11,11 @@ No external I/O here — callers (backtester) are responsible for writing
 files and launching ``run_backtest``.
 """
 
-from __future__ import annotations
 
 import ast
 import json
 import math
 from pathlib import Path
-from typing import Any
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -205,6 +205,7 @@ def write_run_dir(
     Raises:
         ValueError: Generated signal_engine fails static validation.
     """
+
     run_dir = Path(run_dir)
     (run_dir / "code").mkdir(parents=True, exist_ok=True)
 

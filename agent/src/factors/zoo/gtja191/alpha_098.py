@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #98
@@ -9,7 +10,7 @@
 Formula: ((((DELTA((SUM(CLOSE,100)/100),100)/DELAY(CLOSE,100))<0.05) || ((DELTA((SUM(CLOSE,100)/100),100)/DELAY(CLOSE,100))==0.05)) ? (-1*(CLOSE-TSMIN(CLOSE,100))) : (-1*DELTA(CLOSE,3)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 98."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

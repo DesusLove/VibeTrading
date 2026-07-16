@@ -11,7 +11,6 @@ Panel construction matches the spec in the task brief:
     same way as ``test_lookahead._baseline_panel`` (random walk close;
     open from shift; high/low bracketing; volume integer-cast).
 """
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -20,7 +19,6 @@ import pandas as pd
 import pytest
 
 from src.factors.registry import Registry
-
 
 GOLDEN_DIR = Path(__file__).parent / "fixtures" / "goldens"
 
@@ -78,6 +76,7 @@ SAMPLED_ALPHAS = [
 @pytest.mark.parametrize("alpha_id", SAMPLED_ALPHAS)
 def test_alpha_matches_golden(alpha_id: str, panel: dict[str, pd.DataFrame], registry: Registry) -> None:
     """Compute the alpha and compare against the pinned golden CSV."""
+
     actual = registry.compute(alpha_id, panel)
 
     golden_path = GOLDEN_DIR / f"{alpha_id}.csv"

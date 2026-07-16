@@ -1,12 +1,12 @@
+from typing import Any
+
 """CLI app mention normalization for the WebSocket channel."""
 
-from __future__ import annotations
-
-from typing import Any
 
 
 def normalize_cli_app_mentions(content: Any, metadata: dict[str, Any] | None = None) -> list[str]:
     """Normalize CLI app mentions into a stable list of names."""
+
     del metadata
     if content is None:
         return []

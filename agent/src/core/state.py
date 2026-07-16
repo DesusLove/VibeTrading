@@ -1,12 +1,12 @@
+from typing import Any
+
 """Run state persistence: creates run directories and records status."""
 
-from __future__ import annotations
 
 import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 
 class RunStateStore:
@@ -30,7 +30,7 @@ class RunStateStore:
         (run_dir / "artifacts").mkdir(exist_ok=True)
         return run_dir
 
-    def save_request(self, run_dir: Path, prompt: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    def save_request(self, run_dir: Path, prompt: str, context: dict[str, Any]) -> dict[str, Any]:
         """Save the user request.
 
         Args:
@@ -60,6 +60,7 @@ class RunStateStore:
             run_dir: Run directory.
             reason: Failure reason.
         """
+
         self._write_json(run_dir / "state.json", {"status": "failed", "reason": reason})
 
     @staticmethod

@@ -14,7 +14,6 @@ inherit the same guarantees:
 - A short remaining budget is never overspent by ``backoff``.
 """
 
-from __future__ import annotations
 
 import datetime as dt
 import sys
@@ -451,6 +450,7 @@ def test_loader_cache_real_duckdb_round_trip(tmp_path, monkeypatch, loader_cache
 
 def test_yfinance_loader_serves_second_fetch_from_cache(tmp_path, monkeypatch, fake_duckdb, loader_cache_root):
     """A batch loader (yfinance) must skip its bulk download on a full cache hit."""
+
     monkeypatch.setenv(LOADER_CACHE_ENV, "1")
     import backtest.loaders.yfinance_loader as yfl
 

@@ -1,15 +1,15 @@
+from typing import Any
+
 """Read file tool: read file contents from the workspace."""
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from src.agent.tools import BaseTool
+from src.tools.path_utils import allowed_file_roots
 from src.tools.path_utils import safe_path as _safe_path
 from src.tools.path_utils import safe_run_dir as _safe_run_dir
-from src.tools.path_utils import allowed_file_roots
 from src.tools.redaction import redact_internal_paths
 
 _OUTPUT_LIMIT = 50_000
@@ -39,6 +39,7 @@ class ReadFileTool(BaseTool):
         Returns:
             JSON string containing content or an error.
         """
+
         file_path = kwargs["path"]
         limit = kwargs.get("limit")
         run_dir = kwargs.get("run_dir")

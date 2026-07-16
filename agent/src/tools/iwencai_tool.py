@@ -1,3 +1,5 @@
+from typing import Any
+
 """iWenCai (问财) natural-language A-share research search tool.
 
 iWenCai is a Chinese-market natural-language stock screener: a research caller
@@ -14,12 +16,9 @@ when that key is absent, so a key-less install never advertises a search it cann
 perform.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-import os
-from typing import Any
 
 from backtest.loaders._http import resolve_min_interval, throttled_get_json
 from src.agent.tools import BaseTool
@@ -252,4 +251,5 @@ class IWenCaiSearchTool(BaseTool):
         Returns:
             ``{"ok": false, "error": message}`` as a JSON string.
         """
+
         return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

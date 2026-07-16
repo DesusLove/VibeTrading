@@ -1,10 +1,12 @@
+from typing import Any
+
 """Fundamental factor panel gate and runner injection tests."""
+
 
 from __future__ import annotations
 
 import sys
 import types
-from typing import Any
 
 import pandas as pd
 import pytest

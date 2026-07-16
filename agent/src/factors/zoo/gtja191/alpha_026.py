@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #26 - 条件SMA差值
@@ -9,7 +10,7 @@
 Formula: ((((SUM(CLOSE,7)/7)-CLOSE))+((CORR(VWAP,DELAY(CLOSE,5),230))))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 26."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

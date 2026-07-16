@@ -8,11 +8,9 @@
 信号约定: 1=做多, -1=做空, 0=观望
 """
 
-from typing import Dict
 
 import numpy as np
 import pandas as pd
-
 
 # ---------------------------------------------------------------------------
 # 向量化辅助函数
@@ -476,7 +474,7 @@ class SignalEngine:
     # 主入口
     # -----------------------------------------------------------------------
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """对每个标的运行全部形态检测，汇总评分生成信号。
 
         Args:

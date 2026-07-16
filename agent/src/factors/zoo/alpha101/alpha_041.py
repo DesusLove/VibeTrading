@@ -10,7 +10,6 @@ Formula (paper appendix): (high*low)^0.5 - vwap
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 41.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ __alpha_meta__ = {
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     high = panel["high"]
     low = panel["low"]
     vwap = panel["vwap"]

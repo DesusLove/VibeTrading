@@ -1,3 +1,5 @@
+from typing import Literal
+
 """Unified fundamental field schema and SEC XBRL concept aliases.
 
 This module is deliberately metadata-only. Callers use ``SEC_CONCEPT_MAP`` to
@@ -6,10 +8,8 @@ for that field and log the missing alias coverage. This module does not log or
 fabricate fallback values.
 """
 
-from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Literal
 
 import pandas as pd
 
@@ -214,6 +214,7 @@ def resolve_field(field: str) -> tuple[FieldKind, RawFieldSpec | DerivedFieldSpe
 
 def list_supported_fields() -> list[str]:
     """Return all supported raw and schema-derived fundamental field names."""
+
     return sorted(set(RAW_FIELDS) | set(DERIVED_FIELDS))
 
 

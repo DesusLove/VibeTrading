@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Binance (spot) connector profiles.
 
 Read-only paper (testnet) and live profiles plus order-placing paper and live
@@ -7,7 +8,7 @@ are distinct profiles. The order-placing live profile carries an
 gate it behind the user's mandate before any order reaches the connector.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

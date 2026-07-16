@@ -9,7 +9,6 @@ key (additive: omitted entirely when all codes resolve, so the happy-path
 payload is byte-identical to before), and a loader blow-up is contained.
 """
 
-from __future__ import annotations
 
 import json
 import logging
@@ -90,6 +89,7 @@ def test_partial_loader_only_missing_codes_unresolved(monkeypatch):
 
 def test_swallowed_loader_exception_is_logged(monkeypatch, caplog):
     """G2: the contained loader blow-up must still be logged (was silent)."""
+
     monkeypatch.setattr(mcp_server, "_get_loader", lambda src: _BoomLoader)
     with caplog.at_level(logging.ERROR, logger=mcp_server.logger.name):
         _call(["AAA.US", "BBB.US"])

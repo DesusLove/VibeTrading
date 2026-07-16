@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only tool: sell-side research reports + consensus EPS for A-shares.
 
 Two free, no-auth disclosure feeds are stitched into one envelope:
@@ -19,11 +21,9 @@ throttled clients so the tool never hits a host un-throttled and never
 re-implements provider plumbing.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders._http import (
     DEFAULT_USER_AGENT,
@@ -329,4 +329,5 @@ def _to_number(value: Any) -> float | None:
 
 def _error(message: str) -> str:
     """Render a failure envelope as a JSON string."""
+
     return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

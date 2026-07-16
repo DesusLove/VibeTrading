@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only symbol-search tool: resolve a name/ticker to symbols + market.
 
 Backed by three frozen, IP-throttled public-API clients so the agent never
@@ -18,11 +20,9 @@ caps the payload. A single failing source never aborts the others; its error is
 recorded under ``sources`` and the surviving candidates still return.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
 
 from backtest.loaders import eastmoney_client, sec_edgar_client, yahoo_client
 from src.agent.tools import BaseTool
@@ -37,7 +37,7 @@ _EASTMONEY_SUGGEST_URL = "https://searchapi.eastmoney.com/api/suggest/get"
 
 # Eastmoney market-number -> our symbol suffix. Anything else is left unmapped
 # (those candidates are skipped rather than emitted with a wrong suffix).
-_EASTMONEY_SUFFIX_BY_MARKET: Dict[str, str] = {
+_EASTMONEY_SUFFIX_BY_MARKET: dict[str, str] = {
     "1": "SH",   # Shanghai
     "0": "SZ",   # Shenzhen / Beijing share the 0 prefix on Eastmoney
     "116": "HK",
@@ -47,7 +47,7 @@ _EASTMONEY_SUFFIX_BY_MARKET: Dict[str, str] = {
 }
 
 # Coarse market label for the candidate row, keyed by symbol suffix.
-_MARKET_BY_SUFFIX: Dict[str, str] = {
+_MARKET_BY_SUFFIX: dict[str, str] = {
     "SH": "cn",
     "SZ": "cn",
     "BJ": "cn",
@@ -123,8 +123,8 @@ class SymbolSearchTool(BaseTool):
 
         limit = _clamp_limit(kwargs.get("limit", _DEFAULT_LIMIT))
 
-        candidates: List[Dict[str, Any]] = []
-        sources: Dict[str, str] = {}
+        candidates: list[dict[str, Any]] = []
+        sources: dict[str, str] = {}
 
         em_hits, sources["eastmoney"] = _search_eastmoney(query)
         candidates.extend(em_hits)
@@ -163,7 +163,7 @@ def _clamp_limit(value: Any) -> int:
     return max(1, min(n, _MAX_LIMIT))
 
 
-def _search_eastmoney(query: str) -> tuple[List[Dict[str, Any]], str]:
+def _search_eastmoney(query: str) -> tuple[list[dict[str, Any]], str]:
     """Query Eastmoney's suggest endpoint and normalize the candidates.
 
     Args:
@@ -187,7 +187,7 @@ def _search_eastmoney(query: str) -> tuple[List[Dict[str, Any]], str]:
     return candidates, "ok"
 
 
-def _eastmoney_data_rows(payload: Any) -> List[Dict[str, Any]]:
+def _eastmoney_data_rows(payload: Any) -> list[dict[str, Any]]:
     """Extract the ``QuotationCodeTable.Data`` rows from a suggest payload."""
     if not isinstance(payload, dict):
         return []
@@ -200,7 +200,7 @@ def _eastmoney_data_rows(payload: Any) -> List[Dict[str, Any]]:
     return [row for row in data if isinstance(row, dict)]
 
 
-def _eastmoney_candidate(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _eastmoney_candidate(row: dict[str, Any]) -> dict[str, Any | None]:
     """Map one Eastmoney suggest row to a normalized candidate, or ``None``.
 
     Eastmoney rows carry ``QuoteID`` (``<market>.<code>``), ``Code``, ``Name``,
@@ -239,7 +239,7 @@ def _eastmoney_candidate(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     }
 
 
-def _format_symbol(code: str, suffix: str) -> Optional[str]:
+def _format_symbol(code: str, suffix: str) -> str | None:
     """Render a bare code + suffix into the project symbol convention.
 
     HK codes are zero-padded to five digits to match the loader/secid scheme.
@@ -260,7 +260,7 @@ def _format_symbol(code: str, suffix: str) -> Optional[str]:
     return f"{code}.{suffix}"
 
 
-def _search_yahoo(query: str) -> tuple[List[Dict[str, Any]], str]:
+def _search_yahoo(query: str) -> tuple[list[dict[str, Any]], str]:
     """Query Yahoo's search endpoint and normalize the quote candidates.
 
     Args:
@@ -276,7 +276,7 @@ def _search_yahoo(query: str) -> tuple[List[Dict[str, Any]], str]:
         logger.warning("yahoo search failed for %r: %s", query, exc)
         return [], f"yahoo search failed: {exc}"
 
-    candidates: List[Dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
     for quote in quotes[:_PER_SOURCE_CAP]:
         candidate = _yahoo_candidate(quote)
         if candidate is not None:
@@ -284,7 +284,7 @@ def _search_yahoo(query: str) -> tuple[List[Dict[str, Any]], str]:
     return candidates, "ok"
 
 
-def _yahoo_candidate(quote: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _yahoo_candidate(quote: dict[str, Any]) -> dict[str, Any | None]:
     """Map one Yahoo search quote to a normalized candidate, or ``None``.
 
     Yahoo carries US tickers bare and HK tickers as ``0700.HK``. We translate
@@ -314,7 +314,7 @@ def _yahoo_candidate(quote: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     }
 
 
-def _from_yahoo_symbol(raw_symbol: str, quote: Dict[str, Any]) -> tuple[str, str]:
+def _from_yahoo_symbol(raw_symbol: str, quote: dict[str, Any]) -> tuple[str, str]:
     """Translate a Yahoo symbol into the project convention + market label.
 
     Args:
@@ -336,7 +336,7 @@ def _from_yahoo_symbol(raw_symbol: str, quote: Dict[str, Any]) -> tuple[str, str
     return raw_symbol, "global"
 
 
-def _merge_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _merge_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """De-duplicate candidates by symbol, preserving first-seen order.
 
     When two sources resolve the same symbol the first hit wins and the second
@@ -348,8 +348,8 @@ def _merge_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Returns:
         A de-duplicated candidate list (immutable inputs are copied, not mutated).
     """
-    by_symbol: Dict[str, Dict[str, Any]] = {}
-    order: List[str] = []
+    by_symbol: dict[str, Dict[str, Any]] = {}
+    order: list[str] = []
     for candidate in candidates:
         symbol = candidate.get("symbol")
         if not symbol:
@@ -374,8 +374,8 @@ def _merge_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 def _enrich_us_cik(
-    candidates: List[Dict[str, Any]],
-) -> tuple[List[Dict[str, Any]], str]:
+    candidates: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], str]:
     """Return new candidates with a SEC CIK attached to U.S.-equity rows.
 
     Only ``.US`` equity symbols are looked up; the SEC table maps bare tickers
@@ -398,7 +398,7 @@ def _enrich_us_cik(
         return candidates, _NO_US
 
     status = "ok"
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for candidate in candidates:
         symbol = candidate.get("symbol")
         if status == "ok" and isinstance(symbol, str) and symbol.upper().endswith(".US"):
@@ -419,4 +419,5 @@ def _enrich_us_cik(
 
 def _error(message: str) -> str:
     """Render a failure envelope as a JSON string."""
+
     return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

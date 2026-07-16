@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #92
@@ -9,7 +10,7 @@
 Formula: (MAX(RANK(DECAYLINEAR(DELTA(((CLOSE*0.35)+(VWAP*0.65)),2),3)),TSRANK(DECAYLINEAR(ABS(CORR(MEAN(VOLUME,180),CLOSE,13)),5),15))*-1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 92."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

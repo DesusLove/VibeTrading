@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 """Tests for live-runtime triggers (src/live/runtime/triggers.py, SPEC §7.5 c4).
 
 The decision core is pure — it takes ``now_ms`` as an argument and reads no
@@ -5,10 +7,8 @@ clock — so every market-session / interval / event case is pinned to a fixed
 epoch-millisecond instant and asserted deterministically.
 """
 
-from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Mapping
+from datetime import UTC, datetime
 
 import pytest
 
@@ -24,6 +24,7 @@ from src.live.runtime.triggers import (
 
 def _ms(year: int, month: int, day: int, hour: int, minute: int, tz_name: str) -> int:
     """Epoch milliseconds for a wall-clock instant in a named timezone."""
+
     from zoneinfo import ZoneInfo
 
     dt = datetime(year, month, day, hour, minute, tzinfo=ZoneInfo(tz_name))
@@ -221,7 +222,7 @@ def test_due_now_at_wrapper_delegates(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_now_ms_is_utc_epoch_ms() -> None:
     # Sanity: the real clock reader returns a plausible epoch-ms value.
-    before = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
+    before = int(datetime.now(tz=UTC).timestamp() * 1000)
     val = triggers._now_ms()
-    after = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
+    after = int(datetime.now(tz=UTC).timestamp() * 1000)
     assert before <= val <= after + 1000

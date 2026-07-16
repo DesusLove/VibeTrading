@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #60 - 量价占比排名
@@ -9,7 +10,7 @@
 Formula: SUM(((CLOSE-LOW)-(HIGH-CLOSE))/(HIGH-LOW)*VOLUME, 20)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 60."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -5,7 +5,6 @@ must only ever be reachable through an explicit VIBE_TRADING_OCR_ENGINE
 choice — never via "auto" fallback.
 """
 
-from __future__ import annotations
 
 import pytest
 
@@ -53,6 +52,7 @@ def test_none_disables_ocr(monkeypatch):
 
 def test_unknown_choice_falls_back_to_local_only(monkeypatch):
     """An unknown engine name degrades to auto, which stays local."""
+
     monkeypatch.setenv("VIBE_TRADING_OCR_ENGINE", "bogus-engine")
     monkeypatch.setenv("DASHSCOPE_API_KEY", "sk-test-not-real")
     reset_env_config()

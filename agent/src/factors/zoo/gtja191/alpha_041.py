@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #41 - VWAP标准差
@@ -9,7 +10,7 @@
 Formula: (RANK(MAX(DELTA(VWAP,3),5))*-1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 41."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

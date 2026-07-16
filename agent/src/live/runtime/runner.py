@@ -1,3 +1,6 @@
+from collections.abc import Awaitable, Callable, Mapping
+from typing import Any, Protocol
+
 """Persistent live-trading runner loop (SPEC.md §7.5 components 2 + 7).
 
 The runner is the persistent process that turns the interactive consent channel
@@ -33,12 +36,10 @@ the clock — is injectable, so the runner is unit-testable with no live agent o
 broker. See the live-trading SPEC §7.5.
 """
 
-from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Awaitable, Callable, Mapping, Protocol
+from datetime import UTC, datetime
 
 from src.live.audit import LiveActionEvent, write_live_action
 from src.live.halt import halt_flag_set, trip_halt
@@ -47,8 +48,8 @@ from src.live.mandate.store import load_mandate
 from src.live.runtime.flatten import flatten_and_cancel
 from src.live.runtime.jobstore import JobStore
 from src.live.runtime.liveness import write_heartbeat
-from src.live.runtime.scheduler import Job, Scheduler
-from src.live.runtime.triggers import Trigger, due_now
+from src.live.runtime.scheduler import Job
+from src.live.runtime.triggers import Trigger
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +127,7 @@ ClockFn = Callable[[], datetime]
 
 def _default_clock() -> datetime:
     """Return the current time as a timezone-aware UTC ``datetime``."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _report_is_unsafe(report: Any) -> bool:
@@ -183,8 +184,8 @@ def _parse_expiry(raw: str) -> datetime | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
 def _mandate_is_expired(mandate: Mandate, now: datetime) -> bool:
@@ -793,5 +794,6 @@ class LiveRunner:
 
     def stop_loop(self) -> None:
         """Stop the scheduler if one was injected (idempotent)."""
+
         if self._scheduler is not None:
             self._scheduler.stop()

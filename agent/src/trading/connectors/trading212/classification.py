@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated read/write classification for Trading 212 REST operations.
 
 Keys are the connector's public operation names and the Trading 212 REST
@@ -6,7 +7,7 @@ though this read-only connector refuses them at runtime, so the live gate never
 treats a future Trading 212 order surface as a plain read.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

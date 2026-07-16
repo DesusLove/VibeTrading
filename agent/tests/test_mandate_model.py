@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -168,7 +168,7 @@ def test_load_mandate_missing_field_returns_none(live_runtime: Path) -> None:
 
 def test_expires_at_parses_as_utc_datetime(live_runtime: Path) -> None:
     """expires_at round-trips as an ISO-8601 UTC timestamp the gate can parse."""
-    created = datetime(2026, 5, 29, 14, 0, 0, tzinfo=timezone.utc)
+    created = datetime(2026, 5, 29, 14, 0, 0, tzinfo=UTC)
     expires_dt = created + timedelta(days=30)
     expires = expires_dt.isoformat().replace("+00:00", "Z")
     from src.live.paths import broker_dir

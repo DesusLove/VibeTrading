@@ -7,11 +7,9 @@ API format:
   https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh601595,day,2026-06-01,2026-06-13,500,qfq
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -37,6 +35,7 @@ class DataLoader:
 
     def is_available(self) -> bool:
         """Always available — uses plain HTTP."""
+
         return True
 
     def __init__(self) -> None:
@@ -44,16 +43,16 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         validate_date_range(start_date, end_date)
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -73,7 +72,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         if not _is_a_share(code):
             return None
 

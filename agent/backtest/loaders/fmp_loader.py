@@ -1,3 +1,5 @@
+from typing import Any
+
 """Financial Modeling Prep (FMP) loader: key-gated US-equity OHLCV via HTTP.
 
 FMP exposes a daily historical-price endpoint that, like other free quote
@@ -16,10 +18,8 @@ window yields an empty/absent ``historical`` array.
 Auth: set ``FMP_API_KEY`` in the environment. Covers US equities only.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -189,6 +189,7 @@ def _parse_historical(payload: Any) -> Optional[pd.DataFrame]:
         DataFrame indexed by ``trade_date`` with float ``open/high/low/close/
         volume`` columns, or ``None`` when no usable rows are present.
     """
+
     historical = (payload or {}).get("historical") if isinstance(payload, dict) else None
     if not historical:
         return None

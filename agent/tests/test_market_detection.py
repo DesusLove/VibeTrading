@@ -7,7 +7,6 @@ the consolidation in ``_market_hooks``, both the suffix form and the
 bare product-code form must resolve identically.
 """
 
-from __future__ import annotations
 
 import pytest
 
@@ -19,7 +18,6 @@ from backtest.runner import (
     _group_codes_by_source,
     _normalize_codes,
 )
-
 
 # ---------------------------------------------------------------------------
 # _detect_market
@@ -228,6 +226,7 @@ class TestIsChinaFutures:
 
 class TestDetectMarketRequired:
     """Spot-check assertions called out explicitly by the audit task."""
+
 
     def test_bare_chinese_futures_is_futures(self) -> None:
         assert _detect_market("RB2410") == "futures"

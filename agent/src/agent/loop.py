@@ -11,25 +11,52 @@ Tool execution:
   - Read/write batching: consecutive readonly tools run in parallel via threads
 """
 
-from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
 
 import concurrent.futures
-import copy
+import contextlib
 import json
 import logging
 import queue
-import sys
 import threading
 import time as _time
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
 
 from src.agent.context import ContextBuilder
+from src.agent.loop_utils import (
+    SESSIONS_DIR,
+    RUNS_DIR,
+    KEEP_RECENT,
+    TOOL_RESULT_LIMIT,
+    TAIL_TOKEN_BUDGET,
+    _attach_tool_call_thought_signatures,
+    _context_collapse,
+    _fix_tool_pairs,
+    _format_timeout,
+    _goal_max_continuations,
+    _heartbeat_interval_s,
+    _is_tool_success,
+    _microcompact,
+    _new_llm_usage_summary,
+    _normalize_tool_run_dir,
+    _reasoning_delta_min_interval_s,
+    _record_llm_usage,
+    _redact_trace_result,
+    _stream_retry_delay_s,
+    _token_threshold,
+    _tool_timeout_seconds,
+    _FOCUS_SECTION,
+    _ITERATIVE_UPDATE_PROMPT,
+    _STRUCTURED_SUMMARY_PROMPT,
+    estimate_tokens,
+)
 from src.agent.memory import WorkspaceMemory
 from src.agent.progress import HeartbeatTimer, ProgressEvent, _set_emitter
 from src.agent.tools import ToolRegistry
 from src.agent.trace import TraceWriter
+from src.config.accessor import get_env_config
 from src.core.state import RunStateStore
 from src.goal.context import (
     format_goal_continuation_prompt,
@@ -43,472 +70,10 @@ from src.providers.content_filter import (
     MAX_CONSECUTIVE_CONTENT_FILTER_SKIPS,
     compute_content_filter_warnings,
 )
-from src.config.accessor import get_env_config
 from src.tools.background_tools import get_background_manager
 from src.tools.redaction import redact_payload
 
-RUNS_DIR = Path(__file__).resolve().parents[2] / "runs"
-SESSIONS_DIR = Path(__file__).resolve().parents[2] / "sessions"
-KEEP_RECENT = 3
-TOOL_RESULT_LIMIT = 10_000
-LLM_USAGE_ARTIFACT = "llm_usage.json"
-
-COLLAPSE_PRESERVE_RECENT = 6
-COLLAPSE_TEXT_MIN = 2400
-COLLAPSE_HEAD = 900
-COLLAPSE_TAIL = 500
-
-TAIL_TOKEN_BUDGET = 20_000
-
-
-def _override(name: str):
-    """Return a monkeypatched module-level override if present."""
-    mod = sys.modules.get(__name__)
-    if mod is not None and name in mod.__dict__:
-        return mod.__dict__[name]
-    return None
-
-
-def _token_threshold() -> int:
-    ov = _override("TOKEN_THRESHOLD")
-    if ov is not None:
-        return ov
-    from src.config.accessor import get_env_config
-    return get_env_config().agent_tuning.token_threshold
-
-
-def _heartbeat_interval_s() -> float:
-    ov = _override("HEARTBEAT_INTERVAL_S")
-    if ov is not None:
-        return ov
-    from src.config.accessor import get_env_config
-    return get_env_config().agent_tuning.vt_heartbeat_interval_s
-
-
-def _reasoning_delta_min_interval_s() -> float:
-    ov = _override("REASONING_DELTA_MIN_INTERVAL_S")
-    if ov is not None:
-        return ov
-    from src.config.accessor import get_env_config
-    return get_env_config().agent_tuning.vt_reasoning_delta_min_interval_s
-
-
-def _stream_retry_delay_s() -> float:
-    ov = _override("STREAM_RETRY_DELAY_S")
-    if ov is not None:
-        return ov
-    from src.config.accessor import get_env_config
-    return get_env_config().agent_tuning.vt_stream_retry_delay_s
-
-
-def _tool_timeout_seconds() -> float:
-    ov = _override("TOOL_TIMEOUT_SECONDS")
-    if ov is not None:
-        return ov
-    from src.config.accessor import get_env_config
-    return get_env_config().agent_tuning.vibe_trading_tool_timeout_seconds
-
-
-def _goal_max_continuations() -> int:
-    ov = _override("GOAL_MAX_CONTINUATIONS")
-    if ov is not None:
-        return ov
-    from src.config.accessor import get_env_config
-    return get_env_config().agent_tuning.vibe_trading_goal_max_continuations
-
 logger = logging.getLogger(__name__)
-
-
-def _coerce_usage_int(value: Any) -> int:
-    """Coerce provider token counts to non-negative ints."""
-    try:
-        return max(0, int(value or 0))
-    except (TypeError, ValueError):
-        return 0
-
-
-def _normalize_llm_usage(usage: Any) -> dict[str, int] | None:
-    """Normalize provider-reported usage metadata without estimating tokens."""
-    if usage is None:
-        return None
-    if not isinstance(usage, dict):
-        try:
-            usage = dict(usage)
-        except (TypeError, ValueError):
-            return None
-
-    input_tokens = _coerce_usage_int(usage.get("input_tokens"))
-    output_tokens = _coerce_usage_int(usage.get("output_tokens"))
-    total_tokens = _coerce_usage_int(usage.get("total_tokens"))
-    if total_tokens == 0 and (input_tokens or output_tokens):
-        total_tokens = input_tokens + output_tokens
-    if not (input_tokens or output_tokens or total_tokens):
-        return None
-    return {
-        "input_tokens": input_tokens,
-        "output_tokens": output_tokens,
-        "total_tokens": total_tokens,
-    }
-
-
-def _new_llm_usage_summary(llm: Any) -> dict[str, Any]:
-    """Create the run-scoped provider usage accumulator."""
-    from src.config.accessor import get_env_config
-    cfg = get_env_config()
-    provider = cfg.llm.langchain_provider.strip() or "openai"
-    model = getattr(llm, "model_name", None) or cfg.llm.langchain_model_name.strip()
-    return {
-        "provider": provider,
-        "model": model,
-        "totals": {
-            "input_tokens": 0,
-            "output_tokens": 0,
-            "total_tokens": 0,
-            "calls": 0,
-        },
-        "per_iteration": [],
-    }
-
-
-def _record_llm_usage(
-    run_dir: Path,
-    summary: dict[str, Any],
-    usage: Any,
-    iteration: int,
-) -> dict[str, int] | None:
-    """Accumulate and persist one provider-reported usage event."""
-    normalized = _normalize_llm_usage(usage)
-    if normalized is None:
-        return None
-
-    totals = summary.setdefault("totals", {})
-    totals["input_tokens"] = int(totals.get("input_tokens") or 0) + normalized["input_tokens"]
-    totals["output_tokens"] = int(totals.get("output_tokens") or 0) + normalized["output_tokens"]
-    totals["total_tokens"] = int(totals.get("total_tokens") or 0) + normalized["total_tokens"]
-    totals["calls"] = int(totals.get("calls") or 0) + 1
-    summary.setdefault("per_iteration", []).append({"iter": iteration, **normalized})
-    summary["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
-    try:
-        path = run_dir / LLM_USAGE_ARTIFACT
-        tmp_path = path.with_suffix(path.suffix + ".tmp")
-        tmp_path.write_text(
-            json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-        tmp_path.replace(path)
-    except OSError as exc:
-        logger.debug("LLM usage artifact write skipped: %s", exc)
-
-    return normalized
-
-
-def _redact_trace_result(result: str) -> str:
-    """Redact structured sensitive fields before persisting trace/event previews.
-
-    Args:
-        result: Raw tool result string.
-
-    Returns:
-        Redacted JSON string when ``result`` is JSON, otherwise the original
-        text. Plain text is left unchanged because reliable free-text secret
-        scrubbing would be more error-prone than helpful here.
-    """
-    try:
-        payload = json.loads(result)
-    except (TypeError, json.JSONDecodeError):
-        return result
-    return json.dumps(redact_payload(payload), ensure_ascii=False)
-
-
-def _format_timeout(seconds: float) -> str:
-    """Return a human-readable timeout label."""
-    if seconds < 1:
-        return f"{seconds:.2f}s"
-    return f"{seconds:.0f}s"
-
-
-def estimate_tokens(messages: list) -> int:
-    """Rough token count estimate (~4 chars/token).
-
-    Args:
-        messages: Message list.
-
-    Returns:
-        Estimated token count.
-    """
-    return len(json.dumps(messages, default=str, ensure_ascii=False)) // 4
-
-
-def _microcompact(messages: list) -> None:
-    """Layer 1: silently prune old tool results, keeping the most recent N intact.
-
-    Args:
-        messages: Message list (mutated in place).
-    """
-    tool_msgs = [m for m in messages if m.get("role") == "tool"]
-    if len(tool_msgs) <= KEEP_RECENT:
-        return
-    for msg in tool_msgs[:-KEEP_RECENT]:
-        content = msg.get("content", "")
-        if isinstance(content, str) and len(content) > 100:
-            msg["content"] = "[cleared]"
-
-
-def _context_collapse(messages: list) -> None:
-    """Layer 2: fold long text blocks in older messages without LLM call.
-
-    Preserves head + tail of large text, collapses the middle.
-    Zero API cost — pure string operation.
-
-    Args:
-        messages: Message list (mutated in place).
-    """
-    if len(messages) <= COLLAPSE_PRESERVE_RECENT + 1:
-        return
-    for msg in messages[1:-COLLAPSE_PRESERVE_RECENT]:
-        content = msg.get("content")
-        if not isinstance(content, str) or len(content) <= COLLAPSE_TEXT_MIN:
-            continue
-        if content == "[cleared]":
-            continue
-        head = content[:COLLAPSE_HEAD]
-        tail = content[-COLLAPSE_TAIL:]
-        trimmed = len(content) - COLLAPSE_HEAD - COLLAPSE_TAIL
-        msg["content"] = f"{head}\n\n...[{trimmed} chars collapsed]...\n\n{tail}"
-
-
-def _fix_tool_pairs(messages: list) -> None:
-    """Repair orphaned tool_call / tool_result pairs after compression.
-
-    Two fixes:
-      1. Remove tool results whose matching tool_call was compressed away.
-      2. Insert stub results for tool_calls whose results were compressed away.
-
-    Args:
-        messages: Message list (mutated in place).
-    """
-    # Collect all tool_call IDs from assistant messages
-    call_ids: set[str] = set()
-    for msg in messages:
-        if msg.get("role") == "assistant":
-            for tc in msg.get("tool_calls", []):
-                tc_id = tc.get("id", "")
-                if tc_id:
-                    call_ids.add(tc_id)
-
-    # Remove orphaned tool results
-    i = 0
-    while i < len(messages):
-        msg = messages[i]
-        if msg.get("role") == "tool" and msg.get("tool_call_id") not in call_ids:
-            messages.pop(i)
-        else:
-            i += 1
-
-    # Collect existing result IDs
-    result_ids: set[str] = set()
-    for msg in messages:
-        if msg.get("role") == "tool":
-            tcid = msg.get("tool_call_id", "")
-            if tcid:
-                result_ids.add(tcid)
-
-    # Insert stub results for orphaned tool_calls
-    inserts: list[tuple[int, dict]] = []
-    for idx, msg in enumerate(messages):
-        if msg.get("role") != "assistant":
-            continue
-        for tc in msg.get("tool_calls", []):
-            tc_id = tc.get("id", "")
-            if tc_id and tc_id not in result_ids:
-                stub = {
-                    "role": "tool",
-                    "tool_call_id": tc_id,
-                    "name": tc.get("function", {}).get("name", "unknown"),
-                    "content": "[Result from earlier context — see summary above]",
-                }
-                inserts.append((idx + 1, stub))
-                result_ids.add(tc_id)
-
-    for pos, stub in reversed(inserts):
-        messages.insert(pos, stub)
-
-
-def _attach_tool_call_thought_signatures(message: dict[str, Any], tool_calls: list) -> dict[str, Any]:
-    """Attach Gemini thought signatures to assistant replay tool calls.
-
-    The replay message is later converted back into LangChain messages from a
-    plain dict history. Keep signatures in both the provider-neutral
-    ``extra_content.thought_signature`` slot and Gemini's OpenAI-compatible
-    ``extra_content.google.thought_signature`` slot so both local replay tests
-    and the Gemini request injector can recover the value.
-    """
-    outbound_tool_calls = message.get("tool_calls")
-    if not isinstance(outbound_tool_calls, list):
-        return message
-
-    signatures_by_id: dict[str, str] = {}
-    signatures_by_index: dict[int, str] = {}
-    for index, tc in enumerate(tool_calls):
-        extra_content = getattr(tc, "extra_content", None)
-        signature = None
-        if isinstance(extra_content, dict):
-            signature = extra_content.get("thought_signature")
-            google_extra = extra_content.get("google")
-            if not signature and isinstance(google_extra, dict):
-                signature = google_extra.get("thought_signature") or google_extra.get(
-                    "thoughtSignature"
-                )
-        signature = signature or getattr(tc, "thought_signature", None)
-        if not signature:
-            continue
-        tc_id = getattr(tc, "id", None)
-        if tc_id:
-            signatures_by_id[str(tc_id)] = signature
-        signatures_by_index[index] = signature
-
-    if not signatures_by_id and not signatures_by_index:
-        return message
-
-    def attach(raw_tool_call: Any, index: int) -> None:
-        if not isinstance(raw_tool_call, dict):
-            return
-        signature = signatures_by_id.get(str(raw_tool_call.get("id"))) or signatures_by_index.get(index)
-        if not signature:
-            return
-        extra_content = raw_tool_call.setdefault("extra_content", {})
-        if not isinstance(extra_content, dict):
-            extra_content = {}
-            raw_tool_call["extra_content"] = extra_content
-        extra_content["thought_signature"] = signature
-        google = extra_content.setdefault("google", {})
-        if not isinstance(google, dict):
-            google = {}
-            extra_content["google"] = google
-        google["thought_signature"] = signature
-
-    for index, raw_tool_call in enumerate(outbound_tool_calls):
-        attach(raw_tool_call, index)
-
-    additional_kwargs = message.setdefault("additional_kwargs", {})
-    raw_tool_calls = additional_kwargs.setdefault(
-        "tool_calls",
-        copy.deepcopy(outbound_tool_calls),
-    )
-    if isinstance(raw_tool_calls, list):
-        for index, raw_tool_call in enumerate(raw_tool_calls):
-            attach(raw_tool_call, index)
-
-    return message
-
-
-# -- Structured summary templates ------------------------------------------
-
-_STRUCTURED_SUMMARY_PROMPT = """\
-Summarize this conversation for handoff to a fresh context window.
-This summary is the ONLY context available — omitted information is lost.
-
-Use EXACTLY this structure:
-
-## Goal
-What the user is trying to accomplish.
-
-## Constraints & Preferences
-User-stated requirements: risk tolerance, strategy parameters, asset preferences.
-
-## Progress
-### Done
-- Completed steps with key results and specific numbers.
-### In Progress
-- Current work when compression triggered.
-
-## Key Decisions
-Choices made and rationale.
-
-## Resolved Questions
-Questions already answered — do NOT re-answer these.
-
-## Pending User Asks
-Unfinished requests still needing action.
-
-## Relevant Files
-File paths, run_dir, signal engines, artifact locations.
-
-## Remaining Work
-What still needs to be done (background reference, NOT active instructions).
-
-## Critical Context
-Specific numbers, parameters, error messages, configuration values.
-
-## Tools & Patterns
-Which tools worked, what failed, effective approaches.
-
-IMPORTANT: This is a handoff — background reference, NOT active instructions.
-Preserve ALL specific numbers, file paths, and parameter values.
-{focus_section}
-Conversation to summarize:
-"""
-
-_FOCUS_SECTION = """
-FOCUS TOPIC: {topic}
-Allocate 60-70% of the summary budget to content related to this topic.
-Aggressively compress unrelated content to make room.
-"""
-
-_ITERATIVE_UPDATE_PROMPT = """\
-Update the existing summary with new conversation turns.
-
-PREVIOUS SUMMARY:
-{previous_summary}
-
-NEW TURNS TO INCORPORATE:
-{new_turns}
-
-Rules:
-- PRESERVE all existing information from the previous summary.
-- ADD new progress, decisions, and findings.
-- Move "In Progress" items to "Done" when completed.
-- Move answered questions to "Resolved Questions".
-- Keep the same section structure.
-- Do NOT drop any critical context from the previous summary.
-{focus_section}"""
-
-
-def _is_tool_success(result: str) -> bool:
-    """Return True if the tool result does not look like an error response."""
-    try:
-        data = json.loads(result)
-        if isinstance(data, dict) and data.get("status") == "error":
-            return False
-    except (json.JSONDecodeError, TypeError):
-        pass
-    return True
-
-
-def _normalize_tool_run_dir(args: dict[str, Any], memory_run_dir: str | None) -> dict[str, Any]:
-    """Normalize ``run_dir`` in tool args to an absolute path when possible.
-
-    If the model supplies a relative ``run_dir`` (for example ``"."`` or
-    ``"risk_parity_run"``), resolve it against the active run directory.
-    """
-    normalized = dict(args)
-    if not memory_run_dir:
-        return normalized
-
-    if "run_dir" not in normalized:
-        normalized["run_dir"] = memory_run_dir
-        return normalized
-
-    run_dir_value = str(normalized["run_dir"]).strip()
-    if not run_dir_value:
-        normalized["run_dir"] = memory_run_dir
-        return normalized
-
-    candidate = Path(run_dir_value)
-    if not candidate.is_absolute():
-        normalized["run_dir"] = str((Path(memory_run_dir) / candidate).resolve())
-    return normalized
 
 
 class AgentLoop:
@@ -525,10 +90,10 @@ class AgentLoop:
         self,
         registry: ToolRegistry,
         llm: ChatLLM,
-        memory: Optional[WorkspaceMemory] = None,
-        event_callback: Optional[Callable[[str, Dict[str, Any]], None]] = None,
+        memory: WorkspaceMemory | None = None,
+        event_callback: Callable[[str, dict[str, Any | None], None]] = None,
         max_iterations: int = 50,
-        persistent_memory: Optional[Any] = None,
+        persistent_memory: Any | None = None,
     ) -> None:
         """Initialize AgentLoop.
 
@@ -560,7 +125,7 @@ class AgentLoop:
         """
         self._cancel_event.set()
 
-    def run(self, user_message: str, history: Optional[List[Dict[str, Any]]] = None, session_id: str = "") -> Dict[str, Any]:
+    def run(self, user_message: str, history: list[dict[str, Any | None]] = None, session_id: str = "") -> dict[str, Any]:
         """Run the ReAct loop synchronously.
 
         Args:
@@ -599,7 +164,7 @@ class AgentLoop:
         goal_store = None
         goal_turn_accounted = False
         messages = context.build_messages(llm_user_message, history)
-        react_trace: List[Dict[str, Any]] = []
+        react_trace: list[dict[str, Any]] = []
 
         trace_dir = SESSIONS_DIR / session_id if session_id else run_dir
         trace = TraceWriter(trace_dir)
@@ -694,7 +259,7 @@ class AgentLoop:
                     })
 
                 # Streaming output + collect thinking text
-                thinking_chunks: List[str] = []
+                thinking_chunks: list[str] = []
                 reasoning_chars = 0
                 last_reasoning_emit: float | None = None
 
@@ -1251,7 +816,7 @@ class AgentLoop:
 
         self._finalize_tool_result(tc, result, elapsed_ms, context, messages, trace, react_trace, iteration)
 
-    def _invoke_tool(self, tool_name: str, args: Dict[str, Any]) -> tuple[str, int]:
+    def _invoke_tool(self, tool_name: str, args: dict[str, Any]) -> tuple[str, int]:
         """Execute a tool with heartbeat + structured progress emission.
 
         Installs a thread-local progress emitter so the tool may call
@@ -1278,7 +843,7 @@ class AgentLoop:
             payload["tool"] = tool_name
             self._emit("tool_progress", payload)
 
-        def _on_heartbeat(payload: Dict[str, Any]) -> None:
+        def _on_heartbeat(payload: dict[str, Any]) -> None:
             if timed_out.is_set():
                 return
             self._emit("tool_heartbeat", payload)
@@ -1320,7 +885,7 @@ class AgentLoop:
                 Elapsed milliseconds at emission time.
             """
             elapsed_ms = _elapsed_ms()
-            payload: Dict[str, Any] = {
+            payload: dict[str, Any] = {
                 "tool": tool_name,
                 "stage": stage,
                 "message": message,
@@ -1576,16 +1141,15 @@ class AgentLoop:
         # Fix orphaned tool pairs in the reconstructed message list
         _fix_tool_pairs(messages)
 
-    def _emit(self, event_type: str, data: Dict[str, Any]) -> None:
+    def _emit(self, event_type: str, data: dict[str, Any]) -> None:
         """Fire an event via the callback."""
         if self._event_callback:
-            try:
+            with contextlib.suppress(Exception):
                 self._event_callback(event_type, data)
-            except Exception:
-                pass
 
     def _update_memory(self, tool_name: str) -> None:
         """Update workspace memory counters after tool execution."""
+
         self.memory.increment(tool_name)
 
 

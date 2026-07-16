@@ -8,14 +8,12 @@ no retry, and no wall-clock budget, so a flaky connection hung
 the happy path is unchanged (one call per page).
 """
 
-from __future__ import annotations
 
 import importlib
 
+import ccxt
 import pandas as pd
 import pytest
-
-import ccxt
 
 import backtest.loaders.ccxt_loader as cl
 from backtest.loaders.base import DEFAULT_MAX_RETRIES
@@ -61,6 +59,7 @@ def test_transient_networkerror_retried_then_succeeds():
 
 def test_persistent_disconnect_is_bounded_not_a_hang():
     """The old 10-min hang: now a bounded TimeoutError after a fixed budget."""
+
     ex = _FakeEx([ccxt.NetworkError("down")])  # always fails
     with pytest.raises(TimeoutError):
         DataLoader._fetch_one(ex, "BTC/USDT", "1d", SINCE, END)

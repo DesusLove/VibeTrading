@@ -1,14 +1,13 @@
+from typing import Any
+
 """HTTP helpers for the WebSocket channel."""
 
-from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 from src.channels.utils import validate_url_target
-
 
 _LONG_LIVED_TIMEOUT = 300  # seconds for long-lived HTTP connections
 
@@ -55,6 +54,7 @@ async def read_uploaded_file(*args: Any, **kwargs: Any) -> bytes:
     The helper accepts common async/sync file objects used by lightweight HTTP
     adapters. It is intentionally conservative and only returns raw bytes.
     """
+
     del kwargs
     if not args:
         return b""

@@ -154,9 +154,8 @@ class TestFetchKline:
     def test_http_error_propagates(self):
         with patch.object(
             ec, "throttled_get_json", side_effect=RuntimeError("HTTP 429")
-        ):
-            with pytest.raises(RuntimeError, match="429"):
-                ec.fetch_kline("1.600519", klt=101)
+        ), pytest.raises(RuntimeError, match="429"):
+            ec.fetch_kline("1.600519", klt=101)
 
 
 class TestStripJsonp:

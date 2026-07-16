@@ -10,14 +10,12 @@ Market rules:
   - Roll/expiry: not modeled (assumes continuous front-month data)
 """
 
-from __future__ import annotations
 
 import re
 
 import pandas as pd
 
 from backtest.engines.futures_base import FuturesBaseEngine
-
 
 # ── Contract multiplier (USD per point / per unit) ──
 
@@ -231,6 +229,7 @@ def _calc_pct_change(bar: pd.Series):
     Priority: close/pre_close > settle/pre_settle > pct_chg.
     Falls back to pct_chg only when price fields are absent.
     """
+
     close = bar.get("close")
     pre_close = bar.get("pre_close")
     if close is not None and pre_close is not None and pre_close > 0:

@@ -1,6 +1,7 @@
+from typing import Any
+
 """QVeris discovery and execution tools."""
 
-from __future__ import annotations
 
 import json
 import os
@@ -9,7 +10,6 @@ import tempfile
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
 
 import httpx
 
@@ -401,6 +401,7 @@ class QVerisInspectTool(_QVerisBaseTool):
 
 class QVerisExecuteTool(_QVerisBaseTool):
     """Execute a selected QVeris capability behind paid-mode budget gates."""
+
 
     name = "qveris_execute"
     description = (

@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any
+
 """Integration tests: full-stack SSE MCP client path with a real FastMCP server.
 
 These tests spawn an actual FastMCP SSE server process
@@ -10,10 +13,9 @@ These tests spawn an actual FastMCP SSE server process
                     -> remote tool callable from registry
 """
 
-from __future__ import annotations
+
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 

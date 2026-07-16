@@ -1,6 +1,7 @@
+from typing import Any
+
 """LLM factory."""
 
-from __future__ import annotations
 
 import logging
 import os
@@ -8,7 +9,6 @@ from collections.abc import Sequence
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Any, Optional
 from urllib.parse import urlsplit
 
 from pydantic import PrivateAttr
@@ -41,7 +41,7 @@ if ChatOpenAI is not None:
         multi-turn continuations.
         """
 
-        _vibe_provider: Optional[str] = PrivateAttr(default=None)
+        _vibe_provider: str | None = PrivateAttr(default=None)
 
         def __init__(self, *args: Any, vibe_provider: str | None = None, **kwargs: Any) -> None:
             """Initialize while retaining the resolved provider name."""
@@ -58,7 +58,7 @@ if ChatOpenAI is not None:
             return get_provider_capabilities(self._vibe_provider, str(model))
 
         @staticmethod
-        def _extract_tool_call_thought_signature(tool_call: Any) -> Optional[str]:
+        def _extract_tool_call_thought_signature(tool_call: Any) -> str | None:
             if not isinstance(tool_call, dict):
                 return None
 
@@ -236,7 +236,7 @@ if ChatOpenAI is not None:
             self,
             chunk: dict,
             default_chunk_class: type,
-            base_generation_info: Optional[dict],
+            base_generation_info: dict | None,
         ):
             gen = super()._convert_chunk_to_generation_chunk(
                 chunk, default_chunk_class, base_generation_info
@@ -252,7 +252,7 @@ if ChatOpenAI is not None:
             self,
             input_: Any,
             *,
-            stop: Optional[list[str]] = None,
+            stop: list[str | None] = None,
             **kwargs: Any,
         ) -> dict:
             """Re-inject reasoning_content and normalize assistant content.
@@ -396,7 +396,7 @@ def _build_native_deepseek(
     """
     try:
         module = import_module("langchain_deepseek")
-        chat_deepseek = getattr(module, "ChatDeepSeek")
+        chat_deepseek = module.ChatDeepSeek
     except Exception as exc:  # noqa: BLE001 - optional adapter fallback
         logger.info("DeepSeek native adapter unavailable; using OpenAI-compatible path: %s", exc)
         return None
@@ -567,7 +567,7 @@ def provider_diagnostics() -> dict[str, Any]:
     }
 
 
-def build_llm(*, model_name: Optional[str] = None, callbacks: Any = None) -> Any:
+def build_llm(*, model_name: str | None = None, callbacks: Any = None) -> Any:
     """Construct a ChatOpenAI instance.
 
     Args:
@@ -580,6 +580,7 @@ def build_llm(*, model_name: Optional[str] = None, callbacks: Any = None) -> Any
     Raises:
         RuntimeError: If langchain-openai is missing or LANGCHAIN_MODEL_NAME is unset.
     """
+
     _sync_provider_env()
     name = model_name or get_env_config().llm.langchain_model_name.strip()
     if not name:

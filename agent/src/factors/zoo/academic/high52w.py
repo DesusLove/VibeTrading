@@ -16,7 +16,6 @@ better than past returns alone. Computed as close / ts_max(close, 252), then
 cross-sectional z-scored per date. Higher z-scores = closer to the 52-week
 high (the long leg).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -54,6 +53,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return close-to-252d-high ratio cross-sectional z-score per stock."""
+
     close = panel['close']
     ratio = safe_div(close, ts_max(close, 252))
     return _cross_sectional_zscore(ratio)

@@ -1,3 +1,5 @@
+from collections.abc import Callable, Mapping
+
 """Live-runtime triggers — when an autonomous tick is due (SPEC §7.5 component 4).
 
 This layers market-session, interval, and event triggers over R1's wall-clock
@@ -21,12 +23,10 @@ Frozen public contract (imported blind by R2):
 Imports are stdlib only (``datetime`` / ``zoneinfo``); no other parcel.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime, time, timezone
+from datetime import UTC, date, datetime, time
 from enum import Enum
-from typing import Callable, Mapping
 from zoneinfo import ZoneInfo
 
 # --------------------------------------------------------------------------- #
@@ -157,7 +157,7 @@ class Trigger:
     predicate: Callable[[Mapping[str, object]], bool] | None = None
 
     @classmethod
-    def interval(cls, interval_ms: int, *, epoch_ms: int = 0) -> "Trigger":
+    def interval(cls, interval_ms: int, *, epoch_ms: int = 0) -> Trigger:
         """Build an interval trigger firing every ``interval_ms`` ms.
 
         Args:
@@ -175,7 +175,7 @@ class Trigger:
         return cls(kind=TriggerKind.INTERVAL, interval_ms=interval_ms, epoch_ms=epoch_ms)
 
     @classmethod
-    def market(cls, market: str) -> "Trigger":
+    def market(cls, market: str) -> Trigger:
         """Build a market-session trigger for a known market key.
 
         Args:
@@ -192,7 +192,7 @@ class Trigger:
         return cls(kind=TriggerKind.MARKET, market=market)
 
     @classmethod
-    def event(cls, predicate: Callable[[Mapping[str, object]], bool]) -> "Trigger":
+    def event(cls, predicate: Callable[[Mapping[str, object]], bool]) -> Trigger:
         """Build an event trigger driven by a pure predicate.
 
         Args:
@@ -220,7 +220,7 @@ def _ms_to_aware_dt(now_ms: int, tz: str) -> datetime:
     Returns:
         A timezone-aware :class:`datetime` localized to ``tz``.
     """
-    utc_dt = datetime.fromtimestamp(now_ms / 1000.0, tz=timezone.utc)
+    utc_dt = datetime.fromtimestamp(now_ms / 1000.0, tz=UTC)
     return utc_dt.astimezone(ZoneInfo(tz))
 
 
@@ -310,7 +310,7 @@ def _now_ms() -> int:
     Returns:
         Epoch milliseconds for the current instant.
     """
-    return int(datetime.now(tz=timezone.utc).timestamp() * 1000)
+    return int(datetime.now(tz=UTC).timestamp() * 1000)
 
 
 def market_is_open(market: str) -> bool:
@@ -344,4 +344,5 @@ def due_now_at(trigger: Trigger, *, event_state: Mapping[str, object] | None = N
     Returns:
         ``True`` if the trigger is due now, else ``False``.
     """
+
     return due_now(trigger, _now_ms(), event_state=event_state)

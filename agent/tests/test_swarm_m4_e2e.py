@@ -1,3 +1,5 @@
+from typing import Any
+
 """M4 — SWARM external MCP tools: end-to-end worker integration tests.
 
 Covers requirements R-04, R-07, R-10 and tests T-12, T-13, T-14, T-15 in
@@ -18,11 +20,9 @@ stubbed — :func:`run_worker` doesn't need a real LLM to exercise the
 event-emit / tool-execution / report-write contract.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 from unittest.mock import patch
 
 from fastmcp.client.client import CallToolResult
@@ -33,7 +33,6 @@ from src.providers.chat import LLMResponse, ToolCallRequest
 from src.swarm.models import SwarmAgentSpec, SwarmEvent, SwarmTask
 from src.swarm.worker import run_worker
 from src.tools.mcp import build_mcp_tool_wrappers
-
 
 # --------------------------------------------------------------------------- #
 # Fakes — fake MCP transport + scripted ChatLLM
@@ -51,7 +50,7 @@ class _FakeMCPClient:
     def __init__(self, state: dict[str, Any]) -> None:
         self._state = state
 
-    async def __aenter__(self) -> "_FakeMCPClient":
+    async def __aenter__(self) -> _FakeMCPClient:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> bool | None:
@@ -599,6 +598,7 @@ def _registry_with_remote(
 
 def _tool_names(tool_defs: list[dict] | None) -> set[str]:
     """Extract tool names from an OpenAI-format tool-definitions list."""
+
     if not tool_defs:
         return set()
     names: set[str] = set()

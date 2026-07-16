@@ -1,3 +1,5 @@
+from typing import Any
+
 """Lockup-expiry (限售解禁) tool backed by the Eastmoney datacenter API.
 
 Chinese A-share restricted shares come off lockup on scheduled dates; a large
@@ -13,12 +15,10 @@ un-throttled GET. It only knows Eastmoney's ``RPT_LIFT_STOCK`` report layout,
 not any loader's DataFrame conventions.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from datetime import date, datetime, timedelta, timezone
-from typing import Any
+from datetime import UTC, date, datetime, timedelta
 
 from backtest.loaders import eastmoney_client
 from src.agent.tools import BaseTool
@@ -46,7 +46,7 @@ _PAGE_SIZE = 200
 
 def _today() -> date:
     """Return today's date (indirection kept for test monkeypatching)."""
-    return datetime.now(timezone.utc).date()
+    return datetime.now(UTC).date()
 
 
 def _compact(d: date) -> str:
@@ -318,6 +318,7 @@ class LockupExpiryTool(BaseTool):
 
     def execute(self, **kwargs: Any) -> str:
         """Execute the lockup-expiry query and return a JSON envelope."""
+
         return get_lockup_expiry(
             kwargs.get("code"),
             kwargs.get("horizon_days", _DEFAULT_HORIZON_DAYS),

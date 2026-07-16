@@ -8,7 +8,6 @@ fields) still parse — important because existing on-disk runs will be
 re-read by ``SwarmStore.list_runs`` after this change.
 """
 
-from __future__ import annotations
 
 import pytest
 
@@ -78,6 +77,7 @@ def test_legacy_run_json_without_provider_model_still_parses() -> None:
 )
 def test_accepts_other_providers(provider: str, model: str) -> None:
     """Field accepts any string — provider list is not enumerated at runtime."""
+
     run = SwarmRun(**_base_kwargs(), provider=provider, model=model)
     assert run.provider == provider
     assert run.model == model

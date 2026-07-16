@@ -6,7 +6,6 @@ parsing/envelope logic runs against a canned datacenter payload, and the error
 path makes that boundary raise.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -17,6 +16,7 @@ from src.tools.margin_trading_tool import MarginTradingTool
 
 def _datacenter_payload() -> dict:
     """Two daily rows in the Eastmoney RZRQ datacenter response shape."""
+
     return {
         "result": {
             "data": [

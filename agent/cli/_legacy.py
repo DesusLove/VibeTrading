@@ -10,10 +10,8 @@ Usage:
     vibe-trading show <run_id>             Show run details
 """
 
-from __future__ import annotations
 
 # ruff: noqa: E402
-
 import argparse
 import csv
 import json
@@ -26,11 +24,11 @@ import sys
 import threading
 import time
 import uuid
-from datetime import datetime
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
-
 import warnings
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
 warnings.filterwarnings("ignore", message=".*Importing verbose from langchain.*")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="langchain")
 
@@ -95,7 +93,7 @@ def _print_swarm_vars_json_error(vars_json: str, exc: json.JSONDecodeError) -> N
     )
 
 
-def _parse_swarm_run_args(values: list[str]) -> tuple[str, Optional[str]] | None:
+def _parse_swarm_run_args(values: list[str]) -> tuple[str, str | None] | None:
     """Validate ``--swarm-run`` values before starting the swarm."""
     if len(values) > 2:
         extras = ", ".join(rich_escape(repr(token)) for token in values[2:])
@@ -138,7 +136,7 @@ class _SessionStats:
 
     def __init__(self, session_start: float) -> None:
         self.session_start = session_start
-        self.last_elapsed: Optional[float] = None
+        self.last_elapsed: float | None = None
         self.total_tool_ms = 0
         self.tool_count = 0
 
@@ -269,18 +267,18 @@ def _result_exit_code(result: dict) -> int:
     return EXIT_SUCCESS if result.get("status") == "success" else EXIT_RUN_FAILED
 
 
-def _coerce_exit_code(value: Optional[int]) -> int:
+def _coerce_exit_code(value: int | None) -> int:
     """Normalize command return values to an integer exit code."""
     return EXIT_SUCCESS if value is None else int(value)
 
 
 def _read_prompt_source(
-    prompt: Optional[str],
-    prompt_file: Optional[Path],
+    prompt: str | None,
+    prompt_file: Path | None,
     *,
     no_rich: bool,
     allow_interactive: bool = True,
-) -> tuple[Optional[str], Optional[str]]:
+) -> tuple[str | None, str | None]:
     """Resolve prompt text from CLI args, file, stdin, or interactive input."""
     if prompt is not None:
         return prompt.strip(), None
@@ -524,7 +522,7 @@ class _RunDashboard:
         self.latest_text = ""
         self.timeline: list[tuple[str, str, str, float, str]] = []
         self.status = "running"
-        self.live: Optional[Live] = None
+        self.live: Live | None = None
         # Per-tool live feedback keyed by tool name. Supports parallel
         # readonly batches (loop._execute_parallel runs up to 8 tools in
         # ThreadPoolExecutor and each gets its own HeartbeatTimer). Each
@@ -556,7 +554,7 @@ class _RunDashboard:
             self.tool_active[tool] = entry
         return entry
 
-    def handle_event(self, event_type: str, data: Dict[str, Any]) -> None:
+    def handle_event(self, event_type: str, data: dict[str, Any]) -> None:
         """Update the dashboard from AgentLoop UI events."""
         if event_type == "text_delta":
             delta = data.get("delta", "")
@@ -674,7 +672,7 @@ class _RunDashboard:
     def _render_progress_row(
         self,
         tool: str,
-        entry: Dict[str, Any],
+        entry: dict[str, Any],
         spinner: str,
         bar_width: int,
         compact: bool,
@@ -840,12 +838,11 @@ class _RunDashboard:
 
 from cli.ui.rail import RailRunDashboard as _RunDashboard  # noqa: E402,F811
 
-
 # ---------------------------------------------------------------------------
 # Agent execution core
 # ---------------------------------------------------------------------------
 
-def _format_tool_call_args(tool: str, args: Dict[str, str]) -> str:
+def _format_tool_call_args(tool: str, args: dict[str, str]) -> str:
     """Smart-format tool argument summary."""
     if tool == "load_skill":
         return f'("{args.get("name", "")}")'
@@ -915,7 +912,7 @@ _PROPOSAL_TOOL_NAME = "propose_mandate_profiles"
 _PROPOSAL_ID_RE = re.compile(r'"proposal_id"\s*:\s*"(mp_[0-9a-f]{32})"')
 
 
-def _load_full_proposal(proposal_id: str) -> Optional[Dict[str, Any]]:
+def _load_full_proposal(proposal_id: str) -> dict[str, Any] | None:
     """Reload a persisted ``mandate.proposal`` payload by id, broker-agnostic.
 
     The propose tool persists the full proposal under
@@ -946,7 +943,7 @@ def _load_full_proposal(proposal_id: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _mandate_proposal_from_tool_result(data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _mandate_proposal_from_tool_result(data: dict[str, Any]) -> dict[str, Any] | None:
     """Recover a full ``mandate.proposal`` payload from a propose-tool result.
 
     Detection mirrors api_server's ``_mandate_proposal_frame_from_tool_result``:
@@ -973,15 +970,15 @@ def _mandate_proposal_from_tool_result(data: Dict[str, Any]) -> Optional[Dict[st
 
 def _run_agent(
     prompt: str,
-    history: Optional[List[Dict]] = None,
-    run_dir_override: Optional[str] = None,
+    history: list[dict] | None = None,
+    run_dir_override: str | None = None,
     max_iter: int = 50,
     *,
     no_rich: bool = False,
     stream_output: bool = True,
-    dashboard: Optional[_RunDashboard] = None,
+    dashboard: _RunDashboard | None = None,
     session_id: str = "",
-    proposal_sink: Optional[Any] = None,
+    proposal_sink: Any | None = None,
 ) -> dict:
     """Build AgentLoop and execute, return result dict.
 
@@ -993,9 +990,9 @@ def _run_agent(
             is a privileged surface action (commit), never a tool the model can
             call (SPEC.md Consent §2).
     """
-    from src.tools import build_registry
-    from src.providers.chat import ChatLLM
     from src.agent.loop import AgentLoop
+    from src.providers.chat import ChatLLM
+    from src.tools import build_registry
 
     # Closure-level state for the no-rich path so dots and progress lines
     # don't shoulder-bump each other (M3) and progress prints are throttled
@@ -1005,7 +1002,7 @@ def _run_agent(
         "last_progress_ts": {},  # type: ignore[var-annotated]
     }
 
-    def on_event(event_type: str, data: Dict[str, Any]) -> None:
+    def on_event(event_type: str, data: dict[str, Any]) -> None:
         # Live mandate proposals are surfaced to the REPL out-of-band so the
         # user's pick is intercepted before the model (SPEC.md Consent §2).
         # This fires regardless of stream_output / rich state — capturing the
@@ -1161,9 +1158,9 @@ def _run_agent(
 
 
 def _run_with_graceful_cancel(
-    agent: "AgentLoop",
+    agent: AgentLoop,
     prompt: str,
-    history: Optional[List[Dict]],
+    history: list[dict] | None,
     *,
     no_rich: bool,
     session_id: str = "",
@@ -1225,7 +1222,7 @@ def _run_with_graceful_cancel(
             pass
 
 
-def _build_benchmark_table(m: dict) -> Optional[Table]:
+def _build_benchmark_table(m: dict) -> Table | None:
     """Build a benchmark comparison table from metrics dict.
 
     Args:
@@ -1440,7 +1437,7 @@ def cmd_run(prompt: str, max_iter: int, *, json_mode: bool = False, no_rich: boo
     return _result_exit_code(result)
 
 
-def _build_history_from_trace(run_dir: Path) -> List[Dict[str, str]]:
+def _build_history_from_trace(run_dir: Path) -> list[dict[str, str]]:
     """Build conversation history from trace.jsonl."""
     from src.agent.trace import TraceWriter
 
@@ -1452,7 +1449,7 @@ def _build_history_from_trace(run_dir: Path) -> List[Dict[str, str]]:
         resolve_offloads=True,
         resolve_fields={"prompt", "content"},
     )
-    history: List[Dict[str, str]] = []
+    history: list[dict[str, str]] = []
     for e in entries:
         if e.get("type") == "start" and e.get("prompt"):
             history.append({"role": "user", "content": e["prompt"]})
@@ -1534,7 +1531,7 @@ def cmd_continue(
 # Interactive mode (Welcome + Slash commands + Swarm streaming)
 # ---------------------------------------------------------------------------
 
-def _build_welcome_panel(term_width: Optional[int] = None) -> Panel:
+def _build_welcome_panel(term_width: int | None = None) -> Panel:
     """Build the welcome screen for the given terminal width."""
     _ensure_cli_env()
     term_width = term_width or _terminal_width()
@@ -1886,7 +1883,7 @@ def cmd_interactive(max_iter: int) -> None:
     if any(r.critical and r.status != "ready" for r in results):
         return
 
-    history: List[Dict[str, str]] = []
+    history: list[dict[str, str]] = []
     stats = _SessionStats(session_start=time.monotonic())
     prompt_session = _create_prompt_session(stats)
 
@@ -1953,9 +1950,9 @@ class _SwarmDashboard:
         self.start_time = time.monotonic()
         self.current_layer = 0
         self.total_layers = 0
-        self.agents: Dict[str, Dict[str, Any]] = {}
-        self.agent_order: List[str] = []
-        self.completed_summaries: List[tuple[str, str]] = []
+        self.agents: dict[str, dict[str, Any]] = {}
+        self.agent_order: list[str] = []
+        self.completed_summaries: list[tuple[str, str]] = []
         self.finished = False
         self.final_status = ""
 
@@ -2118,15 +2115,16 @@ class _SwarmDashboard:
         return table
 
 
-def cmd_swarm_run_live(preset: str, vars_json: Optional[str] = None) -> Optional[int]:
+def cmd_swarm_run_live(preset: str, vars_json: str | None = None) -> int | None:
     """Run a swarm preset with Rich Live dashboard."""
     from rich.live import Live
+
     from src.config import load_swarm_agent_config
+    from src.swarm.models import RunStatus
     from src.swarm.runtime import SwarmRuntime
     from src.swarm.store import SwarmStore
-    from src.swarm.models import RunStatus
 
-    user_vars: Dict[str, str] = {}
+    user_vars: dict[str, str] = {}
     if vars_json:
         try:
             user_vars = json.loads(vars_json)
@@ -2449,7 +2447,7 @@ def cmd_swarm_presets() -> None:
     console.print(table)
 
 
-def cmd_swarm_run(preset: str, vars_json: Optional[str] = None) -> Optional[int]:
+def cmd_swarm_run(preset: str, vars_json: str | None = None) -> int | None:
     """Run swarm preset (legacy polling mode, use cmd_swarm_run_live for streaming)."""
     return cmd_swarm_run_live(preset, vars_json)
 
@@ -2564,8 +2562,8 @@ def cmd_swarm_list() -> None:
 
 def cmd_swarm_show(run_id: str) -> None:
     """Show swarm run details."""
-    from src.swarm.store import SwarmStore
     from src.swarm.models import TaskStatus
+    from src.swarm.store import SwarmStore
 
     store = SwarmStore(base_dir=SWARM_DIR)
     run = store.load_run(run_id)
@@ -2675,7 +2673,7 @@ def cmd_session_chat(session_id: str, max_iter: int) -> None:
         return
 
     messages = store.get_messages(session_id)
-    history: List[Dict[str, str]] = []
+    history: list[dict[str, str]] = []
     for msg in messages:
         if msg.role in ("user", "assistant") and msg.content.strip():
             history.append({"role": msg.role, "content": msg.content})
@@ -2828,14 +2826,14 @@ def _live_api_base() -> str:
     return get_env_config().api.vibe_trading_api_url.rstrip("/")
 
 
-def _api_auth_headers() -> Dict[str, str]:
+def _api_auth_headers() -> dict[str, str]:
     """Return Bearer auth headers for CLI-to-API control calls."""
     reset_env_config()  # ensure fresh read of auth credentials
     key = get_env_config().api.api_auth_key.strip()
     return {"Authorization": f"Bearer {key}"} if key else {}
 
 
-def _live_api_call(method: str, path: str, *, body: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def _live_api_call(method: str, path: str, *, body: dict[str, Any] | None = None) -> dict[str, Any]:
     """Call an R6 live-runner endpoint and decode the JSON response.
 
     Args:
@@ -2863,7 +2861,7 @@ def _live_api_call(method: str, path: str, *, body: Optional[Dict[str, Any]] = N
         return {"status": "error", "error": str(exc)}
 
 
-def _channels_api_call(method: str, path: str, *, body: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def _channels_api_call(method: str, path: str, *, body: dict[str, Any] | None = None) -> dict[str, Any]:
     """Call an IM channel runtime endpoint on the local API server."""
     import httpx
 
@@ -2880,7 +2878,7 @@ def _channels_api_call(method: str, path: str, *, body: Optional[Dict[str, Any]]
         return {"status": "error", "error": str(exc)}
 
 
-def _channels_local_status() -> Dict[str, Any]:
+def _channels_local_status() -> dict[str, Any]:
     """Build local channel config/import status without starting adapters."""
     from src.channels.config import load_channels_config
     from src.channels.registry import inspect_channels
@@ -2893,7 +2891,7 @@ def _channels_local_status() -> Dict[str, Any]:
     }
 
 
-def _print_channels_status(payload: Dict[str, Any]) -> None:
+def _print_channels_status(payload: dict[str, Any]) -> None:
     """Render IM channel status."""
     table = Table(title="IM Channels", box=box.SIMPLE)
     table.add_column("Channel")
@@ -2982,9 +2980,9 @@ def cmd_channels_login(channel_name: str, *, force: bool = False) -> int:
     """Run a channel adapter's interactive login hook when available."""
     import asyncio
 
+    from src.channels.bus.queue import MessageBus
     from src.channels.config import load_channels_config
     from src.channels.manager import ChannelManager
-    from src.channels.bus.queue import MessageBus
 
     config = load_channels_config()
     section = dict(config.get(channel_name, {})) if isinstance(config.get(channel_name), dict) else {}
@@ -3031,7 +3029,14 @@ def _dispatch_channels(args: argparse.Namespace) -> int:
 # QVERIS-INTEGRATION
 def _print_qveris_config(config) -> None:  # QVERIS-INTEGRATION
     """Render local QVeris config."""  # QVERIS-INTEGRATION
-    from src.tools.qveris_tool import SIGNUP_URL, INVITE_CODE, has_qveris_credentials, is_qveris_configured, mask_api_key, normalize_qveris_mode  # QVERIS-INTEGRATION
+    from src.tools.qveris_tool import (  # QVERIS-INTEGRATION
+        INVITE_CODE,
+        SIGNUP_URL,
+        has_qveris_credentials,
+        is_qveris_configured,
+        mask_api_key,
+        normalize_qveris_mode,
+    )
     table = Table(title="Data Routing", box=box.SIMPLE)  # QVERIS-INTEGRATION
     table.add_column("Field")  # QVERIS-INTEGRATION
     table.add_column("Value")  # QVERIS-INTEGRATION
@@ -3064,7 +3069,13 @@ def cmd_qveris_status() -> int:  # QVERIS-INTEGRATION
 # QVERIS-INTEGRATION
 def cmd_qveris_enable(*, key: str | None = None, url: str | None = None) -> int:  # QVERIS-INTEGRATION
     """Enable QVeris if an API key is present or supplied."""  # QVERIS-INTEGRATION
-    from src.tools.qveris_tool import SIGNUP_URL, INVITE_CODE, QVerisConfig, _read_config_file, save_qveris_config  # QVERIS-INTEGRATION
+    from src.tools.qveris_tool import (  # QVERIS-INTEGRATION
+        INVITE_CODE,
+        SIGNUP_URL,
+        QVerisConfig,
+        _read_config_file,
+        save_qveris_config,
+    )
     existing = _read_config_file()  # QVERIS-INTEGRATION
     api_key = (key or existing.api_key or "").strip()  # QVERIS-INTEGRATION
     if not api_key:  # QVERIS-INTEGRATION
@@ -3088,7 +3099,12 @@ def cmd_qveris_mode(
     url: str | None = None,
 ) -> int:  # QVERIS-INTEGRATION
     """Switch QVeris between free and paid modes."""  # QVERIS-INTEGRATION
-    from src.tools.qveris_tool import QVerisConfig, _read_config_file, normalize_qveris_mode, save_qveris_config  # QVERIS-INTEGRATION
+    from src.tools.qveris_tool import (  # QVERIS-INTEGRATION
+        QVerisConfig,
+        _read_config_file,
+        normalize_qveris_mode,
+        save_qveris_config,
+    )
     existing = _read_config_file()  # QVERIS-INTEGRATION
     next_mode = normalize_qveris_mode(mode)  # QVERIS-INTEGRATION
     next_budget = existing.budget_credits_per_session if budget is None else max(float(budget), 0.0)  # QVERIS-INTEGRATION
@@ -3305,15 +3321,15 @@ def cmd_provider_doctor() -> int:
 
 def _format_expiry_countdown(expires_at: str) -> str:
     """Return a human-readable countdown to ``expires_at`` (ISO-8601 UTC)."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     try:
         parsed = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
     except ValueError:
         return f"{expires_at} (unparseable)"
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    delta = parsed - datetime.now(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
+    delta = parsed - datetime.now(UTC)
     secs = int(delta.total_seconds())
     if secs <= 0:
         return f"{expires_at} (EXPIRED)"
@@ -3383,7 +3399,7 @@ def _format_last_tick(tick: Any) -> str:
     Returns:
         Human-readable ``"<iso> (<n>s ago)"`` (or the raw value if unparseable).
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     if isinstance(tick, datetime):
         parsed = tick
@@ -3393,8 +3409,8 @@ def _format_last_tick(tick: Any) -> str:
         except ValueError:
             return str(tick)
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    ago = int((datetime.now(timezone.utc) - parsed).total_seconds())
+        parsed = parsed.replace(tzinfo=UTC)
+    ago = int((datetime.now(UTC) - parsed).total_seconds())
     iso = parsed.isoformat()
     if ago < 0:
         return iso
@@ -3405,7 +3421,7 @@ def _format_last_tick(tick: Any) -> str:
     return f"{iso} ({ago // 3600}h ago)"
 
 
-def cmd_live_status(broker: Optional[str] = None) -> int:
+def cmd_live_status(broker: str | None = None) -> int:
     """Show auth state, active mandate, and halt state for live channels.
 
     Read-only: it loads the mandate via :func:`src.live.mandate.store.load_mandate`
@@ -3471,7 +3487,7 @@ def cmd_live_status(broker: Optional[str] = None) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_live_mandate(broker: Optional[str] = None) -> int:
+def cmd_live_mandate(broker: str | None = None) -> int:
     """Print the committed mandate for a broker (read-only).
 
     Args:
@@ -3502,7 +3518,7 @@ def cmd_live_mandate(broker: Optional[str] = None) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_live_halt(broker: Optional[str] = None) -> int:
+def cmd_live_halt(broker: str | None = None) -> int:
     """Trip the kill switch — write the HALT sentinel (privileged).
 
     With no broker, trips the global switch (halts all brokers); with a broker,
@@ -3526,7 +3542,7 @@ def cmd_live_halt(broker: Optional[str] = None) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_live_resume(broker: Optional[str] = None) -> int:
+def cmd_live_resume(broker: str | None = None) -> int:
     """Clear a tripped kill switch (privileged, explicit re-enable).
 
     Args:
@@ -3574,7 +3590,7 @@ def cmd_live_revoke(broker: str) -> int:
     # OAuth token cache. Prefer the configured cache_dir; fall back to the
     # canonical per-broker oauth/ subtree.
     server_config = _live_server_config(key)
-    cache_dir: Optional[Path] = None
+    cache_dir: Path | None = None
     auth = getattr(server_config, "auth", None) if server_config is not None else None
     if auth is not None and getattr(auth, "cache_dir", None):
         cache_dir = Path(auth.cache_dir).expanduser()
@@ -3602,7 +3618,7 @@ def cmd_live_revoke(broker: str) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_live_start(broker: Optional[str] = None) -> int:
+def cmd_live_start(broker: str | None = None) -> int:
     """Start the persistent live runner in the background (SPEC §7.5).
 
     Relays a start request to the R6 surface endpoint
@@ -3634,7 +3650,7 @@ def cmd_live_start(broker: Optional[str] = None) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_live_stop(broker: Optional[str] = None) -> int:
+def cmd_live_stop(broker: str | None = None) -> int:
     """Stop the persistent live runner (SPEC §7.5).
 
     Relays a stop request to ``POST /live/runner/stop``. Stopping the runner
@@ -3660,7 +3676,7 @@ def cmd_live_stop(broker: Optional[str] = None) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_live_run(broker: Optional[str] = None) -> int:
+def cmd_live_run(broker: str | None = None) -> int:
     """Run the persistent live runner in the foreground (SPEC §7.5).
 
     The foreground variant of ``live start``: it starts the runner via
@@ -3734,7 +3750,7 @@ def cmd_live_run(broker: Optional[str] = None) -> int:
 # Trading connector commands
 # ---------------------------------------------------------------------------
 
-def _profile_id(value: Optional[str]) -> Optional[str]:
+def _profile_id(value: str | None) -> str | None:
     """Normalize an optional connector profile id."""
     if value is None:
         return None
@@ -3742,7 +3758,7 @@ def _profile_id(value: Optional[str]) -> Optional[str]:
     return text or None
 
 
-def _selected_profile_or(value: Optional[str]):
+def _selected_profile_or(value: str | None):
     """Resolve the selected or explicit trading profile."""
     from src.trading.profiles import profile_by_id
 
@@ -3840,7 +3856,7 @@ def cmd_connector_configure(
 
 
 def cmd_connector_check(
-    profile_id: Optional[str] = None,
+    profile_id: str | None = None,
     *,
     host: str | None = None,
     port: int | None = None,
@@ -3925,7 +3941,7 @@ def _print_connector_account(result: dict[str, Any]) -> int:
 
 
 def cmd_connector_account(
-    profile_id: Optional[str] = None,
+    profile_id: str | None = None,
     *,
     host: str | None = None,
     port: int | None = None,
@@ -3947,7 +3963,7 @@ def cmd_connector_account(
 
 
 def cmd_connector_positions(
-    profile_id: Optional[str] = None,
+    profile_id: str | None = None,
     *,
     host: str | None = None,
     port: int | None = None,
@@ -3990,7 +4006,7 @@ def cmd_connector_positions(
 
 
 def cmd_connector_orders(
-    profile_id: Optional[str] = None,
+    profile_id: str | None = None,
     *,
     host: str | None = None,
     port: int | None = None,
@@ -4047,7 +4063,7 @@ def cmd_connector_orders(
 
 def cmd_connector_quote(
     symbol: str,
-    profile_id: Optional[str] = None,
+    profile_id: str | None = None,
     *,
     host: str | None = None,
     port: int | None = None,
@@ -4098,7 +4114,7 @@ def cmd_connector_quote(
 
 def cmd_connector_history(
     symbol: str,
-    profile_id: Optional[str] = None,
+    profile_id: str | None = None,
     *,
     host: str | None = None,
     port: int | None = None,
@@ -4166,10 +4182,10 @@ def cmd_connector_history(
 
 
 def _live_profile_connector(
-    profile_id: Optional[str],
+    profile_id: str | None,
     *,
     require_runner: bool = False,
-) -> tuple[int, Optional[str]]:
+) -> tuple[int, str | None]:
     """Resolve a profile to a live-capable connector key."""
     try:
         profile = _selected_profile_or(profile_id)
@@ -4188,7 +4204,7 @@ def _live_profile_connector(
     return EXIT_SUCCESS, profile.connector
 
 
-def cmd_connector_authorize(profile_id: Optional[str]) -> int:
+def cmd_connector_authorize(profile_id: str | None) -> int:
     """Authorize a remote MCP connector profile."""
     code, broker = _live_profile_connector(profile_id)
     if code != EXIT_SUCCESS or broker is None:
@@ -4196,7 +4212,7 @@ def cmd_connector_authorize(profile_id: Optional[str]) -> int:
     return cmd_live_authorize(broker)
 
 
-def cmd_connector_status(profile_id: Optional[str]) -> int:
+def cmd_connector_status(profile_id: str | None) -> int:
     """Show connector status."""
     try:
         profile = _selected_profile_or(profile_id)
@@ -4211,7 +4227,7 @@ def cmd_connector_status(profile_id: Optional[str]) -> int:
     return cmd_connector_check(profile.id)
 
 
-def cmd_connector_start(profile_id: Optional[str]) -> int:
+def cmd_connector_start(profile_id: str | None) -> int:
     """Start a live remote MCP connector runner."""
     code, broker = _live_profile_connector(profile_id, require_runner=True)
     if code != EXIT_SUCCESS or broker is None:
@@ -4219,7 +4235,7 @@ def cmd_connector_start(profile_id: Optional[str]) -> int:
     return cmd_live_start(broker)
 
 
-def cmd_connector_stop(profile_id: Optional[str]) -> int:
+def cmd_connector_stop(profile_id: str | None) -> int:
     """Stop a live remote MCP connector runner."""
     code, broker = _live_profile_connector(profile_id, require_runner=True)
     if code != EXIT_SUCCESS or broker is None:
@@ -4227,7 +4243,7 @@ def cmd_connector_stop(profile_id: Optional[str]) -> int:
     return cmd_live_stop(broker)
 
 
-def cmd_connector_halt(profile_id: Optional[str]) -> int:
+def cmd_connector_halt(profile_id: str | None) -> int:
     """Trip the halt switch for a live remote MCP connector profile."""
     code, broker = _live_profile_connector(profile_id, require_runner=True)
     if code != EXIT_SUCCESS or broker is None:
@@ -4235,7 +4251,7 @@ def cmd_connector_halt(profile_id: Optional[str]) -> int:
     return cmd_live_halt(broker)
 
 
-def cmd_connector_resume(profile_id: Optional[str]) -> int:
+def cmd_connector_resume(profile_id: str | None) -> int:
     """Clear the halt switch for a live remote MCP connector profile."""
     code, broker = _live_profile_connector(profile_id, require_runner=True)
     if code != EXIT_SUCCESS or broker is None:
@@ -4243,7 +4259,7 @@ def cmd_connector_resume(profile_id: Optional[str]) -> int:
     return cmd_live_resume(broker)
 
 
-def cmd_connector_revoke(profile_id: Optional[str]) -> int:
+def cmd_connector_revoke(profile_id: str | None) -> int:
     """Revoke a live remote MCP connector profile."""
     code, broker = _live_profile_connector(profile_id)
     if code != EXIT_SUCCESS or broker is None:
@@ -4600,8 +4616,8 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _handle_prompt_command(
-    prompt: Optional[str],
-    prompt_file: Optional[Path],
+    prompt: str | None,
+    prompt_file: Path | None,
     *,
     max_iter: int,
     json_mode: bool,
@@ -4840,7 +4856,7 @@ assert set(_MEMORY_TYPE_STYLES) == set(MEMORY_TYPES), (
 )
 
 
-def cmd_memory_list(memory_type: Optional[str] = None, *, memory_dir: Optional[Path] = None) -> int:
+def cmd_memory_list(memory_type: str | None = None, *, memory_dir: Path | None = None) -> int:
     """List persisted memory entries."""
     from src.memory.persistent import PersistentMemory
 
@@ -4876,7 +4892,7 @@ def cmd_memory_list(memory_type: Optional[str] = None, *, memory_dir: Optional[P
     return EXIT_SUCCESS
 
 
-def cmd_memory_show(name: str, *, memory_dir: Optional[Path] = None) -> int:
+def cmd_memory_show(name: str, *, memory_dir: Path | None = None) -> int:
     """Show full content of a single memory entry."""
     from src.memory.persistent import PersistentMemory
 
@@ -4898,7 +4914,7 @@ def cmd_memory_show(name: str, *, memory_dir: Optional[Path] = None) -> int:
     return EXIT_SUCCESS
 
 
-def cmd_memory_search(query: str, max_results: int = 5, *, memory_dir: Optional[Path] = None) -> int:
+def cmd_memory_search(query: str, max_results: int = 5, *, memory_dir: Path | None = None) -> int:
     """Run keyword recall and display the top matches."""
     from src.memory.persistent import PersistentMemory
 
@@ -4927,7 +4943,7 @@ def cmd_memory_search(query: str, max_results: int = 5, *, memory_dir: Optional[
     return EXIT_SUCCESS
 
 
-def cmd_memory_forget(name: str, *, yes: bool = False, memory_dir: Optional[Path] = None) -> int:
+def cmd_memory_forget(name: str, *, yes: bool = False, memory_dir: Path | None = None) -> int:
     """Remove a memory entry by name."""
     from src.memory.persistent import PersistentMemory
 
@@ -5081,7 +5097,7 @@ def _is_windows() -> bool:
     return sys.platform == "win32"
 
 
-def _resolve_node_and_npm() -> tuple[Optional[str], Optional[str]]:
+def _resolve_node_and_npm() -> tuple[str | None, str | None]:
     """Return ``(node_path, npm_path)`` if both are on PATH, else ``(None, None)``.
 
     Used by ``cmd_setup`` to fail fast with a clear message instead of
@@ -5221,7 +5237,7 @@ def cmd_setup(frontend_dir: Path) -> int:
 def cmd_dev(
     backend_port: int = 8899,
     frontend_port: int = 5899,
-    frontend_dir: Optional[Path] = None,
+    frontend_dir: Path | None = None,
 ) -> int:
     """Start backend + Vite dev server in one foreground process.
 
@@ -5353,6 +5369,7 @@ def cmd_dev(
 
 def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint returning a process exit code."""
+
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     parser = _build_parser()
     try:

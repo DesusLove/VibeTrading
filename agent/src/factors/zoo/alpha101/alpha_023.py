@@ -10,7 +10,6 @@ Formula (paper appendix): ((sum(high,20)/20) < high) ? (-1*delta(high,2)) : 0
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 23.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -79,6 +78,7 @@ def _where_ternary(cond, a, b):
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     high = panel["high"]
 

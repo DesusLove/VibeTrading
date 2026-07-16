@@ -1,6 +1,7 @@
+from typing import Annotated, Any, Literal
+
 """Napcat (OneBot v11) channel for QQ, over WebSocket."""
 
-from __future__ import annotations
 
 import asyncio
 import base64
@@ -11,21 +12,17 @@ import time
 import uuid
 from collections import deque
 from pathlib import Path
-from typing import Annotated, Any, Literal
 
 import aiohttp
 import logging; logger = logging.getLogger(__name__)
-from pydantic import Field
+from pydantic import BaseModel, Field
 from websockets.asyncio.client import ClientConnection
 from websockets.asyncio.client import connect as ws_connect
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
-from src.channels.utils import validate_url_target
-from src.channels.utils import safe_filename
+from src.channels.utils import get_media_dir, safe_filename, validate_url_target
 
 _DOWNLOAD_TIMEOUT = aiohttp.ClientTimeout(total=60)
 _ACTION_TIMEOUT = 20.0
@@ -126,7 +123,7 @@ class NapcatChannel(BaseChannel):
                 while True:
                     remaining = deadline - asyncio.get_running_loop().time()
                     if remaining <= 0:
-                        raise asyncio.TimeoutError("get_login_info timed out")
+                        raise TimeoutError("get_login_info timed out")
                     raw = await asyncio.wait_for(ws.recv(), timeout=remaining)
                     try:
                         payload = json.loads(raw)
@@ -413,6 +410,7 @@ class NapcatChannel(BaseChannel):
 
     async def _lookup_member_name(self, group_id: int, user_id: int) -> str:
         """Lookup group member nickname. Fallback to user id."""
+
         try:
             resp = await self._call_action(
                 "get_group_member_info",

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #15 - 收益排名差
@@ -9,7 +10,7 @@
 Formula: (OPEN/DELAY(CLOSE,1) - 1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 15."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

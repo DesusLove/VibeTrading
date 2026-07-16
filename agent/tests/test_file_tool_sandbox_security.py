@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+
 import pytest
 
 from src.tools.backtest_tool import run_backtest
 from src.tools.edit_file_tool import EditFileTool
+from src.tools.path_utils import allowed_write_roots, resolve_safe_path
 from src.tools.read_file_tool import ReadFileTool
 from src.tools.write_file_tool import WriteFileTool
-from src.tools.path_utils import allowed_write_roots, resolve_safe_path
 
 
 def _body(raw: str) -> dict:

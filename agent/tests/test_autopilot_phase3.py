@@ -5,7 +5,6 @@ Covers ``scaffold_signal_engine`` (contract-correct stub generation) and
 ``src.tools.autopilot_tool``.
 """
 
-from __future__ import annotations
 
 import importlib.util
 import inspect
@@ -26,6 +25,7 @@ from src.tools.autopilot_tool import (
 @pytest.fixture()
 def isolated_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Isolate the hypothesis registry and allow tmp_path as a run root."""
+
     monkeypatch.setenv(
         "VIBE_TRADING_HYPOTHESES_PATH", str(tmp_path / "hypotheses.json")
     )

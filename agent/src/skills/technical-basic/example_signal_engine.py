@@ -4,7 +4,6 @@
 通过投票机制生成综合交易信号。纯 pandas 实现，适用于任何 OHLCV 数据。
 """
 
-from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -185,7 +184,7 @@ class SignalEngine:
         self.vol_ma_period = vol_ma_period
         self.obv_ma_period = obv_ma_period
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """根据三维度指标投票生成交易信号。
 
         Args:

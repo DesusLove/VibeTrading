@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #69
@@ -9,7 +10,7 @@
 Formula: (SUM(DTM,20)>SUM(DBM,20)?(SUM(DTM,20)-SUM(DBM,20))/SUM(DTM,20):(SUM(DTM,20)=SUM(DBM,20)?0:(SUM(DTM,20)-SUM(DBM,20))/SUM(DBM,20)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 69."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: SUMIF -> (x*cond).rolling(n).sum(); COUNT -> cond.rolling(n).sum().
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     c = panel["close"]
     amt = panel["amount"]
     dc = c - c.shift(1)

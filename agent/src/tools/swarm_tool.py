@@ -1,18 +1,17 @@
+from typing import Any
+
 """SwarmTool: tool for the main agent to invoke a swarm multi-agent team.
 
 The user provides a natural-language prompt; the tool auto-selects the best preset and extracts variables.
 Blocks synchronously until the run completes and returns a JSON summary.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 import time
 from pathlib import Path
-from typing import Any
 
 from src.agent.tools import BaseTool
 
@@ -863,6 +862,7 @@ def _format_result(
     Returns:
         JSON string with run status, report, task summaries, and token usage.
     """
+
     from src.swarm.serialization import run_level_error, serialize_task
 
     task_summaries = [serialize_task(task) for task in run.tasks]

@@ -1,3 +1,6 @@
+from collections.abc import Callable, Iterable
+from typing import Any
+
 """Head-to-head comparison of hand-picked alphas.
 
 Shared core behind the three ``alpha compare`` surfaces:
@@ -14,10 +17,8 @@ zoo), merges the per-alpha IC rows, and ranks them by a chosen metric with a
 ``delta_<metric>_vs_best`` column.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Iterable
 
 from src.factors import bench_runner
 from src.factors.registry import Registry
@@ -116,6 +117,7 @@ def compare_alphas(
         (fewer than two resolvable ids, or no alpha could be evaluated),
         ``status="error"`` with an ``error`` message and the same key set.
     """
+
     reg = registry if registry is not None else Registry()
     if sort not in SORT_KEYS:
         sort = "ir"

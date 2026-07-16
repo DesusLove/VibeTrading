@@ -5,15 +5,13 @@ ledger is append-only, and the accountability refs (mandate/consent) survive
 redaction so the chain back to the authorizing user click stays intact.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
 
 import pytest
 
-from src.live import audit
-from src.live import paths
+from src.live import audit, paths
 from src.live.audit import LiveActionEvent, write_live_action
 
 
@@ -289,6 +287,7 @@ def test_optional_sinks_skipped_when_absent_backward_compat(live_runtime: Path) 
 
 def test_ledger_still_append_only_with_sinks(live_runtime: Path) -> None:
     """Trace/callback sinks do not disturb the append-only ledger semantics."""
+
     trace = _RecordingTrace()
     for i in range(3):
         write_live_action(

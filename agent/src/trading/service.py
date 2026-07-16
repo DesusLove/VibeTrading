@@ -1,8 +1,7 @@
+from typing import Any
+
 """Connector-first trading operations used by CLI, MCP, and agent tools."""
 
-from __future__ import annotations
-
-from typing import Any
 
 from src.trading.profiles import list_profiles, profile_by_id
 from src.trading.types import TradingProfile
@@ -546,6 +545,7 @@ def _remote_arguments(connector: str, operation: str, arguments: dict[str, Any])
 
 def _unsupported(profile: TradingProfile, capability: str) -> dict[str, Any]:
     """Return a standard unsupported-capability payload."""
+
     return {
         "status": "error",
         "profile_id": profile.id,

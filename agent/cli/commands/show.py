@@ -6,7 +6,6 @@ dispatch by command name without importing the legacy module top-level
 (which is heavy — it pulls in providers, swarm, etc.).
 """
 
-from __future__ import annotations
 
 from typing import Any
 
@@ -75,6 +74,7 @@ _DISPATCH = {
 
 def run(ctx: Any = None, command: str = "show", *args: str) -> int:
     """Dispatch ``run("show", run_id)`` / ``run("skill")`` etc."""
+
     handler = _DISPATCH.get(command)
     if handler is None:
         console = _resolve_console()

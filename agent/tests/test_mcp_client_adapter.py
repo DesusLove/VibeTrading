@@ -1,10 +1,10 @@
+from typing import Any
+
 """Unit tests for the MCP client adapter core."""
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 import pytest
 from fastmcp.client.client import CallToolResult
@@ -26,7 +26,7 @@ class _FakeClient:
     def __init__(self, state: dict[str, Any]) -> None:
         self._state = state
 
-    async def __aenter__(self) -> "_FakeClient":
+    async def __aenter__(self) -> _FakeClient:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> bool | None:
@@ -422,6 +422,7 @@ def test_normalize_mcp_tool_schema_strips_null_from_any_of_branches() -> None:
 
 def test_normalize_mcp_tool_schema_collapses_nested_type_list_with_null() -> None:
     """type: ["string", "null"] at any nesting level must collapse to type: "string"."""
+
     schema = normalize_mcp_tool_schema(
         {
             "type": "object",

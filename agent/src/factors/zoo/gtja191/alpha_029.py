@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #29 - 日内价差比
@@ -9,7 +10,7 @@
 Formula: (CLOSE-DELAY(CLOSE,6))/DELAY(CLOSE,6)*VOLUME
 Source: 国泰君安 191 alpha 研报 (2014), alpha 29."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

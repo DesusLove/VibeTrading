@@ -1,3 +1,5 @@
+from typing import Any
+
 """Pre-trade advisory interface — observational risk assessments on live orders.
 
 The advisory layer sits **outside** the mandate gate. It provides a
@@ -21,14 +23,12 @@ Key design principles:
   ``gate_decision["advisory"]`` audit field — no new audit event kind.
 """
 
-from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from enum import Enum
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +114,7 @@ class AdvisoryResult:
             object.__setattr__(
                 self,
                 "created_at",
-                datetime.now(timezone.utc).isoformat(),
+                datetime.now(UTC).isoformat(),
             )
 
 
@@ -257,6 +257,7 @@ def clear_advisory_providers() -> None:
 
 def get_advisory_providers() -> list[PreTradeAdvisoryInterface]:
     """Return a copy of the current advisory provider list."""
+
     return list(_advisory_providers)
 
 

@@ -1,3 +1,6 @@
+from collections.abc import Callable, Iterable
+from typing import Any
+
 """OpenAI Codex OAuth provider.
 
 This provider follows the reference OpenAI Codex OAuth path: a ChatGPT account is
@@ -6,14 +9,11 @@ Responses endpoint. It is intentionally separate from the standard OpenAI API
 key path because ChatGPT OAuth tokens are not OpenAI API keys.
 """
 
-from __future__ import annotations
 
 import asyncio
 import hashlib
 import json
-import os
 from dataclasses import dataclass, field
-from typing import Any, Callable, Iterable, Optional
 from urllib.parse import urlparse
 
 from src.config.accessor import get_env_config
@@ -48,7 +48,7 @@ class CodexAIMessage:
     additional_kwargs: dict[str, Any] = field(default_factory=dict)
     response_metadata: dict[str, Any] = field(default_factory=lambda: {"finish_reason": "stop"})
 
-    def __add__(self, other: "CodexAIMessage") -> "CodexAIMessage":
+    def __add__(self, other: CodexAIMessage) -> CodexAIMessage:
         finish_reason = other.response_metadata.get(
             "finish_reason",
             self.response_metadata.get("finish_reason", "stop"),
@@ -340,6 +340,7 @@ def _message_chunks_from_events(events: Iterable[dict[str, Any]]) -> Iterable[Co
 class OpenAICodexLLM:
     """Minimal LangChain-compatible adapter for Vibe-Trading's ChatLLM."""
 
+
     def __init__(
         self,
         *,
@@ -361,7 +362,7 @@ class OpenAICodexLLM:
             codex_url or get_env_config().llm.openai_codex_base_url
         )
 
-    def bind_tools(self, tools: list[dict[str, Any]]) -> "OpenAICodexLLM":
+    def bind_tools(self, tools: list[dict[str, Any]]) -> OpenAICodexLLM:
         return OpenAICodexLLM(
             model=self.model,
             temperature=self.temperature,
@@ -396,7 +397,7 @@ class OpenAICodexLLM:
         token = _get_codex_token()
         return _build_headers(str(token.account_id), str(token.access))
 
-    def stream(self, messages: list[dict[str, Any]], config: Optional[dict[str, Any]] = None) -> Iterable[CodexAIMessage]:
+    def stream(self, messages: list[dict[str, Any]], config: dict[str, Any | None] = None) -> Iterable[CodexAIMessage]:
         timeout = (config or {}).get("timeout") or self.timeout
         with httpx.Client(timeout=timeout, follow_redirects=True, trust_env=True) as client:
             with client.stream("POST", self.codex_url, headers=self._headers(), json=self._body(messages, stream=True)) as response:
@@ -405,11 +406,11 @@ class OpenAICodexLLM:
                     raise RuntimeError(f"OpenAI Codex HTTP {response.status_code}: {raw[:500]}")
                 yield from _message_chunks_from_events(_events_from_lines(response.iter_lines()))
 
-    def invoke(self, messages: list[dict[str, Any]], config: Optional[dict[str, Any]] = None) -> CodexAIMessage:
+    def invoke(self, messages: list[dict[str, Any]], config: dict[str, Any | None] = None) -> CodexAIMessage:
         accumulated: CodexAIMessage | None = None
         for chunk in self.stream(messages, config=config):
             accumulated = chunk if accumulated is None else accumulated + chunk
         return accumulated or CodexAIMessage()
 
-    async def ainvoke(self, messages: list[dict[str, Any]], config: Optional[dict[str, Any]] = None) -> CodexAIMessage:
+    async def ainvoke(self, messages: list[dict[str, Any]], config: dict[str, Any | None] = None) -> CodexAIMessage:
         return await asyncio.to_thread(self.invoke, messages, config)

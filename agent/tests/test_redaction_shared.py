@@ -5,7 +5,6 @@ Covers ``redact_payload`` (recursive sensitive-key scrubbing) and
 worker and the live-action audit ledger from one module.
 """
 
-from __future__ import annotations
 
 import pytest
 
@@ -86,6 +85,7 @@ def test_is_sensitive_arg_preserves_account_ref_and_benign_account_fields(
 def test_redact_payload_keeps_account_ref_provenance() -> None:
     """``account_ref`` provenance survives while sibling account numbers/SSN are
     scrubbed (SPEC §5 mandate→consent chain)."""
+
     out = redact_payload(
         {
             "account_ref": "rh_ref_opaque",

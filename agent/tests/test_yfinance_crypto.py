@@ -7,7 +7,6 @@ import pytest
 
 from backtest.loaders.yfinance_loader import DataLoader, _to_yfinance_symbol
 
-
 # ---------------------------------------------------------------------------
 # _to_yfinance_symbol — crypto conversions
 # ---------------------------------------------------------------------------

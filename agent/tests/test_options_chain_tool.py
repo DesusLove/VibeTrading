@@ -4,7 +4,6 @@ All HTTP is mocked at ``yahoo_client.get_options`` (the client function the tool
 imports), so no test ever reaches a live Yahoo endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -118,6 +117,7 @@ class TestOptionsChainSuccess:
 
 class TestOptionsChainErrors:
     """Error envelopes: missing ticker, bad expiration, upstream failure."""
+
 
     def test_missing_ticker_returns_error_envelope(self):
         out = oc.OptionsChainTool().execute(ticker="  ")

@@ -1,13 +1,12 @@
-"""Edit file tool: find-and-replace in workspace files."""
-
-from __future__ import annotations
-
-import json
 from typing import Any
 
+"""Edit file tool: find-and-replace in workspace files."""
+
+
+import json
+
 from src.agent.tools import BaseTool
-from src.tools.path_utils import allowed_write_roots
-from src.tools.path_utils import resolve_safe_path
+from src.tools.path_utils import allowed_write_roots, resolve_safe_path
 from src.tools.redaction import redact_internal_paths
 
 
@@ -37,6 +36,7 @@ class EditFileTool(BaseTool):
         Returns:
             JSON string with the operation result or an error.
         """
+
         file_path = kwargs["path"]
         old_text = kwargs["old_text"]
         new_text = kwargs["new_text"]

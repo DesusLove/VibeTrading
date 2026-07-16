@@ -18,7 +18,6 @@ from src.factors.registry import (
     load_alpha_meta_from_py,
 )
 
-
 GOOD_META = """
 __alpha_meta__ = {
     "id": "__FULL_ID__",

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Block-trade (大宗交易) lookup tool backed by the Eastmoney datacenter.
 
 Eastmoney publishes every A-share block trade — negotiated off-book deals struck
@@ -13,12 +15,10 @@ Every request routes through the shared, throttled Eastmoney client
 rate-limits by source IP; this tool never opens its own HTTP session.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 from datetime import date, datetime, timedelta
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json, resolve_secid
 from src.agent.tools import BaseTool
@@ -213,6 +213,7 @@ class BlockTradesTool(BaseTool):
             "data": {"code", "days", "count", "records": [...]}}``. On failure:
             ``{"ok": false, "error": str}``.
         """
+
         symbol = str(kwargs.get("code") or "").strip()
         if not symbol:
             return json.dumps(

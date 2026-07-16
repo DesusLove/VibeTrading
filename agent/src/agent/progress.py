@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """Progress emission channel for long-running tools.
 
 Two mechanisms:
@@ -16,13 +19,11 @@ progress flows back to the correct AgentLoop instance even when multiple
 read-only tools run in parallel.
 """
 
-from __future__ import annotations
 
 import logging
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -43,13 +44,13 @@ class ProgressEvent:
 
     tool: str = ""
     stage: str = ""
-    current: Optional[int] = None
-    total: Optional[int] = None
+    current: int | None = None
+    total: int | None = None
     message: str = ""
     elapsed_s: float = 0.0
     ts: float = field(default_factory=time.time)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable dict for SSE payloads."""
         return {
             "tool": self.tool,
@@ -68,7 +69,7 @@ class ProgressEvent:
 _local = threading.local()
 
 
-def _set_emitter(emit: Optional[Callable[[ProgressEvent], None]]) -> None:
+def _set_emitter(emit: Callable[[ProgressEvent | None, None]]) -> None:
     """Install the active progress emitter for the current thread.
 
     Args:
@@ -81,7 +82,7 @@ def _set_emitter(emit: Optional[Callable[[ProgressEvent], None]]) -> None:
     _local.emit = emit
 
 
-def _get_emitter() -> Optional[Callable[[ProgressEvent], None]]:
+def _get_emitter() -> Callable[[ProgressEvent | None, None]]:
     """Return the active emitter on the current thread, if any."""
     return getattr(_local, "emit", None)
 
@@ -89,8 +90,8 @@ def _get_emitter() -> Optional[Callable[[ProgressEvent], None]]:
 def emit_progress(
     stage: str = "",
     *,
-    current: Optional[int] = None,
-    total: Optional[int] = None,
+    current: int | None = None,
+    total: int | None = None,
     message: str = "",
 ) -> None:
     """Publish a structured progress event from a tool.
@@ -137,7 +138,7 @@ class HeartbeatTimer:
         self,
         tool_name: str,
         interval: float,
-        emit: Callable[[Dict[str, Any]], None],
+        emit: Callable[[dict[str, Any]], None],
     ) -> None:
         """Initialize the heartbeat timer (not started until ``__enter__``).
 
@@ -155,10 +156,10 @@ class HeartbeatTimer:
             )
         self._emit = emit
         self._stop_event = threading.Event()
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         self._t0 = 0.0
 
-    def __enter__(self) -> "HeartbeatTimer":
+    def __enter__(self) -> HeartbeatTimer:
         self._t0 = time.perf_counter()
         self._thread = threading.Thread(
             target=self._run,
@@ -175,6 +176,7 @@ class HeartbeatTimer:
 
     def _run(self) -> None:
         """Tick loop: wait + emit until the stop event fires."""
+
         while not self._stop_event.wait(self._interval):
             elapsed = time.perf_counter() - self._t0
             try:

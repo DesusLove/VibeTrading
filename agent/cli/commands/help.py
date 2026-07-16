@@ -4,7 +4,6 @@ Renders ``SLASH_COMMANDS`` as a two-column Rich table (name in primary
 color, description muted) plus a short keyboard-shortcuts panel.
 """
 
-from __future__ import annotations
 
 from typing import Any
 
@@ -35,6 +34,7 @@ _SHORTCUTS: tuple[tuple[str, str], ...] = (
 
 def run(ctx: Any = None, *args: str) -> int:  # noqa: ARG001 — ctx unused here
     """Print the help screen. Always returns 0."""
+
     console = _resolve_console()
 
     commands_table = Table.grid(padding=(0, 2))

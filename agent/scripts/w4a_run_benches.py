@@ -12,13 +12,12 @@ Safe to re-run; each bench result is cached by ``_load_universe_panel`` so the
 expensive Tushare/yfinance fetches only happen once per (universe, period).
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -40,7 +39,6 @@ logger = logging.getLogger("w4a")
 from src.factors.bench_runner import run_bench  # noqa: E402
 from src.tools.alpha_bench_tool import run_alpha_bench  # noqa: E402
 
-
 REPORTS_DIR = Path.home() / ".vibe-trading" / "reports"
 
 BENCHES = [
@@ -59,6 +57,7 @@ def _run_one(bench: dict) -> dict:
     per-alpha rows for downstream tooling, both of which the CLI driver wants
     but the API route does not.
     """
+
     key = bench["key"]
     zoo = bench["zoo"]
     universe = bench["universe"]
@@ -140,7 +139,7 @@ def _run_one(bench: dict) -> dict:
 def main() -> int:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     summary: dict = {
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "zoos": {},
     }
 

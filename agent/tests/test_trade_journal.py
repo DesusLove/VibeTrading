@@ -6,7 +6,6 @@ normalization, market inference, end-to-end parse) and
 filtering, and the analyze_trade_journal error/dispatch paths).
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -54,6 +53,7 @@ def _df(records: list[TradeRecord]) -> pd.DataFrame:
 @pytest.fixture()
 def allow_tmp(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Allow analyze_trade_journal to read files under tmp_path."""
+
     monkeypatch.setenv("VIBE_TRADING_ALLOWED_FILE_ROOTS", str(tmp_path))
     return tmp_path
 

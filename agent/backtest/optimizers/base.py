@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared base class for portfolio optimizers.
 
 Handles preprocessing, rolling covariance windows, and weight normalization;
@@ -5,7 +7,6 @@ subclasses implement ``_calc_weights``.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List
 
 import numpy as np
 import pandas as pd

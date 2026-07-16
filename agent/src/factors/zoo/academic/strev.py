@@ -16,7 +16,6 @@ month. Computed directly from prices as the negative of the trailing 21-day
 return, then cross-sectional z-scored per date. Higher z-scores = larger
 recent losers (the long leg).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return inverse 21-day return cross-sectional z-score per stock."""
+
     close = panel['close']
     ret = safe_div(delta(close, 21), close.shift(21))
     return _cross_sectional_zscore(-ret)

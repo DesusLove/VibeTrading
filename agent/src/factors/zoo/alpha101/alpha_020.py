@@ -10,7 +10,6 @@ Formula (paper appendix): (((-1*rank(open-delay(high,1)))*rank(open-delay(close,
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 20.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -60,6 +59,7 @@ def _delay(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     open_ = panel["open"]
     high = panel["high"]

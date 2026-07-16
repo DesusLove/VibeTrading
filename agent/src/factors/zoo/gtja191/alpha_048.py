@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #48 - 量价极值
@@ -9,7 +10,7 @@
 Formula: -1*((RANK((SIGN((CLOSE-DELAY(CLOSE,1)))+SIGN((DELAY(CLOSE,1)-DELAY(CLOSE,2)))+SIGN((DELAY(CLOSE,2)-DELAY(CLOSE,3))))))*SUM(VOLUME,5))/SUM(VOLUME,20)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 48."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -14,15 +14,14 @@ Turn shape:
     }
 """
 
-from __future__ import annotations
 
-from typing import Iterable, Mapping, Optional
+from collections.abc import Iterable, Mapping
 
 from rich.console import Console
 from rich.text import Text
 
 
-def _resolve_console(console: Optional[Console]) -> Console:
+def _resolve_console(console: Console | None) -> Console:
     """Return ``console`` if given, else the shared CLI console."""
     if console is not None:
         return console
@@ -52,7 +51,7 @@ def _render_turn(turn: Mapping[str, object]) -> Text:
 def render_history(
     turns: Iterable[Mapping[str, object]],
     *,
-    console: Optional[Console] = None,
+    console: Console | None = None,
 ) -> None:
     """Print past turns to ``console``.
 
@@ -62,6 +61,7 @@ def render_history(
 
     No return value — this is a side-effecting renderer.
     """
+
     cons = _resolve_console(console)
     for turn in turns:
         cons.print(_render_turn(turn))

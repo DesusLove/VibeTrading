@@ -1,3 +1,6 @@
+from collections.abc import Callable, Sequence
+from typing import TypeVar
+
 """SQLite-backed strategy/factor artifact store.
 
 Satisfies ``StrategyStoreProtocol``.  Uses WAL mode for concurrent reads,
@@ -5,17 +8,15 @@ FK constraints for referential integrity, and ``PRAGMA user_version``
 for schema migrations.
 """
 
-from __future__ import annotations
 
 import json
 import sqlite3
 import threading
 import uuid
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Sequence, TypeVar
 
 from src.strategy_store.models import (
     Artifact,
@@ -40,7 +41,7 @@ _DEFAULT_DB_PATH = Path.home() / ".vibe-trading" / "strategy_store.db"
 
 def _now_iso() -> str:
     """Return the current UTC time as an ISO-8601 string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _new_artifact_id() -> str:
@@ -582,6 +583,7 @@ class SqliteStrategyStore:
         self, artifact_id: str, *, limit: int = 20
     ) -> Sequence[DecaySnapshot]:
         """Get decay snapshots for an artifact, newest first."""
+
         rows = self._conn.execute(
             """
             SELECT * FROM decay_snapshots

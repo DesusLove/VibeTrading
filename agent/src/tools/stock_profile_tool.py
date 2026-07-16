@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only company-profile tool: key stats, estimates, and ownership.
 
 Backed by the shared Yahoo Finance quoteSummary client
@@ -7,11 +9,9 @@ handshake. This tool only selects modules, projects the verbose Yahoo payload
 into compact rows, and wraps the result in the project envelope.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
 
 from backtest.loaders.yahoo_client import get_quote_summary
 from src.agent.tools import BaseTool
@@ -19,7 +19,7 @@ from src.agent.tools import BaseTool
 logger = logging.getLogger(__name__)
 
 # Section name (tool-facing) -> Yahoo quoteSummary module name.
-_SECTION_MODULES: Dict[str, str] = {
+_SECTION_MODULES: dict[str, str] = {
     "key_stats": "defaultKeyStatistics",
     "financials": "financialData",
     "earnings_trend": "earningsTrend",
@@ -48,12 +48,12 @@ def _raw(value: Any) -> Any:
     return value
 
 
-def _pick(source: Dict[str, Any], fields: tuple[str, ...]) -> Dict[str, Any]:
+def _pick(source: dict[str, Any], fields: tuple[str, ...]) -> dict[str, Any]:
     """Project selected Yahoo fields into a flat, raw-unwrapped row."""
     return {field: _raw(source.get(field)) for field in fields}
 
 
-def _key_stats(module: Dict[str, Any]) -> Dict[str, Any]:
+def _key_stats(module: dict[str, Any]) -> dict[str, Any]:
     """Shape the defaultKeyStatistics module into a compact row."""
     return _pick(
         module,
@@ -74,7 +74,7 @@ def _key_stats(module: Dict[str, Any]) -> Dict[str, Any]:
     )
 
 
-def _financials(module: Dict[str, Any]) -> Dict[str, Any]:
+def _financials(module: dict[str, Any]) -> dict[str, Any]:
     """Shape the financialData module into a compact row."""
     return _pick(
         module,
@@ -96,9 +96,9 @@ def _financials(module: Dict[str, Any]) -> Dict[str, Any]:
     )
 
 
-def _earnings_trend(module: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _earnings_trend(module: dict[str, Any]) -> list[dict[str, Any]]:
     """Shape the earningsTrend periods into per-period estimate rows."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for entry in (module.get("trend") or [])[:_MAX_ROWS]:
         if not isinstance(entry, dict):
             continue
@@ -119,9 +119,9 @@ def _earnings_trend(module: Dict[str, Any]) -> List[Dict[str, Any]]:
     return rows
 
 
-def _institution_ownership(module: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _institution_ownership(module: dict[str, Any]) -> list[dict[str, Any]]:
     """Shape the institutionOwnership holders into per-holder rows."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for entry in (module.get("ownershipList") or [])[:_MAX_ROWS]:
         if not isinstance(entry, dict):
             continue
@@ -137,9 +137,9 @@ def _institution_ownership(module: Dict[str, Any]) -> List[Dict[str, Any]]:
     return rows
 
 
-def _insider_holders(module: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _insider_holders(module: dict[str, Any]) -> list[dict[str, Any]]:
     """Shape the insiderHolders holders into per-insider rows."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for entry in (module.get("holders") or [])[:_MAX_ROWS]:
         if not isinstance(entry, dict):
             continue
@@ -154,9 +154,9 @@ def _insider_holders(module: Dict[str, Any]) -> List[Dict[str, Any]]:
     return rows
 
 
-def _recommendation_trend(module: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _recommendation_trend(module: dict[str, Any]) -> list[dict[str, Any]]:
     """Shape the recommendationTrend periods into per-period rating rows."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for entry in (module.get("trend") or [])[:_MAX_ROWS]:
         if not isinstance(entry, dict):
             continue
@@ -184,7 +184,7 @@ _SHAPERS = {
 }
 
 
-def _resolve_sections(sections: Optional[List[str]]) -> List[str]:
+def _resolve_sections(sections: list[str | None]) -> list[str]:
     """Validate the requested sections, defaulting to all when omitted.
 
     Args:
@@ -198,7 +198,7 @@ def _resolve_sections(sections: Optional[List[str]]) -> List[str]:
     """
     if not sections:
         return list(_ALL_SECTIONS)
-    resolved: List[str] = []
+    resolved: list[str] = []
     for name in sections:
         key = str(name).strip().lower()
         if key not in _SECTION_MODULES:
@@ -285,7 +285,7 @@ class StockProfileTool(BaseTool):
             logger.warning("get_stock_profile failed for %s: %s", ticker, exc)
             return self._error(f"yahoo quoteSummary request failed: {exc}")
 
-        shaped: Dict[str, Any] = {}
+        shaped: dict[str, Any] = {}
         for name in sections:
             module = summary.get(_SECTION_MODULES[name]) or {}
             shaped[name] = _SHAPERS[name](module if isinstance(module, dict) else {})
@@ -303,4 +303,5 @@ class StockProfileTool(BaseTool):
     @staticmethod
     def _error(message: str) -> str:
         """Render a failure envelope as a JSON string."""
+
         return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

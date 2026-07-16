@@ -1,3 +1,5 @@
+from typing import Any
+
 """``propose_mandate_profiles`` — the read-only PROPOSE half of consent.
 
 The agent calls this tool when the user expresses a live-trading intent (or when
@@ -15,11 +17,9 @@ still fits the ceilings the user saw. This is the structural "agent proposes,
 user disposes" guarantee (live-trading SPEC §3, Consent §1).
 """
 
-from __future__ import annotations
 
 import json
 import uuid
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.live.mandate.commit import _normalize_limits, save_proposal
@@ -241,5 +241,6 @@ class ProposeMandateProfilesTool(BaseTool):
     @staticmethod
     def _account_type(ceilings: dict[str, Any]) -> str:
         """Return the account type label ('cash' unless ceilings allow leverage)."""
+
         leverage = ceilings.get("leverage", "none")
         return "cash" if leverage in ("none", None, 1, 1.0) else "margin"

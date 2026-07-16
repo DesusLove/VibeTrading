@@ -16,7 +16,6 @@ India (NSE/BSE) is handled by the dedicated ``backtest.engines.india_equity``
 ``IndiaEquityEngine`` (T+1 delivery, circuit bands, STT/stamp/GST stack).
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
@@ -77,5 +76,6 @@ class GlobalEquityEngine(BaseEngine):
 
     def apply_slippage(self, price: float, direction: int) -> float:
         """US: low slippage. HK: moderate slippage."""
+
         rate = self.slippage_hk if self.market == "hk" else self.slippage_us
         return price * (1 + direction * rate)

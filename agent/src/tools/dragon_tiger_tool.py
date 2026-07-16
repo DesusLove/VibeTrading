@@ -1,3 +1,5 @@
+from typing import Any
+
 """Dragon-Tiger (龙虎榜) board tool backed by the Eastmoney datacenter API.
 
 The Shanghai/Shenzhen exchanges publish a daily "dragon-tiger" (龙虎榜) board
@@ -12,11 +14,9 @@ narrowed to one A-share ``code``) and, for a specific security, the ranked
 top buy/sell brokerage seats.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders import eastmoney_client
 from src.agent.tools import BaseTool
@@ -263,4 +263,5 @@ class DragonTigerTool(BaseTool):
         Returns:
             ``{"ok": false, "error": message}`` as a JSON string.
         """
+
         return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

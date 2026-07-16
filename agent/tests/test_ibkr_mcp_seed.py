@@ -1,3 +1,5 @@
+from typing import Any
+
 """IBKR official MCP read-only probe wiring.
 
 The IBKR endpoint exposes tool names only after OAuth, so the seed uses a
@@ -5,15 +7,12 @@ read-only ``mcp.read`` wildcard probe. These tests keep that narrow exception
 from becoming an ungated live-broker wildcard.
 """
 
-from __future__ import annotations
-
-from typing import Any
 
 import pytest
 from fastmcp.client.client import CallToolResult
 from mcp import types as mcp_types
 
-from src.config.schema import AgentConfig, IBKR_MCP_SERVER_SEED
+from src.config.schema import IBKR_MCP_SERVER_SEED, AgentConfig
 from src.live.order_guard import LiveOrderGuardTool
 from src.live.registry import is_live_broker, wrap_live_broker_tools
 from src.tools.mcp import MCPRemoteTool, build_mcp_tool_wrappers
@@ -24,7 +23,8 @@ pytestmark = pytest.mark.unit
 class _FakeIBKRClient:
     """Mock IBKR MCP client exposing one annotated read and one write."""
 
-    async def __aenter__(self) -> "_FakeIBKRClient":
+
+    async def __aenter__(self) -> _FakeIBKRClient:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

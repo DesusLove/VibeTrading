@@ -1,3 +1,6 @@
+from collections.abc import Mapping, Sequence
+from typing import Any
+
 """Tests for crash recovery + position reconciliation (SPEC §7.5 component 5).
 
 Drives each delta class with fabricated broker snapshots (no live broker), and
@@ -10,11 +13,9 @@ asserts the load-bearing invariants:
 * an unsafe reconcile does NOT advance (overwrite) the durable state.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Mapping, Sequence
 
 import pytest
 
@@ -299,6 +300,7 @@ def test_unsafe_reconcile_does_not_advance_state(live_runtime: Path) -> None:
 
 def test_corrupt_state_renamed_and_cold_starts(live_runtime: Path) -> None:
     """A truncated/corrupt state file is renamed .corrupt-* and treated as cold."""
+
     path = paths.broker_dir("robinhood") / "runtime_state.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("{not json", encoding="utf-8")

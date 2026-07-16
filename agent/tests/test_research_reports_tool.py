@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for get_research_reports: success + error envelopes, HTTP mocked.
 
 Eastmoney is mocked at ``get_json`` (imported into the tool module) and THS at
@@ -5,7 +6,7 @@ Eastmoney is mocked at ``get_json`` (imported into the tool module) and THS at
 test reaches a live endpoint.
 """
 
-from __future__ import annotations
+
 
 import json
 from types import SimpleNamespace

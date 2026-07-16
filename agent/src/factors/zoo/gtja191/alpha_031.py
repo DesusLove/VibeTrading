@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #31 - VWAP动量
@@ -9,7 +10,7 @@
 Formula: (CLOSE-MEAN(CLOSE,12))/MEAN(CLOSE,12)*100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 31."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

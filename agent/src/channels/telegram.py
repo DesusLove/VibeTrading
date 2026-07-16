@@ -1,6 +1,7 @@
+from typing import Any, Literal
+
 """Telegram channel implementation using python-telegram-bot."""
 
-from __future__ import annotations
 
 import asyncio
 import re
@@ -9,10 +10,9 @@ import unicodedata
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
 from urllib.parse import urlparse
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from telegram import (
     BotCommand,
     InlineKeyboardButton,
@@ -25,14 +25,10 @@ from telegram.error import BadRequest, NetworkError, TimedOut
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 from telegram.request import HTTPXRequest
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
-from src.channels.utils import validate_url_target
-from src.channels.utils import split_message
+from src.channels.utils import get_media_dir, split_message, validate_url_target
 
 TELEGRAM_MAX_MESSAGE_LEN = 4000  # Telegram message character limit
 # Telegram's actual API limit is 4096; we split raw markdown at 4000 as a
@@ -370,7 +366,7 @@ class TelegramConfig(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_webhook_config(self) -> "TelegramConfig":
+    def validate_webhook_config(self) -> TelegramConfig:
         if self.mode != "webhook":
             return self
 
@@ -1031,7 +1027,7 @@ class TelegramChannel(BaseChannel):
     async def _flush_stream_overflow(
         self,
         chat_id: int,
-        buf: "_StreamBuf",
+        buf: _StreamBuf,
         thread_kwargs: dict,
     ) -> None:
         """Split an oversized stream buffer mid-flight.
@@ -1641,6 +1637,7 @@ class TelegramChannel(BaseChannel):
 
     async def _on_callback_query(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handle inline keyboard button clicks (callback queries)."""
+
         if not update.callback_query or not update.effective_user:
             return
         query = update.callback_query

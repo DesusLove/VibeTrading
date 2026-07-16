@@ -8,7 +8,6 @@ Storage layout:
     +-- ...
 """
 
-from __future__ import annotations
 
 import hashlib
 import logging
@@ -17,7 +16,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from src.agent.frontmatter import parse_frontmatter as _parse_frontmatter
-from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +148,7 @@ class PersistentMemory:
         snapshot: Frozen memory index text for system prompt injection.
     """
 
-    def __init__(self, memory_dir: Optional[Path] = None) -> None:
+    def __init__(self, memory_dir: Path | None = None) -> None:
         """Initialize PersistentMemory.
 
         Args:
@@ -177,13 +175,13 @@ class PersistentMemory:
         """Frozen memory index for system prompt injection."""
         return self._snapshot
 
-    def _scan_entries(self) -> List[MemoryEntry]:
+    def _scan_entries(self) -> list[MemoryEntry]:
         """Scan all .md files (except MEMORY.md) and parse frontmatter.
 
         Returns:
             List of parsed memory entries.
         """
-        entries: List[MemoryEntry] = []
+        entries: list[MemoryEntry] = []
         for path in sorted(self._dir.glob("*.md")):
             if path.name == "MEMORY.md":
                 continue
@@ -202,11 +200,11 @@ class PersistentMemory:
             ))
         return entries
 
-    def list_entries(self) -> List[MemoryEntry]:
+    def list_entries(self) -> list[MemoryEntry]:
         """Return all persisted memory entries, filename-sorted."""
         return self._scan_entries()
 
-    def find(self, name: str) -> Optional[MemoryEntry]:
+    def find(self, name: str) -> MemoryEntry | None:
         """Resolve a memory by exact title, then by on-disk filename stem.
 
         Stem fallback accepts both the full ``{type}_{slug}`` form and the
@@ -235,7 +233,7 @@ class PersistentMemory:
         self._rebuild_index()
         return True
 
-    def find_relevant(self, query: str, max_results: int = MAX_RESULTS) -> List[MemoryEntry]:
+    def find_relevant(self, query: str, max_results: int = MAX_RESULTS) -> list[MemoryEntry]:
         """Keyword search across all memory entries.
 
         Scoring: metadata_hits * 2.0 + body_hits * 1.0.
@@ -363,6 +361,7 @@ class PersistentMemory:
 
     def _rebuild_index(self) -> None:
         """Rebuild MEMORY.md from all existing entry files."""
+
         entries = self._scan_entries()
         lines = [f"- [{e.title}]({e.path.name}) — {e.description}" for e in entries]
         self._index_path.write_text("\n".join(lines[:MAX_INDEX_LINES]), encoding="utf-8")

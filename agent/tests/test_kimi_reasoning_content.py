@@ -1,3 +1,5 @@
+from typing import Any
+
 """Regression tests for provider reasoning_content preservation.
 
 Invariant: ``ai_message.additional_kwargs["reasoning_content"]`` is the
@@ -5,11 +7,9 @@ single source of truth. ``ChatOpenAIWithReasoning`` populates it from both
 the non-streaming response path and the streaming delta path.
 """
 
-from __future__ import annotations
 
 import os
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
 
@@ -718,6 +718,7 @@ class TestChatOpenAIWithReasoningOutboundPayload:
 
     def test_non_gemini_does_not_inject_tool_call_thought_signature(self) -> None:
         """Gemini thought signatures must be Gemini-only payload mutations."""
+
         from langchain_core.messages import AIMessage, HumanMessage
 
         instance = self._instance(model="gpt-4")

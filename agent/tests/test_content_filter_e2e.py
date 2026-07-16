@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """E2E content-filter resilience: detection -> skip -> ratio -> warning -> trace.
 
 Simulates a full agent run where semiconductor/geopolitics news triggers
@@ -11,15 +14,12 @@ backtest on 159516.SZ).  Verifies the entire pipeline:
    recommendation.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
 
 import pytest
 
 from src.providers.chat import LLMResponse, ToolCallRequest
-
 
 # ---------------------------------------------------------------------------
 # LLM stubs
@@ -202,6 +202,7 @@ def test_e2e_no_content_filter_clean_run(
       2. No ``content_filter_warnings`` key in result dict.
       3. No ``content_filter_skipped`` entries in trace.
     """
+
     llm = _CleanRunLLM()
 
     result = _run(monkeypatch, tmp_path, llm)

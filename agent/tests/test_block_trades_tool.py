@@ -4,7 +4,6 @@ All HTTP is mocked at :func:`backtest.loaders.eastmoney_client.get_json` as it i
 imported into the tool module, so no test touches a live Eastmoney endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -98,6 +97,7 @@ class TestBlockTradesSuccess:
 
 class TestBlockTradesErrors:
     """Error envelopes: bad symbol, missing code, upstream failure."""
+
 
     def test_missing_code_returns_error_envelope(self):
         out = bt.BlockTradesTool().execute(code="  ")

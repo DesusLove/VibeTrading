@@ -10,7 +10,6 @@ Market rules:
   - Transfer fee: 0.001% bilateral
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
@@ -143,6 +142,7 @@ def _price_limit(symbol: str) -> float:
     Returns:
         Limit as fraction (0.10, 0.20, or 0.05).
     """
+
     code = symbol.split(".")[0] if "." in symbol else symbol
     # ChiNext (300xxx) / STAR (688xxx): ±20%
     if code.startswith("300") or code.startswith("688"):

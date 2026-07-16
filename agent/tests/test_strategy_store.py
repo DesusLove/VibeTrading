@@ -3,20 +3,20 @@
 from __future__ import annotations
 
 import json
+
 import pytest
 
+from src.strategy_store.decay import DecayEvaluator, DecayThresholds
 from src.strategy_store.models import (
     Artifact,
     ArtifactStatus,
     ArtifactType,
-    BenchResult,
     BenchCategory,
-    DecaySnapshot,
+    BenchResult,
     DecaySignal,
+    DecaySnapshot,
 )
 from src.strategy_store.store import InMemoryStrategyStore
-from src.strategy_store.decay import DecayEvaluator, DecayThresholds
-
 
 # ---------------------------------------------------------------------------
 # Fixture: reset the shared singleton before each test
@@ -480,8 +480,8 @@ class TestSdmTools:
         assert result["summary"]["total_scanned"] == 0
 
     def test_decay_scan_tool_dry_run(self):
-        from src.tools.sdm_register_tool import SdmRegisterTool
         from src.tools.sdm_decay_scan_tool import SdmDecayScanTool
+        from src.tools.sdm_register_tool import SdmRegisterTool
 
         # Register an ACTIVE factor with bench history
         reg = json.loads(
@@ -529,8 +529,8 @@ class TestSdmTools:
 
     def test_decay_scan_no_evaluable_metrics_insufficient(self):
         """3+ bench rows with all-None metrics report insufficient_data, not HEALTHY."""
-        from src.tools.sdm_register_tool import SdmRegisterTool
         from src.tools.sdm_decay_scan_tool import SdmDecayScanTool
+        from src.tools.sdm_register_tool import SdmRegisterTool
 
         reg = json.loads(
             SdmRegisterTool().execute(
@@ -579,8 +579,8 @@ class TestSdmTools:
 
     def test_decay_scan_tool_active_to_monitoring_transition(self):
         """Non-dry-run scan transitions active → monitoring after 3+ warnings."""
-        from src.tools.sdm_register_tool import SdmRegisterTool
         from src.tools.sdm_decay_scan_tool import SdmDecayScanTool
+        from src.tools.sdm_register_tool import SdmRegisterTool
 
         reg = json.loads(
             SdmRegisterTool().execute(

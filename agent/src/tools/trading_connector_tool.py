@@ -1,13 +1,13 @@
+from typing import Any
+
 """Connector-first trading tools.
 
 Tools take an optional ``connection`` profile id. If omitted, they use the
 selected profile from ``~/.vibe-trading/trading-connections.json``.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.trading.profiles import (
@@ -384,6 +384,7 @@ class TradingCancelOrderTool(BaseTool):
 
     def execute(self, **kwargs: Any) -> str:
         """Cancel an order via the connector profile."""
+
         try:
             return _json_result(
                 cancel_order(

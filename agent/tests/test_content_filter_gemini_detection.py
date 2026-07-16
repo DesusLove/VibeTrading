@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Gemini content-filter detection regression tests.
 
 Gemini surfaces content moderation via uppercase FinishReason enum values
@@ -13,7 +14,7 @@ Response fixtures sourced from:
 - firebase/flutterfire response parsing tests (BSD-3-Clause)
 """
 
-from __future__ import annotations
+
 
 import pytest
 from langchain_core.messages import AIMessage

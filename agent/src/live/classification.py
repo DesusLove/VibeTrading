@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import TYPE_CHECKING
+
 """Read/write classification for live-channel remote MCP tools.
 
 We do not own the broker's tool names or schemas — they are discovered at
@@ -26,10 +29,8 @@ sufficient to relax safety — it only downgrades toward read, and only when the
 curated map has not already pinned the tool WRITE.
 """
 
-from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Mapping
 
 if TYPE_CHECKING:
     from mcp.types import ToolAnnotations
@@ -51,7 +52,7 @@ class ToolClass(str, Enum):
 
 def classify_tool(
     name: str,
-    annotations: "ToolAnnotations | None",
+    annotations: ToolAnnotations | None,
     curated: Mapping[str, ToolClass] | None = None,
 ) -> ToolClass:
     """Classify one remote tool via the 3-tier precedence ladder.
@@ -71,6 +72,7 @@ def classify_tool(
     Returns:
         The resolved :class:`ToolClass`.
     """
+
     # Tier 2 wins whenever the map names the tool.
     if curated is not None:
         pinned = curated.get(name)

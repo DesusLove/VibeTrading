@@ -16,7 +16,6 @@ stocks earn higher ones. Computed as the negative of the trailing 60-day
 skewness of daily returns, then cross-sectional z-scored per date. Higher
 z-scores = more negatively-skewed names (the long leg of the skewness premium).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -54,6 +53,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return inverse 60-day return-skewness cross-sectional z-score per stock."""
+
     close = panel['close']
     daily_ret = safe_div(close - close.shift(1), close.shift(1))
     skew = daily_ret.rolling(window=60, min_periods=60).skew()

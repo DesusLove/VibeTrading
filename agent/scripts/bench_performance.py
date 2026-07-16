@@ -4,7 +4,6 @@ Development-only script — not included in the package.
 Run: python agent/scripts/bench_performance.py
 """
 
-from __future__ import annotations
 
 import os
 import sys
@@ -46,6 +45,7 @@ def bench_operators():
 
 def bench_equity():
     """Benchmark _calc_equity: vectorized vs loop."""
+
     from backtest.engines.base import BaseEngine
     from backtest.models import Position
 

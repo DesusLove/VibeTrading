@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: PROD(.,1) is identity; we use it directly.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     c = panel["close"]
     ret = safe_div(c, c.shift(1)) - 1.0
     inner = -1.0 * rank(delta(c - 1.0, 5))

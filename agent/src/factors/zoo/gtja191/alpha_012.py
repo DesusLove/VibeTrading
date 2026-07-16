@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #12 - 开盘动量排名
@@ -9,7 +10,7 @@
 Formula: (RANK((OPEN - (SUM(VWAP,10)/10))) * (-1 * RANK(ABS((CLOSE - VWAP)))))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 12."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

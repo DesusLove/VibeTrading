@@ -1,3 +1,5 @@
+from typing import Any
+
 """Trade Journal Analyzer tool.
 
 Parses a broker CSV/Excel export and produces:
@@ -9,12 +11,10 @@ Parses a broker CSV/Excel export and produces:
 Strategy extraction → backtest bridge still pending (Phase 4c).
 """
 
-from __future__ import annotations
 
 import json
 import logging
 from collections import defaultdict, deque
-from typing import Any
 
 import pandas as pd
 
@@ -473,6 +473,7 @@ def _pick_dominant_market(df: pd.DataFrame) -> str:
 
 class TradeJournalTool(BaseTool):
     """Trade journal analyzer tool (registered via auto-discovery)."""
+
 
     name = "analyze_trade_journal"
     description = (

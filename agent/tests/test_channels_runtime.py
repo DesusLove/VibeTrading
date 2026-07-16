@@ -1,11 +1,11 @@
+from typing import Any
+
 """Contracts for the IM channel runtime wiring."""
 
-from __future__ import annotations
 
 import asyncio
 import base64
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -13,11 +13,11 @@ from src.channels.bus.events import InboundMessage, OutboundMessage
 from src.channels.bus.queue import MessageBus
 from src.channels.manager import ChannelManager
 from src.channels.registry import discover_channel_names, inspect_channels
-from src.config.schema import ChannelsConfig
 from src.channelsui.cli_apps_api import normalize_cli_app_mentions
 from src.channelsui.gateway_services import build_gateway_services
 from src.channelsui.mcp_presets_api import normalize_mcp_preset_mentions
 from src.channelsui.transcription_ws import webui_transcription_event
+from src.config.schema import ChannelsConfig
 from src.session.goal_state import goal_state_ws_blob
 from src.session.models import Message, Session
 from src.session.webui_turns import (
@@ -30,6 +30,7 @@ from src.utils.media_decode import FileSizeExceeded, save_base64_data_url
 
 class FakeSessionService:
     """Small SessionService stand-in for channel runtime tests."""
+
 
     def __init__(self) -> None:
         self.created: list[Session] = []
@@ -165,7 +166,6 @@ def test_channel_manager_status_includes_every_configured_adapter() -> None:
 
 def test_registry_marks_lazy_sdk_adapter_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
     import src.channels.discord as discord_channel
-
     from src.channels.registry import inspect_channel
 
     monkeypatch.setattr(discord_channel, "DISCORD_AVAILABLE", False)

@@ -4,9 +4,7 @@
 纯 pandas 实现，适用于任何 OHLCV 数据。
 """
 
-from typing import Dict, List
 
-import numpy as np
 import pandas as pd
 
 
@@ -29,11 +27,11 @@ class SignalEngine:
 
     def __init__(
         self,
-        bullish_months: List[int] = None,
-        bearish_months: List[int] = None,
+        bullish_months: list[int] = None,
+        bearish_months: list[int] = None,
         use_weekday: bool = False,
-        bullish_weekdays: List[int] = None,
-        bearish_weekdays: List[int] = None,
+        bullish_weekdays: list[int] = None,
+        bearish_weekdays: list[int] = None,
     ):
         """初始化季节性引擎。
 
@@ -50,7 +48,7 @@ class SignalEngine:
         self.bullish_weekdays = bullish_weekdays or [4]
         self.bearish_weekdays = bearish_weekdays or [0]
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """根据日历效应生成交易信号。
 
         Args:

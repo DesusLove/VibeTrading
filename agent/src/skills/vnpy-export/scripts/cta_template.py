@@ -13,14 +13,14 @@ Usage in vnpy Trader:
 """
 
 from vnpy.app.cta_strategy import (
+    ArrayManager,
+    BarData,
+    BarGenerator,
     CtaTemplate,
+    OrderData,
     StopOrder,
     TickData,
-    BarData,
     TradeData,
-    OrderData,
-    BarGenerator,
-    ArrayManager,
 )
 
 

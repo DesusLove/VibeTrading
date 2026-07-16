@@ -7,24 +7,21 @@
 5. Date range validation — start > end raises ValueError in all loaders
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict
 from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from backtest.engines.base import _align
 from backtest.engines import base as base_engine
+from backtest.engines.base import _align
 from backtest.engines.china_a import ChinaAEngine
 from backtest.loaders.base import validate_date_range
 from backtest.runner import BacktestConfigSchema
-
 
 # ---------------------------------------------------------------------------
 # 1. ffill(limit=5) — long gaps stay NaN
@@ -108,7 +105,7 @@ class TestSymbolIsolation:
             index=dates,
         )
         df_bad = df_good.copy()
-        data_map: Dict[str, pd.DataFrame] = {"GOOD": df_good, "BAD": df_bad}
+        data_map: dict[str, pd.DataFrame] = {"GOOD": df_good, "BAD": df_bad}
 
         sig = pd.Series(0.0, index=dates)
         sig.iloc[2:] = 1.0
@@ -456,10 +453,10 @@ class TestDateRangeValidation:
 
     def test_tushare_loader_validates_dates(self) -> None:
         """Tushare loader should raise on reversed dates before fetching."""
-        from backtest.loaders.tushare import DataLoader
-
         # Tushare requires TUSHARE_TOKEN at init; skip if unavailable
         import os
+
+        from backtest.loaders.tushare import DataLoader
         if not os.getenv("TUSHARE_TOKEN"):
             pytest.skip("TUSHARE_TOKEN not set")
         loader = DataLoader()
@@ -535,6 +532,7 @@ class TestValidationArtifactDir:
         directory itself. Regression test for the FileNotFoundError hit when
         run_dir has no pre-created artifacts/ (e.g. a swarm agent workspace).
         """
+
         dates = pd.bdate_range("2024-04-01", periods=3)
         bars = pd.DataFrame(
             {

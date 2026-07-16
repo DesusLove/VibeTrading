@@ -1,3 +1,5 @@
+from typing import Any
+
 """Pre-trade mandate gate for DIRECT-SDK connectors (SPEC Mandate Enforcement §3).
 
 The MCP :class:`~src.live.order_guard.LiveOrderGuardTool` gates Robinhood by
@@ -21,11 +23,9 @@ returned a non-error envelope. Every decision writes one audit event and the
 returned payload carries the redacted record under ``live_action``.
 """
 
-from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from src.live.audit import LiveActionEvent, write_live_action
 from src.live.daily_count import increment_daily_count, read_daily_count
@@ -278,6 +278,7 @@ def _connector_quote_price(connector_module: Any, config: Any, symbol: str) -> f
 
 def _safe_read(connector_module: Any, fn_name: str, config: Any) -> object:
     """Call a connector read fn, returning ``None`` on any error (fail-closed)."""
+
     fn = getattr(connector_module, fn_name, None)
     if fn is None:
         return None
@@ -329,8 +330,8 @@ def _is_expired(mandate: Mandate) -> bool:
     except (TypeError, ValueError):
         return True
     if expires.tzinfo is None:
-        expires = expires.replace(tzinfo=timezone.utc)
-    return datetime.now(timezone.utc) >= expires
+        expires = expires.replace(tzinfo=UTC)
+    return datetime.now(UTC) >= expires
 
 
 def _error_message(result: object) -> str:

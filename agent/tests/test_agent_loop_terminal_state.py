@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """Regression tests for AgentLoop terminal-state result dict (issue #114).
 
 Before the fix, AgentLoop.run() returned a dict missing the `reason` field
@@ -9,12 +12,10 @@ These tests exercise both terminal paths with a stubbed LLM so the loop
 exits without hitting any real API.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Callable
 
 import pytest
 
@@ -80,7 +81,7 @@ class _StubLLMCancelMidStream:
     provider; the loop must surface 'cancelled by user' to the UI.
     """
 
-    def __init__(self, agent_ref: "list[AgentLoop]") -> None:
+    def __init__(self, agent_ref: list[AgentLoop]) -> None:
         self._agent_ref = agent_ref
 
     def stream_chat(
@@ -103,8 +104,8 @@ class _StubLLMCancelMidStream:
 
 def _build_agent(llm: Any, max_iter: int = 3, tmp_run_dir: Path | None = None) -> AgentLoop:
     """Build an AgentLoop with a real (but empty) registry and a stub LLM."""
-    from src.tools import build_registry
     from src.memory.persistent import PersistentMemory
+    from src.tools import build_registry
 
     pm = PersistentMemory()
     agent = AgentLoop(
@@ -159,7 +160,7 @@ class _StubLLMCancelWithToolCalls:
     the run as cancelled WITHOUT executing the turn's tool calls (#229).
     """
 
-    def __init__(self, agent_ref: "list[AgentLoop]") -> None:
+    def __init__(self, agent_ref: list[AgentLoop]) -> None:
         self._agent_ref = agent_ref
 
     def stream_chat(
@@ -344,6 +345,7 @@ def test_true_max_iterations_still_returns_max_iteration_reason(tmp_path: Path) 
 def test_force_text_only_on_last_iteration(tmp_path: Path) -> None:
     """When the LLM keeps calling tools, the last iteration forces text-only
     output by passing tools=None, producing a final answer instead of failure."""
+
     agent = _build_agent(
         _StubLLMAlwaysToolCalls(), max_iter=5, tmp_run_dir=tmp_path / "run"
     )

@@ -97,9 +97,8 @@ def test_reasoning_effort_extra_body_is_openrouter_only() -> None:
         "LANGCHAIN_REASONING_EFFORT": "high",
         "VIBE_TRADING_DEEPSEEK_ADAPTER": "openai-compatible",
     }
-    with patch.dict(os.environ, env, clear=True):
-        with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
-            build_llm()
+    with patch.dict(os.environ, env, clear=True), patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
+        build_llm()
 
     assert captured["extra_body"] is None
 
@@ -121,9 +120,8 @@ def test_kimi_user_agent_header_is_moonshot_only() -> None:
         "MOONSHOT_BASE_URL": "https://api.moonshot.ai/v1",
         "LANGCHAIN_MODEL_NAME": "kimi-k2.6",
     }
-    with patch.dict(os.environ, env, clear=True):
-        with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
-            build_llm()
+    with patch.dict(os.environ, env, clear=True), patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
+        build_llm()
 
     assert captured["default_headers"]["User-Agent"].startswith("Vibe-Trading/")
 
@@ -134,9 +132,8 @@ def test_kimi_user_agent_header_is_moonshot_only() -> None:
         "OPENAI_BASE_URL": "https://api.openai.com/v1",
         "LANGCHAIN_MODEL_NAME": "gpt-4",
     }
-    with patch.dict(os.environ, env, clear=True):
-        with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
-            build_llm()
+    with patch.dict(os.environ, env, clear=True), patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
+        build_llm()
 
     assert "default_headers" not in captured
 
@@ -159,18 +156,16 @@ def test_kimi_user_agent_respects_moonshot_user_agent_env_var() -> None:
         "LANGCHAIN_MODEL_NAME": "kimi-k2.6",
         "MOONSHOT_USER_AGENT": "MyCustomAgent/2.0",
     }
-    with patch.dict(os.environ, env, clear=True):
-        with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
-            llm_mod._recent_caps = None  # ensure fresh build reads env
-            build_llm()
+    with patch.dict(os.environ, env, clear=True), patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
+        llm_mod._recent_caps = None  # ensure fresh build reads env
+        build_llm()
 
     assert captured["default_headers"]["User-Agent"] == "MyCustomAgent/2.0"
 
     captured.clear()
     del env["MOONSHOT_USER_AGENT"]
-    with patch.dict(os.environ, env, clear=True):
-        with patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
-            build_llm()
+    with patch.dict(os.environ, env, clear=True), patch.object(llm_mod, "ChatOpenAIWithReasoning", _FakeChatOpenAI):
+        build_llm()
 
     assert captured["default_headers"]["User-Agent"].startswith("Vibe-Trading/")
 

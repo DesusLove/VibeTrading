@@ -6,7 +6,6 @@ identity guard, config resolution, read/write classification, secret redaction,
 and the service dispatch degrading cleanly when nothing is configured.
 """
 
-from __future__ import annotations
 
 import pytest
 
@@ -518,6 +517,7 @@ def test_in_broker_cancel_order_refuses_non_paper(mod, Config) -> None:
 @pytest.mark.parametrize("mod, Config", [(dh, dh.DhanConfig), (sh, sh.ShoonyaConfig)])
 def test_in_broker_paper_place_order_simulated_locally(mod, Config) -> None:
     """Paper config simulates locally — no real money, no SDK call."""
+
     result = mod.place_order(Config(profile="paper"), symbol="RELIANCE", side="buy", quantity=10)
     assert result["status"] == "ok"
     assert result["is_paper"] is True

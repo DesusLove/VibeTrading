@@ -6,10 +6,9 @@ advisory defense-in-depth — the broker enforces the real ceiling — so any
 read failure reads as ``0`` (fail-open on the count only, never on the order).
 """
 
-from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.live.paths import broker_dir
 
@@ -22,7 +21,7 @@ def _counter_path(broker: str):
 
 def _utc_today() -> str:
     """Return today's UTC calendar date as ``YYYY-MM-DD``."""
-    return datetime.now(timezone.utc).date().isoformat()
+    return datetime.now(UTC).date().isoformat()
 
 
 def read_daily_count(broker: str) -> int:
@@ -44,6 +43,7 @@ def read_daily_count(broker: str) -> int:
 
 def increment_daily_count(broker: str) -> int:
     """Persist ``broker``'s incremented count for today (atomic). Returns new count."""
+
     today = _utc_today()
     count = read_daily_count(broker) + 1
     path = _counter_path(broker)

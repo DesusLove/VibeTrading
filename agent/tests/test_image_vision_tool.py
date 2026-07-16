@@ -3,6 +3,7 @@
 The LLM call is mocked; the only real I/O is a tiny PNG written to tmp_path.
 """
 
+
 from __future__ import annotations
 
 import json

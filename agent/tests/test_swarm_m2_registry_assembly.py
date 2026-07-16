@@ -1,3 +1,5 @@
+from typing import Any
+
 """M2 — SWARM external MCP tools: registry assembly regression tests.
 
 Covers requirements R-01, R-02, R-03 and tests T-04, T-05, T-06, T-07 in
@@ -24,10 +26,8 @@ network. The MCP wire protocol stays untouched — we only mock the wrapper
 builder, not the adapter or transport.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 from src.config.schema import AgentConfig
@@ -274,6 +274,7 @@ def test_build_swarm_registry_with_empty_mcp_servers_is_local_only() -> None:
     ``mcp_*`` whitelist entry drops with a warning. No partial discovery, no
     crash.
     """
+
     cfg = AgentConfig.model_validate({"mcpServers": {}})
 
     registry = build_swarm_registry(

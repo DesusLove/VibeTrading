@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #67
@@ -9,7 +10,7 @@
 Formula: SMA(MAX(CLOSE-DELAY(CLOSE,1),0),24,1)/SMA(ABS(CLOSE-DELAY(CLOSE,1)),24,1)*100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 67."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

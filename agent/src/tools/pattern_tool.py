@@ -1,20 +1,19 @@
+from typing import Any
+
 """Chart pattern recognition tool: detect technical patterns in price series.
 
 Reads OHLCV data from run_dir/artifacts/ohlcv_*.csv.
 Can be called before coding (to inform strategy design) or after backtest (to analyse results).
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 
 from src.agent.tools import BaseTool
 from src.tools.path_utils import safe_run_dir
-
 
 # ---------------------------------------------------------------------------
 # Pattern detection functions
@@ -330,13 +329,13 @@ def run_pattern(run_dir: str, patterns: str = "all", window: int = 10) -> str:
         if not selected:
             return json.dumps({"status": "error", "error": f"Invalid pattern name(s). Available: {', '.join(_PATTERN_FUNCS.keys())}"}, ensure_ascii=False)
 
-    results: Dict[str, Any] = {}
+    results: dict[str, Any] = {}
     for f in ohlcv_files:
         code = f.stem.replace("ohlcv_", "")
         df = pd.read_csv(f, index_col=0, parse_dates=True)
         if df.empty:
             continue
-        code_results: Dict[str, Any] = {}
+        code_results: dict[str, Any] = {}
         for pattern_name in selected:
             func = _PATTERN_FUNCS[pattern_name]
             code_results[pattern_name] = func(df, window)
@@ -363,6 +362,7 @@ class PatternTool(BaseTool):
 
     def execute(self, **kwargs) -> str:
         """Run pattern detection."""
+
         return run_pattern(
             run_dir=kwargs["run_dir"],
             patterns=kwargs.get("patterns", "all"),

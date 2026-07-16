@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: 
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     c = panel["close"]
     ratio = safe_div(c - ts_max(c, 12), ts_max(c, 12)) * 100.0
     out = ts_mean(ratio ** 2, 12) ** 0.5

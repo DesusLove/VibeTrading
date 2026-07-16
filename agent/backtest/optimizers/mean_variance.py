@@ -1,6 +1,7 @@
+from typing import Any
+
 """Mean-variance (max Sharpe) optimizer: max (w'mu - r_f) / sqrt(w'Sigma w), w>=0, sum(w)=1."""
 
-from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd

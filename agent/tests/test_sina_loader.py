@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for the Sina US-equity daily OHLCV loader.
 
 All HTTP is mocked at :func:`backtest.loaders._http.throttled_get` (imported into
@@ -5,7 +6,7 @@ the loader module as ``sina_loader.throttled_get``), so no test touches a live
 Sina endpoint.
 """
 
-from __future__ import annotations
+
 
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -20,7 +21,6 @@ from backtest.loaders.sina_loader import (
     _strip_jsonp,
     _to_sina_symbol,
 )
-
 
 # ---------------------------------------------------------------------------
 # Symbol detection / mapping

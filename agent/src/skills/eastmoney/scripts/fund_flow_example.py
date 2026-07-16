@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """资金流向 + 板块联动研究示例。
 
 运行前提：在 agent/ 目录下执行（导入根为 agent/）。无需 token，

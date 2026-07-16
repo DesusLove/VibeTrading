@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #45 - 加权平均变化
@@ -9,7 +10,7 @@
 Formula: (RANK(DELTA((((CLOSE*0.6)+(OPEN*0.4))),1)) * RANK(CORR(VWAP,MEAN(VOLUME,150),15)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 45."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

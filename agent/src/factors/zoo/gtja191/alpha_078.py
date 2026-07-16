@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #78
@@ -9,7 +10,7 @@
 Formula: ((HIGH+LOW+CLOSE)/3-MA((HIGH+LOW+CLOSE)/3,12))/(0.015*MEAN(ABS(CLOSE-MA((HIGH+LOW+CLOSE)/3,12)),12))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 78."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

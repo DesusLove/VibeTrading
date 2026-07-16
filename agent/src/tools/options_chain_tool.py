@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only options-chain tool backed by the shared Yahoo Finance client.
 
 Surfaces the calls/puts ladder for a US-listed underlying (strike, bid/ask,
@@ -7,10 +9,8 @@ flag) for a single expiration. All HTTP routes through
 reuses one session, so the agent never hits Yahoo un-spaced.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional
 
 from backtest.loaders import yahoo_client
 from src.agent.tools import BaseTool
@@ -100,7 +100,7 @@ class OptionsChainTool(BaseTool):
         return _success(ticker, result)
 
 
-def _coerce_expiration(value: Any) -> Optional[int]:
+def _coerce_expiration(value: Any) -> int | None:
     """Coerce an epoch-second expiration to ``int``; ``None`` when absent/bad."""
     if value is None:
         return None
@@ -110,7 +110,7 @@ def _coerce_expiration(value: Any) -> Optional[int]:
         return None
 
 
-def _success(ticker: str, result: Dict[str, Any]) -> str:
+def _success(ticker: str, result: dict[str, Any]) -> str:
     """Build the success envelope from a quote-chain ``result[0]`` mapping."""
     expirations = [
         epoch for epoch in (result.get("expirationDates") or []) if epoch is not None
@@ -136,11 +136,11 @@ def _success(ticker: str, result: Dict[str, Any]) -> str:
     )
 
 
-def _contracts(raw: Any) -> List[Dict[str, Any]]:
+def _contracts(raw: Any) -> list[dict[str, Any]]:
     """Normalize a Yahoo calls/puts array into capped snake_case rows."""
     if not isinstance(raw, list):
         return []
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for entry in raw[:_MAX_CONTRACTS_PER_SIDE]:
         if not isinstance(entry, dict):
             continue
@@ -152,4 +152,5 @@ def _contracts(raw: Any) -> List[Dict[str, Any]]:
 
 def _error(message: str) -> str:
     """Render a failure envelope as a JSON string."""
+
     return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

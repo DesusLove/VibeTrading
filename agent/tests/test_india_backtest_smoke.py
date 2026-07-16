@@ -12,7 +12,6 @@ signal and asserts:
 All data is in-memory; no network access.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -85,6 +84,7 @@ def test_india_backtest_completes_and_emits_run_card(tmp_path: Path) -> None:
 
 def test_india_costs_are_applied_vs_zero_commission_us(tmp_path: Path) -> None:
     """Identical data + signal: the India engine pays costs the US engine does not."""
+
     in_engine = IndiaEquityEngine({"initial_cash": 1_000_000})
     us_engine = GlobalEquityEngine({"initial_cash": 1_000_000}, market="us")
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Alpaca connector profiles.
 
 Layer A ships read-only paper and live profiles; the trade profiles add order
@@ -8,7 +9,7 @@ authorized once the caller has a mandate in place; this connector layer just
 records the capability.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

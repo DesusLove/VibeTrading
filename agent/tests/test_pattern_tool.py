@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for the chart pattern recognition tool.
 
 Covers the deterministic pattern-detection functions in
@@ -6,7 +7,7 @@ trend slope, head-and-shoulders, double top/bottom, triangle, broadening)
 and the ``run_pattern`` dispatch + error paths.
 """
 
-from __future__ import annotations
+
 
 import json
 from pathlib import Path
@@ -25,7 +26,6 @@ from src.tools.pattern_tool import (
     trend_line_slope,
     triangle,
 )
-
 
 # --------------------------------------------------------------------------
 # find_peaks_valleys

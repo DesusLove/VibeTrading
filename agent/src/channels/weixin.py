@@ -1,3 +1,5 @@
+from typing import Any
+
 """Personal WeChat (微信) channel using HTTP long-poll API.
 
 Uses the ilinkai.weixin.qq.com API for personal WeChat messaging.
@@ -7,7 +9,6 @@ bot token obtained via QR code login.
 Protocol reverse-engineered from ``@tencent-weixin/openclaw-weixin`` v1.0.3.
 """
 
-from __future__ import annotations
 
 import asyncio
 import base64
@@ -21,19 +22,16 @@ import uuid
 from collections import OrderedDict
 from contextlib import suppress
 from pathlib import Path
-from typing import Any
 from urllib.parse import quote
 
 import httpx
 import logging; logger = logging.getLogger(__name__)
-from pydantic import Field
+from pydantic import BaseModel, Field
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir, get_runtime_subdir
-from pydantic import BaseModel
-from src.channels.utils import split_message
+from src.channels.utils import get_media_dir, get_runtime_subdir, split_message
 
 # ---------------------------------------------------------------------------
 # Protocol constants (from openclaw-weixin types.ts)
@@ -1565,6 +1563,7 @@ def _decrypt_aes_ecb(data: bytes, aes_key_b64: str) -> bytes:
 
 def _pkcs7_unpad_safe(data: bytes, block_size: int = 16) -> bytes:
     """Safely remove PKCS7 padding when valid; otherwise return original bytes."""
+
     if not data:
         return data
     if len(data) % block_size != 0:

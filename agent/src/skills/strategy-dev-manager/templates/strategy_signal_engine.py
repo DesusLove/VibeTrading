@@ -11,7 +11,6 @@ Position sizing: {POSITION_SIZING}
 This template satisfies the backtest runner SignalEngine contract.
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
@@ -45,6 +44,7 @@ class SignalEngine:
         Returns:
             symbol -> pd.Series of target positions (float, clipped to [-1, 1]).
         """
+
         signals: dict[str, pd.Series] = {}
 
         for symbol, df in data_map.items():

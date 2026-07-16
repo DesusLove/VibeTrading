@@ -11,7 +11,6 @@ Validates:
   - Product code extraction
 """
 
-from __future__ import annotations
 
 import pandas as pd
 import pytest
@@ -19,14 +18,8 @@ import pytest
 from backtest.engines.china_futures import (
     ChinaFuturesEngine,
     _extract_product,
-    _MULTIPLIER,
-    _MARGIN_RATE,
-    _COMMISSION,
-    _PRICE_LIMIT,
-    _DEFAULT_PRICE_LIMIT,
 )
 from backtest.models import Position
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -277,6 +270,7 @@ class TestSlippage:
 class TestLeverageFromMargin:
     def test_if_leverage(self) -> None:
         """IF margin=12% → leverage≈8.33."""
+
         engine = _make_engine(codes=["IF2406.CFFEX"])
         assert engine.default_leverage == pytest.approx(1 / 0.12, rel=0.01)
 

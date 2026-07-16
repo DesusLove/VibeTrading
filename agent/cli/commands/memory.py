@@ -6,7 +6,6 @@ a single arg shows one; with ``search <q>`` runs FTS; with
 ``forget <name>`` deletes one.
 """
 
-from __future__ import annotations
 
 from typing import Any
 
@@ -61,6 +60,7 @@ def cmd_memory(ctx: Any = None, *args: str) -> int:  # noqa: ARG001
 
 def run(ctx: Any = None, *args: str) -> int:
     """Single-entrypoint wrapper for the slash router."""
+
     return cmd_memory(ctx, *args)
 
 

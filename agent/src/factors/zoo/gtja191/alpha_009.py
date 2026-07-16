@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #9 - 量价平滑差
@@ -9,7 +10,7 @@
 Formula: SMA(((HIGH+LOW)/2-(DELAY(HIGH,1)+DELAY(LOW,1))/2)*(HIGH-LOW)/VOLUME,7,2)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 9."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

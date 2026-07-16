@@ -1,15 +1,14 @@
+from typing import Any, Callable
 """ChatLLM: raw LLM message interface with function calling support.
 
 ChatLLM is designed specifically for the AgentLoop ReAct cycle.
 """
 
-from __future__ import annotations
 
 import html
 import os
 import re
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
 
 from src.config.accessor import get_env_config
 from src.providers.content_filter import is_content_filter_triggered
@@ -43,9 +42,9 @@ class ToolCallRequest:
 
     id: str
     name: str
-    arguments: Dict[str, Any]
-    thought_signature: Optional[str] = None
-    extra_content: Dict[str, Any] = field(default_factory=dict)
+    arguments: dict[str, Any]
+    thought_signature: str | None = None
+    extra_content: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -67,11 +66,11 @@ class LLMResponse:
             moderation filter, ``finish_reason == "content_filter"``).
     """
 
-    content: Optional[str] = None
-    tool_calls: List[ToolCallRequest] = field(default_factory=list)
-    reasoning_content: Optional[str] = None
+    content: str | None = None
+    tool_calls: list[ToolCallRequest] = field(default_factory=list)
+    reasoning_content: str | None = None
     finish_reason: str = "stop"
-    usage_metadata: Optional[Dict[str, int]] = None
+    usage_metadata: dict[str, int] | None = None
     content_filter_triggered: bool = False
 
     @property
@@ -94,7 +93,7 @@ class ProviderStreamError(RuntimeError):
         self.provider = provider
         self.model = model
         self.original = original
-        self.status_code: Optional[int] = getattr(original, "status_code", None)
+        self.status_code: int | None = getattr(original, "status_code", None)
         safe_message = _redact_provider_error(str(original))
         super().__init__(
             f"provider_stream_error provider={provider} model={model}: "
@@ -221,7 +220,7 @@ class ChatLLM:
         model_name: Model name.
     """
 
-    def __init__(self, model_name: Optional[str] = None) -> None:
+    def __init__(self, model_name: str | None = None) -> None:
         """Initialize ChatLLM.
 
         Args:
@@ -230,7 +229,7 @@ class ChatLLM:
         self.model_name = model_name
         self._llm = build_llm(model_name=model_name)
 
-    def chat(self, messages: List[Dict[str, Any]], tools: Optional[List[Dict[str, Any]]] = None, timeout: Optional[int] = None) -> LLMResponse:
+    def chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any | None]] = None, timeout: int | None = None) -> LLMResponse:
         """Call the LLM synchronously.
 
         Args:
@@ -248,12 +247,12 @@ class ChatLLM:
 
     def stream_chat(
         self,
-        messages: List[Dict[str, Any]],
-        tools: Optional[List[Dict[str, Any]]] = None,
-        on_text_chunk: Optional[Any] = None,
-        on_reasoning_chunk: Optional[Any] = None,
-        timeout: Optional[int] = None,
-        should_cancel: Optional[Callable[[], bool]] = None,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any | None]] = None,
+        on_text_chunk: Any | None = None,
+        on_reasoning_chunk: Any | None = None,
+        timeout: int | None = None,
+        should_cancel: Callable[[], bool] | None = None,
     ) -> LLMResponse:
         """Stream the LLM and optionally forward text deltas (e.g. thinking).
 
@@ -415,12 +414,12 @@ class ChatLLM:
         )
 
 
-def _extract_tool_call_extra_content(raw_tool_call: Any) -> Dict[str, Any]:
+def _extract_tool_call_extra_content(raw_tool_call: Any) -> dict[str, Any]:
     """Extract provider-specific tool-call metadata LangChain would drop."""
     if not isinstance(raw_tool_call, dict):
         return {}
 
-    extra_content: Dict[str, Any] = {}
+    extra_content: dict[str, Any] = {}
     raw_extra = raw_tool_call.get("extra_content")
     if isinstance(raw_extra, dict):
         extra_content.update(raw_extra)
@@ -446,9 +445,10 @@ def _extract_tool_call_extra_content(raw_tool_call: Any) -> Dict[str, Any]:
     return extra_content
 
 
-def _merge_tool_call_extra_content(*raw_tool_calls: Any) -> Dict[str, Any]:
+def _merge_tool_call_extra_content(*raw_tool_calls: Any) -> dict[str, Any]:
     """Merge provider metadata from standardized and raw tool-call shapes."""
-    extra_content: Dict[str, Any] = {}
+
+    extra_content: dict[str, Any] = {}
     for raw_tool_call in raw_tool_calls:
         extra_content.update(_extract_tool_call_extra_content(raw_tool_call))
     return extra_content

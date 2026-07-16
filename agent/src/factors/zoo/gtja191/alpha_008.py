@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #8 - 价格加权均线变化
@@ -9,7 +10,7 @@
 Formula: RANK(DELTA(((HIGH+LOW)/2)*0.2 + VWAP*0.8, 4)) * -1
 Source: 国泰君安 191 alpha 研报 (2014), alpha 8."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

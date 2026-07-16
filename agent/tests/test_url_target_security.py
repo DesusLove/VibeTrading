@@ -13,7 +13,6 @@ Covers two previously-untested gaps:
   attachment. This mirrors napcat.py's inbound image download.
 """
 
-from __future__ import annotations
 
 import asyncio
 import ipaddress
@@ -85,7 +84,7 @@ class _FakeResp:
     def __init__(self, status: int) -> None:
         self.status = status
 
-    async def __aenter__(self) -> "_FakeResp":
+    async def __aenter__(self) -> _FakeResp:
         return self
 
     async def __aexit__(self, *_exc: object) -> bool:
@@ -97,6 +96,7 @@ class _FakeResp:
 
 class _FakeHttp:
     """Records the ``allow_redirects`` flag and returns a canned response."""
+
 
     def __init__(self, status: int) -> None:
         self.status = status

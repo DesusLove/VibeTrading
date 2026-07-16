@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -116,13 +115,13 @@ class FutuLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV history from Futu OpenAPI.
 
         Args:
@@ -143,12 +142,12 @@ class FutuLoader:
             return {}
         validate_date_range(start_date, end_date)
 
-        results: Dict[str, pd.DataFrame] = {}
+        results: dict[str, pd.DataFrame] = {}
 
         # Serve cached symbols first; only open a FutuOpenD connection when at
         # least one symbol is uncached, so a fully-cached request needs no
         # running gateway.
-        pending: List[str] = []
+        pending: list[str] = []
         for code in codes:
             cached = loader_cache_get(
                 source=self.name,

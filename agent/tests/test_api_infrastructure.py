@@ -5,8 +5,7 @@ from __future__ import annotations
 import pytest
 
 import api_server
-from src.api import _compat, security, models, helpers, state
-
+from src.api import _compat, helpers, models, security, state
 
 # ============================================================================
 # Re-export identity tests

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Longbridge connector profiles.
 
 Layer A ships read-only paper and live profiles. Because Longbridge exposes no
@@ -5,7 +6,7 @@ runtime paper/live discriminator, the paper profile's environment is
 operator-declared (config-trust) and order placement is not exposed here.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

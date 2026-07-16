@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: 
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     h = panel["high"]
     out = (20.0 - ts_argmax(h, 20)) / 20.0 * 100.0
     return out

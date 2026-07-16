@@ -8,9 +8,6 @@ consecutive-skip circuit breaker so both the agent loop and the swarm
 worker stay in sync.
 """
 
-from __future__ import annotations
-
-import os
 
 from src.config.accessor import get_env_config
 
@@ -87,6 +84,7 @@ def compute_content_filter_warnings(
         A list with one warning string when the ratio exceeds the
         configured threshold, otherwise an empty list.
     """
+
     if content_filter_count == 0:
         return []
     denominator = max(1, total_iterations)

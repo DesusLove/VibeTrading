@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated read/write classification for Futu (futu-api) SDK operations.
 
 The trading layer classifies each connector operation as READ or WRITE so the
@@ -8,7 +9,7 @@ Anything not listed and not a known read resolves to WRITE (fail-closed) when
 the live gate consults this map.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

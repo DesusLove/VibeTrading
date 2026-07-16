@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any, Literal
+
 """Strict bench runner: IC + random control + train/test OOS split.
 
 Companion to ``bench_runner.py``. The math in ``run_bench()`` is unchanged
@@ -45,13 +48,11 @@ dedicated function; the original behaviour is preserved for any caller
 that still wants the cheaper gate.
 """
 
-from __future__ import annotations
 
 import logging
 import math
 import time
 from dataclasses import dataclass
-from typing import Any, Callable, Literal
 
 import numpy as np
 import pandas as pd
@@ -247,8 +248,8 @@ def categorise_strict(
 
     Required keys on ``row``:
         - ``alpha_t_full`` (float)
-        - ``alpha_t_train`` (Optional[float])  — None when no OOS split was run
-        - ``alpha_t_test`` (Optional[float])   — None when no OOS split was run
+        - ``alpha_t_train`` (float | None)  — None when no OOS split was run
+        - ``alpha_t_test`` (float | None)   — None when no OOS split was run
         - ``ic_count`` (int)
 
     Rules:
@@ -350,6 +351,7 @@ def run_bench_strict(
     Raises:
         TypeError: If ``random_control`` is omitted (keyword-only, no default).
     """
+
     if random_control is None:  # pragma: no cover — guarded by signature
         raise TypeError(
             "run_bench_strict requires random_control to be passed explicitly "

@@ -8,7 +8,6 @@ Used to surface keyboard guidance ("Tab to complete · /help for
 commands") and ephemeral state ("input cleared", "cancelled").
 """
 
-from __future__ import annotations
 
 import shutil
 
@@ -39,6 +38,7 @@ def render_hint_bar(left: str, right: str = "", *, width: int | None = None) -> 
         right: Right segment (e.g. ``"Esc to cancel"``); may be empty.
         width: Override terminal width. Defaults to autodetect.
     """
+
     cols = width if width is not None else _terminal_width()
     if right == "":
         # Only a left hint — clip and pad to width, dim style throughout.

@@ -5,9 +5,7 @@
 纯 pandas/numpy 实现，无外部波浪库依赖。
 """
 
-from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 
 
@@ -52,7 +50,7 @@ class SignalEngine:
 
     def _find_swings(
         self, high: pd.Series, low: pd.Series
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """用滚动窗口找局部高低点，生成交替的 Zigzag 序列。
 
         Args:
@@ -147,7 +145,7 @@ class SignalEngine:
 
         return True
 
-    def _check_min_bars(self, swings: List[Dict], start: int, count: int) -> bool:
+    def _check_min_bars(self, swings: list[dict], start: int, count: int) -> bool:
         """检查连续 Swing 点之间是否满足最少 K 线数。
 
         Args:
@@ -170,7 +168,7 @@ class SignalEngine:
                 return False
         return True
 
-    def _find_impulse(self, swings: List[Dict]) -> List[Tuple]:
+    def _find_impulse(self, swings: list[dict]) -> list[tuple]:
         """在 Swing 序列中寻找 5 浪推动结构。
 
         看涨推动浪：L-H-L-H-L-H（6个点，5段浪）
@@ -267,7 +265,7 @@ class SignalEngine:
 
         return results
 
-    def _find_abc(self, swings: List[Dict]) -> List[Tuple]:
+    def _find_abc(self, swings: list[dict]) -> list[tuple]:
         """在 Swing 序列中寻找 ABC 调整结构。
 
         看跌调整（上升趋势后）：H-L-H-L（A 下 B 反弹 C 下）
@@ -353,8 +351,8 @@ class SignalEngine:
         return results
 
     def generate(
-        self, data_map: Dict[str, pd.DataFrame]
-    ) -> Dict[str, pd.Series]:
+        self, data_map: dict[str, pd.DataFrame]
+    ) -> dict[str, pd.Series]:
         """根据艾略特波浪理论生成交易信号。
 
         Args:

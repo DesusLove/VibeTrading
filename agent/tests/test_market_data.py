@@ -7,7 +7,6 @@ network-free logic: source detection, row capping, JSON-safety, and the
 ``fetch_market_data`` orchestration via an injected stub loader.
 """
 
-from __future__ import annotations
 
 import json
 
@@ -23,7 +22,6 @@ from src.market_data import (
     fetch_market_data,
     fetch_market_data_json,
 )
-
 
 # --------------------------------------------------------------------------
 # detect_source
@@ -145,6 +143,7 @@ class _BadLoader:
 
 class _PartialLoader:
     """Returns data for only the first requested code."""
+
 
     def __init__(self) -> None:
         pass

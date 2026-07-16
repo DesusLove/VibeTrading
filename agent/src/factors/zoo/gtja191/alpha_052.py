@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #52 - 均值回复信号
@@ -9,7 +10,7 @@
 Formula: SUM(MAX(0,HIGH-DELAY((HIGH+LOW+CLOSE)/3,1)),26) / SUM(MAX(0,DELAY((HIGH+LOW+CLOSE)/3,1)-LOW),26) * 100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 52."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

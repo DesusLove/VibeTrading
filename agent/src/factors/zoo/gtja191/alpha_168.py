@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: 
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     v = panel["volume"]
     out = -1.0 * safe_div(v, ts_mean(v, 20))
     return out

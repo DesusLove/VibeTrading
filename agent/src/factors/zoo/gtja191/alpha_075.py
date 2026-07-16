@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #75
@@ -9,7 +10,7 @@
 Formula: COUNT((CLOSE>OPEN & BENCHMARKINDEXCLOSE<DELAY(BENCHMARKINDEXCLOSE,1)),50)/COUNT(BENCHMARKINDEXCLOSE<DELAY(BENCHMARKINDEXCLOSE,1),50)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 75."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

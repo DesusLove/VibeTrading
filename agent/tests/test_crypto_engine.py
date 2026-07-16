@@ -9,21 +9,18 @@ Validates:
   - Tiered maintenance margin rates
 """
 
-from __future__ import annotations
 
 import pandas as pd
 import pytest
 
-from backtest.engines.crypto import CryptoEngine
 from backtest.engines._market_hooks import (
     FUNDING_HOURS as _FUNDING_HOURS,
-    _TIER_TABLE,
-    calc_crypto_funding_fee,
-    check_crypto_liquidation,
+)
+from backtest.engines._market_hooks import (
     _maintenance_rate,
 )
+from backtest.engines.crypto import CryptoEngine
 from backtest.models import Position
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -240,7 +237,7 @@ class TestFundingFee:
         assert initial - after_both == pytest.approx(9.0)
 
     def test_funding_hours_correct(self) -> None:
-        assert _FUNDING_HOURS == {0, 8, 16}
+        assert {0, 8, 16} == _FUNDING_HOURS
 
 
 # ---------------------------------------------------------------------------
@@ -294,6 +291,7 @@ class TestLiquidation:
 
     def test_short_liquidation(self) -> None:
         """Short position liquidated when price rises sharply."""
+
         engine = _make_engine(leverage=10.0)
         engine.positions["BTC-USDT"] = Position(
             "BTC-USDT", -1, 60000.0, pd.Timestamp("2025-01-01"), 1.0, leverage=10.0,

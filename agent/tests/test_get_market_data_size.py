@@ -9,7 +9,6 @@ queries are unchanged (plain list); `max_rows=0` restores the unbounded
 legacy behavior; a negative `max_rows` is invalid and enforces the cap.
 """
 
-from __future__ import annotations
 
 import json
 
@@ -95,6 +94,7 @@ def test_stride_form_last_pinned_increasing_no_gap(monkeypatch):
 
 def test_multi_symbol_capped_independently(monkeypatch):
     """G3 (iv): each symbol in a multi-symbol payload is capped on its own."""
+
     big = pd.date_range("2025-01-01", periods=400, freq="D")
     small = pd.date_range("2025-01-01", periods=10, freq="D")
 

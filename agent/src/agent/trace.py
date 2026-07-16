@@ -1,3 +1,6 @@
+from collections.abc import Iterable
+from typing import Any
+
 """TraceWriter: crash-safe JSONL trace writer.
 
 One JSON record per line; append + flush keeps the trace useful after crashes.
@@ -5,14 +8,12 @@ Large fields are written to sidecar files so traces can preserve full content
 without turning every CLI/history read into a giant file load.
 """
 
-from __future__ import annotations
 
 import hashlib
 import json
 import os
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
 
 
 def _env_int(name: str, default: int) -> int:
@@ -74,7 +75,7 @@ class TraceWriter:
         self.path = self.dir_path / "trace.jsonl"
         self._file = open(self.path, "a", encoding="utf-8")
 
-    def write(self, entry: Dict[str, Any]) -> None:
+    def write(self, entry: dict[str, Any]) -> None:
         """Write a trace record.
 
         Args:
@@ -87,7 +88,7 @@ class TraceWriter:
 
     def write_text_entry(
         self,
-        entry: Dict[str, Any],
+        entry: dict[str, Any],
         *,
         field: str,
         value: str,
@@ -132,7 +133,7 @@ class TraceWriter:
             elapsed_ms: Execution time in milliseconds.
             iteration: Current iteration number.
         """
-        entry: Dict[str, Any] = {
+        entry: dict[str, Any] = {
             "type": "tool_result",
             "iter": iteration,
             "tool": tool_name,
@@ -158,7 +159,7 @@ class TraceWriter:
 
     def _attach_text_field(
         self,
-        entry: Dict[str, Any],
+        entry: dict[str, Any],
         *,
         field: str,
         value: str,
@@ -174,7 +175,7 @@ class TraceWriter:
 
         offload_dir = self.dir_path / offload_dir_name
         offload_dir.mkdir(parents=True, exist_ok=True)
-        digest = hashlib.sha256(f"{offload_kind}\0{value}".encode("utf-8")).hexdigest()
+        digest = hashlib.sha256(f"{offload_kind}\0{value}".encode()).hexdigest()
         path = offload_dir / f"{digest[:24]}.txt"
         path.write_text(value, encoding="utf-8")
         entry[f"{field}_path"] = f"{offload_dir_name}/{path.name}"
@@ -186,8 +187,8 @@ class TraceWriter:
         dir_path: Path,
         *,
         resolve_offloads: bool = False,
-        resolve_fields: Optional[Iterable[str]] = None,
-    ) -> List[Dict[str, Any]]:
+        resolve_fields: Iterable[str | None] = None,
+    ) -> list[dict[str, Any]]:
         """Read trace.jsonl records.
 
         Args:
@@ -203,7 +204,7 @@ class TraceWriter:
         if not path.exists():
             return []
         fields = set(resolve_fields) if resolve_fields is not None else None
-        entries: List[Dict[str, Any]] = []
+        entries: list[dict[str, Any]] = []
         for line in path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line:
@@ -220,8 +221,8 @@ class TraceWriter:
     @staticmethod
     def _resolve_entry_offloads(
         dir_path: Path,
-        entry: Dict[str, Any],
-        fields: Optional[set[str]],
+        entry: dict[str, Any],
+        fields: set[str | None],
     ) -> None:
         """Resolve safe sidecar paths into their original fields."""
         for key, rel_path in list(entry.items()):
@@ -254,9 +255,9 @@ class TraceWriter:
     @staticmethod
     def find_trace_dir(
         run_id: str,
-        runs_dir: Optional[Path] = None,
-        sessions_dir: Optional[Path] = None,
-    ) -> Optional[Path]:
+        runs_dir: Path | None = None,
+        sessions_dir: Path | None = None,
+    ) -> Path | None:
         """Find the trace directory for a run/session id.
 
         Args:
@@ -268,6 +269,7 @@ class TraceWriter:
         Returns:
             Directory containing ``trace.jsonl``, or ``None`` when absent.
         """
+
         if sessions_dir is None:
             sessions_dir = Path(__file__).resolve().parents[2] / "sessions"
         if runs_dir is None:

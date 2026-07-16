@@ -10,7 +10,6 @@ Formula (paper appendix): ((rank(1/close)*volume/adv20) * (high*rank(high-close)
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 47.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -70,6 +69,7 @@ def _make_one(ref: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     high = panel["high"]
     volume = panel["volume"]

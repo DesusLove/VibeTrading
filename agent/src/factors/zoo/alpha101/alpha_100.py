@@ -10,7 +10,6 @@ Formula (paper appendix): 0 - 1*((1.5*scale(IN(IN(rank(((close-low)-(high-close)
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 100.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -84,6 +83,7 @@ def _ind_neutralize(x: pd.DataFrame, panel: dict) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     high = panel["high"]
     low = panel["low"]

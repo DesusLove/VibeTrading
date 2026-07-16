@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for stooq_loader: symbol mapping, CSV parsing, batch isolation, errors.
 
 All HTTP is mocked — no test reaches a live Stooq endpoint. The loader imports
@@ -5,9 +7,6 @@ All HTTP is mocked — no test reaches a live Stooq endpoint. The loader imports
 we monkeypatch that name on the ``stooq_loader`` module.
 """
 
-from __future__ import annotations
-
-from typing import Any, Dict, List
 
 import pandas as pd
 import pytest
@@ -158,6 +157,7 @@ class TestFetch:
 
 class TestParseCsv:
     """`_parse_csv` edge handling."""
+
 
     def test_rows_with_nan_ohlc_dropped(self):
         body = (

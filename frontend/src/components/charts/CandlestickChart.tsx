@@ -32,6 +32,10 @@ const OVERLAY_COLORS = ["#f59e0b", "#8b5cf6", "#3b82f6", "#ec4899", "#10b981", "
 
 const DRAWING_COLORS = ["#22d3ee", "#fb923c", "#a78bfa", "#f472b6", "#34d399", "#facc15", "#818cf8"];
 const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+let _drawingIdCounter = 0;
+function nextDrawingId(): string {
+  return `drawing-${++_drawingIdCounter}-${Date.now()}`;
+}
 
 interface Props {
   data: PriceBar[];
@@ -446,7 +450,7 @@ export function CandlestickChart({ data, markers, indicators: _indicators, heigh
 
       if (singleClick) {
         const color = DRAWING_COLORS[drawColorIdx.current++ % DRAWING_COLORS.length];
-        setDrawings(prev => [...prev, { id: crypto.randomUUID(), type: activeTool, start: { time: t, price }, color }]);
+        setDrawings(prev => [...prev, { id: nextDrawingId(), type: activeTool, start: { time: t, price }, color }]);
         setFeedback(`${activeTool} placed`);
       } else if (doubleClick) {
         const placing = placingRef.current;
@@ -455,7 +459,7 @@ export function CandlestickChart({ data, markers, indicators: _indicators, heigh
           setFeedback(`First point set. Click for second point.`);
         } else {
           const color = DRAWING_COLORS[drawColorIdx.current++ % DRAWING_COLORS.length];
-          setDrawings(prev => [...prev, { id: crypto.randomUUID(), type: placing.tool, start: placing.first, end: { time: t, price }, color }]);
+          setDrawings(prev => [...prev, { id: nextDrawingId(), type: placing.tool, start: placing.first, end: { time: t, price }, color }]);
           placingRef.current = null;
           setFeedback(`${placing.tool} placed`);
         }

@@ -8,7 +8,6 @@ quarantined and refuses an empty start, and a genuinely-missing store is the
 only blank-start path.
 """
 
-from __future__ import annotations
 
 import json
 import os
@@ -84,6 +83,7 @@ def test_sigkill_mid_write_leaves_old_store_intact(
 ) -> None:
     """A crash during the write (modeled as os.replace raising) must leave the
     previously-committed store fully readable, never a truncated file."""
+
     store = JobStore()
     store.save([_job("a", 1000)])
 

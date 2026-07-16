@@ -10,7 +10,6 @@ This template satisfies the backtest runner SignalEngine contract:
 - generate(data_map) -> dict[str, pd.Series]
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
@@ -39,6 +38,7 @@ class SignalEngine:
         Returns:
             symbol -> pd.Series of target signals (float, clipped to [-1, 1]).
         """
+
         signals: dict[str, pd.Series] = {}
 
         # Step 1: Compute raw factor values for each symbol

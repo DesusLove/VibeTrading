@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """Regression test: reasoning_delta SSE events are throttled.
 
 Long DeepSeek/Kimi reasoning streams produce hundreds of chunks. Before the
@@ -8,10 +11,8 @@ per REASONING_DELTA_MIN_INTERVAL_S, but always emits the first chunk of an
 iteration immediately so the UI flips to "Reasoning…" without delay.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
 
 CHUNK_COUNT = 300
 CHUNK_TEXT = "reasoning…"
@@ -77,6 +78,7 @@ def _build_agent(llm: Any, events: list, tmp_run_dir: Path):
 
 def test_reasoning_delta_throttled_but_first_chunk_immediate(tmp_path: Path) -> None:
     """A burst of reasoning chunks must collapse to few events, first one instant."""
+
     events: list[tuple[str, dict[str, Any]]] = []
     agent = _build_agent(_ReasoningBurstLLM(), events, tmp_path / "run")
 

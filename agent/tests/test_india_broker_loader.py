@@ -5,7 +5,6 @@ Tests inject a fake broker SDK via ``_resolve_broker`` so no real SDK/creds are
 needed; the loader stays unavailable (and inert) when no broker is configured.
 """
 
-from __future__ import annotations
 
 import datetime as dt
 
@@ -17,11 +16,12 @@ from backtest.loaders.india_broker_loader import DataLoader, _base_symbol, _exch
 
 def _epoch(date_str: str) -> int:
     d = pd.Timestamp(date_str).date()
-    return int(dt.datetime(d.year, d.month, d.day, tzinfo=dt.timezone.utc).timestamp())
+    return int(dt.datetime(d.year, d.month, d.day, tzinfo=dt.UTC).timestamp())
 
 
 class _FakeSDK:
     """Minimal stand-in exposing ``get_historical_bars`` like the real connectors."""
+
 
     def __init__(self) -> None:
         self.calls: list[dict] = []

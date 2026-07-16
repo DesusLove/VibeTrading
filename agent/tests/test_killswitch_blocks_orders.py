@@ -5,12 +5,10 @@ must return a refusal and make NO remote call (the mock adapter's order tool is
 never invoked). Read tools are unaffected by HALT — only the gate refuses.
 """
 
-from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -18,12 +16,6 @@ import src.live.paths as paths
 from src.live.halt import trip_halt
 from src.live.mandate.model import (
     MANDATE_SCHEMA_VERSION,
-    AssetClass,
-    ConsentMeta,
-    HardCaps,
-    InstrumentType,
-    Mandate,
-    UniverseConstraint,
 )
 from src.live.order_guard import LiveOrderGuardTool
 from src.tools.mcp import MCPRemoteTool, MCPRemoteToolSpec
@@ -72,7 +64,7 @@ def _read_spec() -> MCPRemoteToolSpec:
 def _write_mandate(live_runtime: Path) -> None:
     broker = live_runtime / "live" / "robinhood"
     broker.mkdir(parents=True, exist_ok=True)
-    created = datetime.now(timezone.utc)
+    created = datetime.now(UTC)
     payload = {
         "schema_version": MANDATE_SCHEMA_VERSION,
         "hard_caps": {
@@ -132,6 +124,7 @@ def test_per_broker_halt_blocks_order(live_runtime: Path) -> None:
 
 def test_read_tools_unaffected_by_halt(live_runtime: Path) -> None:
     """A plain read tool is NOT a guard — HALT must not block reads."""
+
     _write_mandate(live_runtime)
     trip_halt(by="file", reason="test halt")
     adapter = _MockAdapter()

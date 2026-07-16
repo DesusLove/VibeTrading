@@ -6,13 +6,11 @@ and weasyprint both consume ``cjk_font_path()`` or at least see the family
 name via ``apply_matplotlib_cjk_font``.
 """
 
-from __future__ import annotations
 
 import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +52,7 @@ def _system_cjk_candidates() -> list[Path]:
     return candidates
 
 
-def cjk_font_path(*, allow_download: bool = True, timeout: float = 10.0) -> Optional[Path]:
+def cjk_font_path(*, allow_download: bool = True, timeout: float = 10.0) -> Path | None:
     """Resolve a CJK font file path.
 
     Resolution order:
@@ -102,8 +100,8 @@ def apply_matplotlib_cjk_font() -> str:
     try:
         import matplotlib
         matplotlib.use("Agg")  # safe for headless rendering
-        from matplotlib import font_manager as fm
         import matplotlib.pyplot as plt
+        from matplotlib import font_manager as fm
     except Exception as exc:  # pragma: no cover — matplotlib optional
         logger.warning("matplotlib unavailable: %s", exc)
         return _FALLBACK_FAMILY
@@ -131,6 +129,7 @@ def cjk_css_font_face() -> str:
 
     Returns an empty string if no CJK font is resolvable.
     """
+
     path = cjk_font_path()
     if path is None:
         return ""

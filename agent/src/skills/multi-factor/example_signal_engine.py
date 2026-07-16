@@ -4,13 +4,12 @@
 选取 TopN 等权做多。纯 pandas 实现。
 """
 
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 
 
-def zscore_cross_section(series_map: Dict[str, float]) -> Dict[str, float]:
+def zscore_cross_section(series_map: dict[str, float]) -> dict[str, float]:
     """对截面数据做 Z-score 标准化。
 
     Args:
@@ -91,7 +90,7 @@ class SignalEngine:
 
         return factors
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """截面排名选股，TopN 等权做多。
 
         Args:
@@ -106,7 +105,7 @@ class SignalEngine:
             return {code: pd.Series(0.0, index=df.index) for code, df in data_map.items()}
 
         # 计算所有股票的因子
-        factor_map: Dict[str, pd.DataFrame] = {}
+        factor_map: dict[str, pd.DataFrame] = {}
         for code, df in data_map.items():
             factor_map[code] = self._compute_factors(df)
 
@@ -117,7 +116,7 @@ class SignalEngine:
         signals = {code: pd.Series(0.0, index=date_index) for code in codes}
         factor_names = ["momentum", "reversal", "volatility", "volume_ratio"]
 
-        last_selected: List[str] = []
+        last_selected: list[str] = []
         for i, dt in enumerate(date_index):
             # 非调仓日，沿用上次信号
             if i % self.rebalance_freq != 0 and last_selected:
@@ -127,7 +126,7 @@ class SignalEngine:
                 continue
 
             # 调仓日：截面排名
-            composite_scores: Dict[str, float] = {}
+            composite_scores: dict[str, float] = {}
             for factor_name in factor_names:
                 raw_vals = {}
                 for code in codes:

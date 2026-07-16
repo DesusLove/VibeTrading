@@ -5,7 +5,6 @@ Eastmoney ``get_json`` / ``resolve_secid``; US routes through SEC EDGAR
 ``cik_for`` / ``get_company_facts``. No test touches a live endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -331,6 +330,7 @@ class TestPeriodSelection:
 
 class TestErrorEnvelope:
     """Input validation returns the ok=false envelope before any HTTP."""
+
 
     def test_missing_code_rejected(self):
         payload = json.loads(FinancialStatementsTool().execute())

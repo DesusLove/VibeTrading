@@ -9,14 +9,13 @@ Usage (called by pytest, not directly):
     python agent/tests/fixtures/fake_mcp_streamable_http_server.py --port 0 --path /mcp --port-file /tmp/fake-mcp-http.port
 """
 
-from __future__ import annotations
 
 import argparse
 import asyncio
 from pathlib import Path
 
-from fastmcp import FastMCP
 import uvicorn
+from fastmcp import FastMCP
 
 mcp = FastMCP("fake-mcp-streamable-http-server")
 
@@ -30,6 +29,7 @@ def echo(message: str) -> str:
 @mcp.tool()
 def add(a: int, b: int) -> int:
     """Add two integers."""
+
     return a + b
 
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Agent tool: financial-rigor checks with exact decimal arithmetic.
 
 A thin ``BaseTool`` wrapper around six pure-stdlib verification routines that
@@ -26,13 +28,11 @@ Sub-commands (selected via ``command``):
 Read-only: returns JSON verdicts, writes nothing.
 """
 
-from __future__ import annotations
 
 import ast
 import json
 import math
-from decimal import Context, Decimal, ROUND_HALF_EVEN
-from typing import Any
+from decimal import ROUND_HALF_EVEN, Context, Decimal
 
 from src.agent.tools import BaseTool
 
@@ -525,6 +525,7 @@ class FinancialRigorTool(BaseTool):
             JSON string — ``status="ok"`` with the verdict on success,
             ``status="error"`` with a message otherwise.
         """
+
         command = str(kwargs.get("command") or "").strip()
         try:
             if command == "verify_market_cap":

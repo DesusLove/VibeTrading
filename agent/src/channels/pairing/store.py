@@ -1,3 +1,5 @@
+from typing import Any
+
 """Pairing store for DM sender approval.
 
 Persistent storage at ``~/.vibe-trading/pairing.json`` keeps approved senders
@@ -5,7 +7,6 @@ and pending pairing codes per channel.  The store is designed for
 private-assistant scale: small JSON file, simple locking, no external DB.
 """
 
-from __future__ import annotations
 
 import json
 import logging
@@ -14,7 +15,6 @@ import string
 import threading
 import time
 from pathlib import Path
-from typing import Any
 
 from src.config.paths import get_data_dir
 
@@ -209,6 +209,7 @@ def handle_pairing_command(channel: str, subcommand_text: str) -> str:
     This is a pure function (no side effects other than store mutations)
     so it can be used from both the CLI and the agent CommandRouter.
     """
+
     parts = subcommand_text.split()
     sub = parts[0].lower() if parts else "list"
     arg = parts[1] if len(parts) > 1 else None

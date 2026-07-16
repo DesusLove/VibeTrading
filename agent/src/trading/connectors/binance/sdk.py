@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only Binance (spot) connector via the ``ccxt`` unified exchange client.
 
 Wraps ccxt's ``binance`` exchange for the five read operations the trading layer
@@ -21,13 +24,11 @@ Note: Binance spot has NO positions — holdings are simply non-zero balances. S
 balances returned by ``fetch_balance``.
 """
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 from urllib.parse import urlparse
 
 from src.config.paths import get_runtime_root
@@ -100,7 +101,7 @@ class BinanceConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "BinanceConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> BinanceConfig:
         """Build a config from a JSON-like mapping, normalizing the profile."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
@@ -122,7 +123,7 @@ class BinanceConfig:
         api_secret: str | None = None,
         profile: str | None = None,
         testnet_host: str | None = None,
-    ) -> "BinanceConfig":
+    ) -> BinanceConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if api_key is not None:
@@ -154,7 +155,7 @@ class BinanceConfig:
 _OVERRIDE_KEYS = ("api_key", "api_secret", "profile", "testnet_host")
 
 
-def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> "BinanceConfig":
+def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> BinanceConfig:
     """Resolve the effective config: saved file ← profile defaults ← CLI overrides.
 
     Credentials (``api_key`` / ``api_secret``) come from the saved
@@ -760,6 +761,7 @@ def _trade_to_dict(item: Any) -> dict[str, Any]:
 
 def _ohlcv_to_dict(item: Any) -> dict[str, Any]:
     """Shape a ccxt OHLCV row (``[ts, o, h, l, c, v]``) into a named dict."""
+
     row = list(item) if isinstance(item, (list, tuple)) else []
     row += [None] * (6 - len(row))
     return {

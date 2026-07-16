@@ -6,11 +6,10 @@ Keeping the YAMLs inside the ``src.swarm`` package guarantees identical
 behavior under editable installs and built wheels.
 """
 
-from __future__ import annotations
 
 import uuid
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from string import Formatter
 
@@ -232,6 +231,7 @@ def build_run_from_preset(preset_name: str, user_vars: dict[str, str]) -> SwarmR
         FileNotFoundError: If preset does not exist.
         ValueError: If preset YAML is malformed.
     """
+
     data = load_preset(preset_name)
 
     # Parse agents
@@ -265,7 +265,7 @@ def build_run_from_preset(preset_name: str, user_vars: dict[str, str]) -> SwarmR
         ))
 
     # Generate run ID
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     ts = now.strftime("%Y%m%d-%H%M%S")
     short_uuid = uuid.uuid4().hex[:8]
     run_id = f"swarm-{ts}-{short_uuid}"

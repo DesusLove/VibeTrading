@@ -4,10 +4,8 @@ Lightweight runtime state — survives within one AgentLoop.run() invocation onl
 Cross-session persistence is handled by src.memory.persistent.PersistentMemory.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional
 
 
 @dataclass
@@ -19,8 +17,8 @@ class WorkspaceMemory:
         counters: Tool invocation counters.
     """
 
-    run_dir: Optional[str] = None
-    counters: Dict[str, int] = field(default_factory=dict)
+    run_dir: str | None = None
+    counters: dict[str, int] = field(default_factory=dict)
 
     def increment(self, key: str) -> int:
         """Increment a counter and return the new value.
@@ -44,6 +42,7 @@ class WorkspaceMemory:
         Returns:
             State summary text.
         """
+
         lines: list[str] = []
         if self.run_dir:
             lines.append(f"- run_dir: {self.run_dir}")

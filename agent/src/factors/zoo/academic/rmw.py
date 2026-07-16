@@ -16,7 +16,6 @@ operating profitability from income statements. We use the negative of trailing
 exhibit lower idiosyncratic volatility (the "low-vol anomaly" overlap). Higher
 z-scores = lower volatility = quality proxy.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -54,6 +53,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return inverse 60-day return-volatility z-score per stock."""
+
     close = panel['close']
     ret_1d = safe_div(delta(close, 1), close.shift(1))
     vol_60 = ts_std(ret_1d, 60)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Trading 212 connector profiles.
 
 Trading 212's public REST API is registered here as read-only only. The API key
@@ -6,7 +7,7 @@ runtime paper/live discriminator it can independently verify, so order
 placement is not exposed by any built-in profile.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import TradingProfile
 

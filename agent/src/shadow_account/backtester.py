@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shadow Account — multi-market backtest driver + delta-PnL attribution.
 
 Responsibilities:
@@ -14,12 +16,10 @@ The attribution algorithm is deliberately arithmetic-only: no LLM, no
 simulation rebuild. This keeps the numbers auditable and reproducible.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -495,6 +495,7 @@ def _overtrading_pnl(
     Excess trades' PnL is totaled with a negative sign (shadow would've
     skipped them, so real PnL — positive or negative — is "noise").
     """
+
     if not roundtrips:
         return 0.0
     median_hold, _ = profile.typical_holding_days
@@ -521,4 +522,3 @@ __all__ = [
     "run_shadow_backtest",
     "select_multi_market_codes",
 ]
-

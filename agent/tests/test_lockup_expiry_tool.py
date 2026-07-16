@@ -6,7 +6,6 @@ the frozen HTTP boundary (``throttled_get_json``) so the real client routing and
 this tool's parsing both run while nothing hits the network.
 """
 
-from __future__ import annotations
 
 import json
 from datetime import date
@@ -24,6 +23,7 @@ def _payload(rows: list[dict]) -> dict:
 
 def _row(code: str, free_date: str) -> dict:
     """One RPT_LIFT_STOCK-shaped record."""
+
     return {
         "SECURITY_CODE": code,
         "SECURITY_NAME_ABBR": "贵州茅台",

@@ -14,7 +14,6 @@ the registry pre-warm in ``mcp_server.main()``, the lazy registry build runs
 inside FastMCP's worker thread on the first ``tools/call`` and deadlocks.
 """
 
-from __future__ import annotations
 
 import json
 import os
@@ -26,7 +25,6 @@ from pathlib import Path
 from queue import Empty, Queue
 
 import pytest
-
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENT_DIR = REPO_ROOT / "agent"
@@ -139,6 +137,7 @@ def test_mcp_server_happy_path() -> None:
     by PR #85; without the registry pre-warm, ``tools/call`` deadlocks
     inside FastMCP's worker thread.
     """
+
     env = os.environ.copy()
     env["PYTHONPATH"] = str(AGENT_DIR) + os.pathsep + env.get("PYTHONPATH", "")
     # Force unbuffered stdio in the child so its responses reach our reader

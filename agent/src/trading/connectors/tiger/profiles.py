@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Tiger Brokers connector profiles.
 
 Layer A ships read-only paper and live profiles. Layer B/C adds two
@@ -7,7 +8,7 @@ trade profiles set ``readonly=False`` and add the relevant ``orders.place``
 capability.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

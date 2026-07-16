@@ -1,3 +1,5 @@
+from typing import Any
+
 """Alpha bench orchestrator: registry → universe panel → IC/IR → HTML report.
 
 W2 scaffold: implements the orchestration shape and HTML rendering. Universe
@@ -22,18 +24,15 @@ files). Cache files are user-local; if shared across machines they can be
 tampered with and the sha256 sidecar is only an integrity check, not authenticity.
 """
 
-from __future__ import annotations
 
 import hashlib
 import html
 import json
 import logging
-import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -769,13 +768,13 @@ def run_alpha_bench(**kwargs: Any) -> dict[str, Any]:
     top = results[:top_n]
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     report_path = output_dir / f"alpha_bench_{ts}.html"
 
     context = {
         "csp": _CSP,
         "css": _REPORT_CSS,
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "universe": universe,
         "period": period,
         "n_alphas_tested": len(results),
@@ -800,6 +799,7 @@ def run_alpha_bench(**kwargs: Any) -> dict[str, Any]:
 
 class AlphaBenchTool(BaseTool):
     """Bench one alpha or a whole zoo on a universe and emit an HTML IC report."""
+
 
     name = "alpha_bench"
     description = (

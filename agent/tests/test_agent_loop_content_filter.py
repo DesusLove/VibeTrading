@@ -1,13 +1,14 @@
+from collections.abc import Callable
+from typing import Any
+
 """AgentLoop content-filter skip-and-continue behavior.
 
 When the LLM returns a content-filtered response (content_filter_triggered=True),
 the agent loop should skip that iteration and continue instead of breaking.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
 
 import pytest
 
@@ -261,6 +262,7 @@ def test_content_filter_circuit_breaker(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """10 consecutive content filters trip the circuit breaker → run fails early."""
+
     llm = _ContentFilterLoopLLM(filter_count=15, final_content="Never reached.")
 
     result = _run(monkeypatch, tmp_path, llm, max_iterations=20)

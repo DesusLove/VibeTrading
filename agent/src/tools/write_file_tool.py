@@ -1,13 +1,12 @@
-"""Write file tool: create or overwrite files in the workspace."""
-
-from __future__ import annotations
-
-import json
 from typing import Any
 
+"""Write file tool: create or overwrite files in the workspace."""
+
+
+import json
+
 from src.agent.tools import BaseTool
-from src.tools.path_utils import allowed_write_roots
-from src.tools.path_utils import resolve_safe_path
+from src.tools.path_utils import allowed_write_roots, resolve_safe_path
 from src.tools.redaction import redact_internal_paths
 
 
@@ -36,6 +35,7 @@ class WriteFileTool(BaseTool):
         Returns:
             JSON string with bytes_written or an error.
         """
+
         file_path = kwargs["path"]
         content = kwargs["content"]
         run_dir = kwargs.get("run_dir")

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #17 - 价格振幅比
@@ -9,7 +10,7 @@
 Formula: (RANK(VWAP - MAX(VWAP,15))^DELTA(CLOSE,5))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 17."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

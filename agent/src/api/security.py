@@ -6,7 +6,6 @@ import hmac
 import ipaddress
 import urllib.parse
 from pathlib import Path
-from typing import List, Optional
 
 from fastapi import HTTPException, Query, Request, Security, status
 from fastapi.responses import JSONResponse
@@ -14,7 +13,6 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.api._compat import host_attr as _host_attr
 from src.config.accessor import get_env_config
-
 
 # ============================================================================
 # Constants
@@ -45,7 +43,7 @@ _SAFE_BROWSER_METHODS = {"GET", "HEAD", "OPTIONS"}
 # ============================================================================
 
 
-def _parse_cors_origins(raw: Optional[str]) -> List[str]:
+def _parse_cors_origins(raw: str | None) -> list[str]:
     """Parse CORS origins and reject credentialed wildcard configuration."""
     if raw is None or not raw.strip():
         return list(_DEFAULT_CORS_ORIGINS)
@@ -58,7 +56,7 @@ def _parse_cors_origins(raw: Optional[str]) -> List[str]:
     return origins
 
 
-def _parse_extra_loopback_hosts(raw: Optional[str]) -> set[str]:
+def _parse_extra_loopback_hosts(raw: str | None) -> set[str]:
     """Return additional trusted Host names for loopback API traffic."""
     if raw is None or not raw.strip():
         return set()
@@ -99,7 +97,7 @@ def _is_loopback_bind_host(host: str) -> bool:
         return host == "localhost"
 
 
-def _get_cors_origins() -> List[str]:
+def _get_cors_origins() -> list[str]:
     from src.config.accessor import get_env_config
     return _parse_cors_origins(get_env_config().api.cors_origins or None)
 
@@ -146,8 +144,8 @@ def _configured_api_key() -> str:
 
 
 def _auth_credential_from_header_or_query(
-    cred: Optional[HTTPAuthorizationCredentials],
-    query_api_key: Optional[str],
+    cred: HTTPAuthorizationCredentials | None,
+    query_api_key: str | None,
     *,
     allow_query: bool,
 ) -> str:
@@ -213,7 +211,7 @@ def _reject_cross_site_browser_request(request: Request) -> None:
 def _require_shutdown_authorization(
     *,
     request: Request,
-    cred: Optional[HTTPAuthorizationCredentials],
+    cred: HTTPAuthorizationCredentials | None,
 ) -> None:
     """Authorize the local shutdown control-plane action."""
     _reject_cross_site_browser_request(request)
@@ -233,8 +231,8 @@ def _require_shutdown_authorization(
 def _validate_api_auth(
     *,
     request: Request,
-    cred: Optional[HTTPAuthorizationCredentials],
-    query_api_key: Optional[str] = None,
+    cred: HTTPAuthorizationCredentials | None,
+    query_api_key: str | None = None,
     allow_query: bool = False,
 ) -> None:
     """Validate configured auth, preserving loopback-only dev mode."""
@@ -322,7 +320,7 @@ def _shell_tools_enabled_for_request(request: Request) -> bool:
 
 async def require_auth(
     request: Request,
-    cred: Optional[HTTPAuthorizationCredentials] = Security(_security),
+    cred: HTTPAuthorizationCredentials | None = Security(_security),
 ) -> None:
     """Validate Bearer token for sensitive API endpoints."""
     _validate_api_auth(request=request, cred=cred)
@@ -330,8 +328,8 @@ async def require_auth(
 
 async def require_event_stream_auth(
     request: Request,
-    api_key: Optional[str] = Query(None),
-    cred: Optional[HTTPAuthorizationCredentials] = Security(_security),
+    api_key: str | None = Query(None),
+    cred: HTTPAuthorizationCredentials | None = Security(_security),
 ) -> None:
     """Validate auth for browser EventSource streams."""
     _validate_api_auth(request=request, cred=cred, query_api_key=api_key, allow_query=True)
@@ -339,7 +337,7 @@ async def require_event_stream_auth(
 
 async def require_local_or_auth(
     request: Request,
-    cred: Optional[HTTPAuthorizationCredentials] = Security(_security),
+    cred: HTTPAuthorizationCredentials | None = Security(_security),
 ) -> None:
     """Protect settings access when dev-mode auth is disabled."""
     if _configured_api_key():
@@ -354,7 +352,7 @@ async def require_local_or_auth(
 
 async def require_settings_write_auth(
     request: Request,
-    cred: Optional[HTTPAuthorizationCredentials] = Security(_security),
+    cred: HTTPAuthorizationCredentials | None = Security(_security),
 ) -> None:
     """Require explicit authorization before changing credential-routing settings."""
     api_key = _configured_api_key()

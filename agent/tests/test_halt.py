@@ -4,14 +4,12 @@ The kill switch is a pure-filesystem sentinel — independent of any LLM/agent
 state — so these tests exercise it purely through the filesystem.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from src.live import halt
-from src.live import paths
+from src.live import halt, paths
 
 
 @pytest.fixture
@@ -104,6 +102,7 @@ def test_trip_is_idempotent_latest_wins(live_runtime: Path) -> None:
 @pytest.fixture(autouse=True)
 def _clear_halt_actions() -> object:
     """Isolate the module-level action registry between tests."""
+
     halt._HALT_ACTIONS.clear()
     yield
     halt._HALT_ACTIONS.clear()

@@ -9,7 +9,6 @@ The multiplier affects:
   - Position sizing: target_notional / (price * multiplier)
 """
 
-from __future__ import annotations
 
 from abc import abstractmethod
 
@@ -33,6 +32,7 @@ class FuturesBaseEngine(BaseEngine):
         Returns:
             Points-to-currency multiplier (e.g. IF=300, ES=50).
         """
+
 
     # ── Override PnL / margin / sizing to include multiplier ──
 

@@ -1,11 +1,12 @@
+from collections.abc import Callable
+from typing import Any
+
 """Local agent tools for finance research goals."""
 
-from __future__ import annotations
 
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Callable
 
 from src.agent.tools import BaseTool
 from src.goal import AuditRow, EvidenceInput, GoalStatus, GoalStore, RiskTier, StaleGoalError
@@ -412,6 +413,7 @@ class AddGoalEvidenceTool(_GoalToolBase):
         Returns:
             JSON envelope with the evidence row and updated snapshot.
         """
+
         session_id = self._session_id(kwargs)
         if not session_id:
             return _json_error("session_id is required")

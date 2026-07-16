@@ -1,3 +1,5 @@
+from typing import Any
+
 """Data model for scheduled research jobs.
 
 A ``ScheduledResearchJob`` records everything needed to describe a deferred
@@ -6,13 +8,11 @@ research or backtest run: the prompt/query, when to run it, and an opaque
 to a follow-up PR once the product shape is confirmed.
 """
 
-from __future__ import annotations
 
 import re
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, Optional
 
 # ---------------------------------------------------------------------------
 # Schedule validation
@@ -104,10 +104,10 @@ class ScheduledResearchJob:
     next_run_at: int = field(default_factory=lambda: int(time.time() * 1000))
     status: JobStatus = JobStatus.PENDING
     created_at: int = field(default_factory=lambda: int(time.time() * 1000))
-    last_run_at: Optional[int] = None
-    config: Dict[str, Any] = field(default_factory=dict)
+    last_run_at: int | None = None
+    config: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to a plain JSON-serializable dict.
 
         Returns:
@@ -126,7 +126,7 @@ class ScheduledResearchJob:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ScheduledResearchJob":
+    def from_dict(cls, data: dict[str, Any]) -> ScheduledResearchJob:
         """Reconstruct a job from a plain dict.
 
         Args:
@@ -140,6 +140,7 @@ class ScheduledResearchJob:
             TypeError: If a field has the wrong type.
             ValueError: If ``status`` is not a recognized ``JobStatus`` value.
         """
+
         job_id = data["id"]
         prompt = data["prompt"]
         schedule = data["schedule"]
@@ -154,7 +155,7 @@ class ScheduledResearchJob:
             raise TypeError("'last_run_at' must be an integer (epoch ms) or null")
         status = JobStatus(data["status"])
         raw_config = data.get("config")
-        config: Dict[str, Any] = raw_config if isinstance(raw_config, dict) else {}
+        config: dict[str, Any] = raw_config if isinstance(raw_config, dict) else {}
         return cls(
             id=job_id,
             prompt=prompt,

@@ -16,12 +16,11 @@ Layout (matches design_proposal §3.5):
   when Parcel α has shipped it; otherwise a local fallback is used
 """
 
-from __future__ import annotations
 
-from typing import Any, Iterable, Literal, Mapping
+from collections.abc import Iterable, Mapping
+from typing import Any, Literal
 
 from rich.text import Text
-
 
 Status = Literal["running", "ok", "error"]
 
@@ -201,6 +200,7 @@ def render_tool_events(events: Iterable[Mapping[str, Any]]) -> list[Text]:
     ``duration_ms`` / ``result_summary``. Useful for replaying a stored
     run via :mod:`agent.cli.commands.show`.
     """
+
     rendered: list[Text] = []
     for ev in events:
         rendered.append(

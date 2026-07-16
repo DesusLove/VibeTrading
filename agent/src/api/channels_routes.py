@@ -1,15 +1,14 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """IM channel HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_channels_routes(app, ...)``.
 """
 
-from __future__ import annotations
-
-from typing import Any, Awaitable, Callable
 
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
-
 
 # ---------------------------------------------------------------------------
 # Pydantic models (defined locally -- NO shared modules, per maintainer rule)
@@ -107,6 +106,7 @@ def register_channels_routes(
     @app.post("/channels/pairing/command", dependencies=[Depends(require_auth)])
     async def channels_pairing_command(payload: ChannelPairingCommandRequest):
         """Run a pairing command against the shared pairing store."""
+
         from src.channels.pairing import handle_pairing_command
 
         return {

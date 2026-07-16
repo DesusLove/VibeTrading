@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #93
@@ -9,7 +10,7 @@
 Formula: SUM((OPEN>=DELAY(OPEN,1)?0:MAX(OPEN-LOW,OPEN-DELAY(OPEN,1))),20)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 93."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

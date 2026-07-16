@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared Yahoo Finance public-API client: chart, quote summary, options, search.
 
 Yahoo Finance exposes several unauthenticated JSON endpoints (the same ones the
@@ -22,16 +24,13 @@ This module is provider-specific glue only; it returns plain Python
 dicts/lists so a downstream loader can map them into the project's OHLCV frame.
 """
 
-from __future__ import annotations
 
 import logging
 import threading
-from typing import Any, Dict, List, Optional
 
 import requests
 
 from backtest.loaders._http import (
-    DEFAULT_USER_AGENT,
     resolve_min_interval,
     throttled_get,
     throttled_get_json,
@@ -379,6 +378,7 @@ def search(query: str) -> List[Dict[str, Any]]:
     Raises:
         requests.RequestException: On a network/HTTP failure.
     """
+
     payload = throttled_get_json(
         _SEARCH_BASE,
         host_key=HOST_KEY,

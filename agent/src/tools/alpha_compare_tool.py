@@ -1,3 +1,5 @@
+from typing import Any
+
 """Agent tool: head-to-head comparison of hand-picked Alpha Zoo alphas.
 
 Thin wrapper over :func:`src.factors.compare_runner.compare_alphas` — the same
@@ -8,11 +10,9 @@ Read-only: it computes IC/IR for the named alphas and ranks them; it writes no
 files and places no orders.
 """
 
-from __future__ import annotations
 
 import json
 import re
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.factors.compare_runner import SORT_KEYS, compare_alphas
@@ -92,6 +92,7 @@ class AlphaCompareTool(BaseTool):
             JSON string — on success ``status="ok"`` with a ranking + winner;
             on failure ``status="error"`` with a message.
         """
+
         alpha_ids = _coerce_ids(kwargs.get("alpha_ids"))
         universe = str(kwargs.get("universe", "")).strip()
         period = str(kwargs.get("period", "")).strip()

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Pre-trade enforcement gate (SPEC.md Mandate Enforcement §3).
 
 :class:`LiveOrderGuardTool` is the dedicated wrapper that owns the live-order
@@ -34,13 +36,10 @@ no quote is obtainable — so the notional/exposure/leverage caps stay enforceab
 ``MCPServerAdapter._call_tool`` — a live order must never be silently re-issued.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-import os
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from src.config.accessor import get_env_config
 from src.live.advisory import (
@@ -50,6 +49,7 @@ from src.live.advisory import (
     get_advisory_providers,
 )
 from src.live.audit import LiveActionEvent, write_live_action
+from src.live.daily_count import increment_daily_count, read_daily_count
 from src.live.enforcement import (
     BREACH_KIND_INSTRUMENT,
     BREACH_KIND_UNIVERSE,
@@ -63,7 +63,6 @@ from src.live.extractors import get_extractor
 from src.live.halt import halt_flag_set
 from src.live.mandate.model import MANDATE_SCHEMA_VERSION, Mandate
 from src.live.mandate.store import load_mandate
-from src.live.daily_count import increment_daily_count, read_daily_count
 from src.tools.mcp import MCPRemoteTool, MCPRemoteToolSpec, MCPServerAdapter
 
 logger = logging.getLogger(__name__)
@@ -662,8 +661,8 @@ class LiveOrderGuardTool(MCPRemoteTool):
         except (TypeError, ValueError):
             return True
         if expires.tzinfo is None:
-            expires = expires.replace(tzinfo=timezone.utc)
-        return datetime.now(timezone.utc) >= expires
+            expires = expires.replace(tzinfo=UTC)
+        return datetime.now(UTC) >= expires
 
     @staticmethod
     def _safe_json(text: str) -> dict | None:
@@ -805,6 +804,7 @@ def _price_from_quote_dict(quote: dict) -> float | None:
 
 def _describe_intent(intent: OrderIntent | None) -> str | None:
     """Render a human-readable normalized intent for the audit record."""
+
     if intent is None:
         return None
     size = (

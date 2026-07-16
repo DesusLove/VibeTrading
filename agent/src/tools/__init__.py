@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import TYPE_CHECKING
+
 """Tool registry: auto-discovery via BaseTool.__subclasses__().
 
 Adding a new tool:
@@ -8,15 +11,13 @@ Tools with missing dependencies can override check_available() → False
 to be silently excluded from the registry.
 """
 
-from __future__ import annotations
 
 import importlib
 import logging
 import pkgutil
-from collections.abc import Mapping
 from collections import deque
+from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
 
 from src.agent.tools import BaseTool, ToolRegistry
 
@@ -65,9 +66,9 @@ def _discover_subclasses() -> list[type[BaseTool]]:
 
 def build_registry(
     *,
-    persistent_memory: "PersistentMemory | None" = None,
+    persistent_memory: PersistentMemory | None = None,
     include_shell_tools: bool = False,
-    agent_config: "AgentConfig | None" = None,
+    agent_config: AgentConfig | None = None,
     session_id: str | None = None,
     event_callback: Callable[[str, dict], None] | None = None,
     warn_callback: Callable[[str], None] | None = None,
@@ -113,13 +114,13 @@ def build_registry(
         ToolRegistry containing all available local tools followed by any
         successfully discovered MCP tools.
     """
+    from src.tools.autopilot_tool import RunResearchAutopilotTool
     from src.tools.goal_tool import (
         AddGoalEvidenceTool,
         GetResearchGoalTool,
         StartResearchGoalTool,
         UpdateResearchGoalStatusTool,
     )
-    from src.tools.autopilot_tool import RunResearchAutopilotTool
     from src.tools.remember_tool import RememberTool
     from src.tools.swarm_tool import SwarmTool
 
@@ -267,7 +268,7 @@ def build_filtered_registry(tool_names: list[str], *, include_shell_tools: bool 
 def build_swarm_registry(
     tool_names: list[str],
     *,
-    agent_config: "AgentConfig | None" = None,
+    agent_config: AgentConfig | None = None,
     include_shell_tools: bool = False,
 ) -> ToolRegistry:
     """Build a per-worker registry that merges local + remote MCP tools.
@@ -309,9 +310,9 @@ def build_swarm_registry(
 
 
 def _prune_agent_config_for_swarm_tools(
-    agent_config: "AgentConfig | None",
+    agent_config: AgentConfig | None,
     tool_names: list[str],
-) -> tuple["AgentConfig | None", dict[str, str] | None]:
+) -> tuple[AgentConfig | None, dict[str, str] | None]:
     """Keep only MCP servers whose local tool prefix appears in ``tool_names``."""
     if not agent_config or not agent_config.mcp_servers:
         return agent_config, None
@@ -346,6 +347,7 @@ def _filter_registry(
     include_shell_tools: bool,
 ) -> ToolRegistry:
     """Project a full registry down to a whitelist with consistent drop logging."""
+
     filtered = ToolRegistry()
     for name in tool_names:
         tool = full.get(name)

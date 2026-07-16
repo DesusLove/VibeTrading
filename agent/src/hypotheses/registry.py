@@ -1,19 +1,18 @@
+from typing import Any
+
 """Pure-code durable research hypothesis registry.
 
 The registry is intentionally small: local JSON storage, deterministic reads,
 and no dependency on LLMs or live trading services.
 """
 
-from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 from src.config.accessor import get_env_config
 
@@ -43,7 +42,7 @@ def default_hypotheses_path() -> Path:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _coerce_str_list(value: Any) -> list[str]:
@@ -116,7 +115,7 @@ class Hypothesis:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Hypothesis":
+    def from_dict(cls, data: dict[str, Any]) -> Hypothesis:
         """Build a hypothesis from persisted JSON data.
 
         Args:
@@ -346,6 +345,7 @@ class HypothesisRegistry:
 
     def list(self) -> list[Hypothesis]:
         """Load all hypotheses from storage."""
+
         if not self.path.exists():
             return []
         try:

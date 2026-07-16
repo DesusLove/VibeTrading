@@ -4,14 +4,12 @@ futu-api is not installed in CI, so we stub ``sys.modules['futu']`` before
 importing the loader.  Every external call goes through the stub.
 """
 
-from __future__ import annotations
 
 import sys
 from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Stub futu before importing loader
@@ -30,9 +28,8 @@ _futu_stub.RET_OK = 0
 _futu_stub.KLType = _KLType
 sys.modules.setdefault("futu", _futu_stub)
 
-from backtest.loaders.futu import FutuLoader, _normalize_frame, _to_futu_symbol, _to_futu_ktype  # noqa: E402
 from backtest.loaders.base import NoAvailableSourceError  # noqa: E402
-
+from backtest.loaders.futu import FutuLoader, _normalize_frame, _to_futu_ktype, _to_futu_symbol  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -50,6 +47,7 @@ def reset_futu_mock():
 
 def _make_kline_df(dates=None) -> pd.DataFrame:
     """Build a minimal Futu kline DataFrame mirroring request_history_kline output."""
+
     dates = dates or ["2024-01-02 00:00:00", "2024-01-03 00:00:00"]
     n = len(dates)
     return pd.DataFrame({

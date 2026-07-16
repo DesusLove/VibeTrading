@@ -16,12 +16,12 @@ Coverage map:
    reaper has a precise liveness signal.
 """
 
-from __future__ import annotations
 
 import asyncio
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 import mcp_server
 import src.swarm.runtime as rt
 import src.swarm.store as store_mod
@@ -39,7 +39,7 @@ from src.swarm.task_store import TaskStore
 
 
 def _iso(dt: datetime) -> str:
-    return dt.astimezone(timezone.utc).isoformat()
+    return dt.astimezone(UTC).isoformat()
 
 
 def _base_run(run_id: str = "r", *, timeout: int = 300, retries: int = 0) -> SwarmRun:
@@ -54,7 +54,7 @@ def _base_run(run_id: str = "r", *, timeout: int = 300, retries: int = 0) -> Swa
     return SwarmRun(
         id=run_id,
         preset_name="demo",
-        created_at=_iso(datetime.now(timezone.utc)),
+        created_at=_iso(datetime.now(UTC)),
         agents=[agent],
         tasks=[task],
     )
@@ -77,7 +77,7 @@ def test_hydrate_run_merges_live_task_files(tmp_path):
 
     TaskStore(store.run_dir(run.id)).save_task(
         run.tasks[0].model_copy(
-            update={"status": TaskStatus.in_progress, "started_at": _iso(datetime.now(timezone.utc))}
+            update={"status": TaskStatus.in_progress, "started_at": _iso(datetime.now(UTC))}
         )
     )
 
@@ -114,7 +114,7 @@ def test_get_swarm_status_surfaces_live_progress(tmp_path, monkeypatch):
     )
     store.append_event(
         run.id,
-        SwarmEvent(type="task_started", data={}, timestamp=_iso(datetime.now(timezone.utc))),
+        SwarmEvent(type="task_started", data={}, timestamp=_iso(datetime.now(UTC))),
     )
     monkeypatch.setattr(mcp_server, "_get_swarm_store", lambda: store)
 
@@ -202,7 +202,7 @@ def test_reaper_threshold_lifts_when_heartbeat_disabled(tmp_path, monkeypatch):
         SwarmEvent(
             type="task_started",
             data={},
-            timestamp=_iso(datetime.now(timezone.utc) - timedelta(minutes=40)),
+            timestamp=_iso(datetime.now(UTC) - timedelta(minutes=40)),
         ),
     )
 
@@ -228,7 +228,7 @@ def test_reaper_reaps_silent_run_and_writes_task_errors(tmp_path):
         SwarmEvent(
             type="task_started",
             data={},
-            timestamp=_iso(datetime.now(timezone.utc) - timedelta(hours=1)),
+            timestamp=_iso(datetime.now(UTC) - timedelta(hours=1)),
         ),
     )
 
@@ -262,7 +262,7 @@ def test_reaper_leaves_terminal_tasks_alone(tmp_path):
         SwarmEvent(
             type="task_completed",
             data={},
-            timestamp=_iso(datetime.now(timezone.utc) - timedelta(hours=1)),
+            timestamp=_iso(datetime.now(UTC) - timedelta(hours=1)),
         ),
     )
 
@@ -289,7 +289,7 @@ def test_reap_stale_runs_mcp_tool(tmp_path, monkeypatch):
         SwarmEvent(
             type="task_started",
             data={},
-            timestamp=_iso(datetime.now(timezone.utc) - timedelta(hours=1)),
+            timestamp=_iso(datetime.now(UTC) - timedelta(hours=1)),
         ),
     )
     monkeypatch.setattr(mcp_server, "_get_swarm_store", lambda: store)
@@ -373,6 +373,7 @@ def test_swarm_tool_no_longer_cancels_on_budget_out():
     """Source-level guard: the SwarmTool wait loop must not call cancel_run
     when its budget elapses — that used to throw away in-flight LLM work."""
     import inspect
+
     import src.tools.swarm_tool as swarm_tool
 
     source = inspect.getsource(swarm_tool.SwarmTool.execute)
@@ -485,7 +486,7 @@ def test_get_swarm_status_auto_recovers_zombie(tmp_path, monkeypatch):
         SwarmEvent(
             type="task_started",
             data={},
-            timestamp=_iso(datetime.now(timezone.utc) - timedelta(hours=1)),
+            timestamp=_iso(datetime.now(UTC) - timedelta(hours=1)),
         ),
     )
     monkeypatch.setattr(mcp_server, "_get_swarm_store", lambda: store)
@@ -545,7 +546,7 @@ def test_run_swarm_emits_keepalive_every_poll(tmp_path, monkeypatch):
             SwarmEvent(
                 type="task_started",
                 data={},
-                timestamp=_iso(datetime.now(timezone.utc)),
+                timestamp=_iso(datetime.now(UTC)),
             ),
         )
         return run
@@ -602,6 +603,7 @@ def test_heartbeat_interval_env_var_is_robust_to_garbage(monkeypatch):
 
     # Force re-evaluation by calling the resolver directly.
     import importlib
+
     import src.swarm.worker as w
     importlib.reload(w)
 
@@ -655,7 +657,7 @@ def test_swarm_tool_forwards_started_and_live_events(monkeypatch):
                     agent_id="analyst",
                     task_id="t1",
                     data={},
-                    timestamp=_iso(datetime.now(timezone.utc)),
+                    timestamp=_iso(datetime.now(UTC)),
                 )
             )
             return run
@@ -681,6 +683,7 @@ def test_swarm_tool_forwards_started_and_live_events(monkeypatch):
 
 def test_swarm_tool_without_session_callback_preserves_plain_runtime(monkeypatch):
     """No session bridge means no live callback is installed."""
+
     import src.tools.swarm_tool as swarm_tool
 
     run = _base_run("r-no-session")

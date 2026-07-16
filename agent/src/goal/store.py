@@ -1,20 +1,20 @@
+from collections.abc import Callable
+from typing import TypeVar
+
 """SQLite-backed store for finance research goals."""
 
-from __future__ import annotations
 
 import hashlib
 import json
-import os
 import sqlite3
 import threading
 import uuid
 from contextlib import contextmanager
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from functools import wraps
 from pathlib import Path
-from typing import Callable, TypeVar
 
 from src.config.accessor import get_env_config
 from src.goal.models import (
@@ -52,7 +52,7 @@ _COMPLETION_RESULTS = {
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _id(prefix: str) -> str:
@@ -883,6 +883,7 @@ class GoalStore:
     def _require_claim(self, goal_id: str, claim_id: str) -> GoalClaim:
         row = self._conn.execute(
             """
+
             SELECT * FROM goal_claims
             WHERE goal_id = ? AND claim_id = ?
             """,

@@ -1,3 +1,5 @@
+from collections.abc import Awaitable, Callable
+
 """Wall-clock scheduler for the live runtime (SPEC.md §7.5 #1).
 
 Follows the reference ``cron/service.py`` shape: an asyncio timer that sleeps until
@@ -17,13 +19,11 @@ The scheduler holds the live job set in memory and invokes an async
 :class:`src.live.runtime.jobstore.JobStore`'s job, kept orthogonal here.
 """
 
-from __future__ import annotations
 
 import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Awaitable, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -307,7 +307,7 @@ class Scheduler:
         self._wakeup.clear()
         try:
             await asyncio.wait_for(self._wakeup.wait(), timeout=sleep_ms / 1000.0)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pass
 
     async def _fire_due(self, now_ms: int) -> None:
@@ -316,6 +316,7 @@ class Scheduler:
         Args:
             now_ms: The reference time for due-ness, in epoch ms.
         """
+
         for job in due_jobs(self.jobs(), now_ms):
             try:
                 await self._on_fire(job)

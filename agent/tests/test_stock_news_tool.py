@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the stock-news tool.
 
 No request leaves the process: the Eastmoney HTTP boundary
@@ -6,13 +8,9 @@ No request leaves the process: the Eastmoney HTTP boundary
 client + tool parsing run fully offline.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any
 from unittest.mock import patch
-
-import pytest
 
 from backtest.loaders import eastmoney_client, yahoo_client
 from src.tools.stock_news_tool import (
@@ -50,6 +48,7 @@ def _em_news_payload() -> dict[str, Any]:
 
 def _yahoo_matches() -> list[dict[str, Any]]:
     """A Yahoo search result list with two instrument matches."""
+
     return [
         {
             "symbol": "AAPL",

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only sector / concept board tool backed by the Eastmoney client.
 
 Eastmoney publishes a free, no-auth board taxonomy that groups A-shares into
@@ -17,11 +19,9 @@ and bans bursting clients). Membership covers A-shares (``.SH`` / ``.SZ`` /
 ``.BJ``); ranking is the A-share board universe.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json, resolve_secid
 from src.agent.tools import BaseTool
@@ -303,6 +303,7 @@ class SectorInfoTool(BaseTool):
             "eastmoney", "mode": ..., "data": {...}}`` on success, or
             ``{"ok": false, "error": ...}`` on a validation / request failure.
         """
+
         mode = kwargs.get("mode", "membership")
         if mode not in _VALID_MODES:
             return _error(f"mode must be one of {list(_VALID_MODES)}")

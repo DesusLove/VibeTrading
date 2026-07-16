@@ -3,7 +3,6 @@
 Uses ChinaAEngine as a concrete implementation since BaseEngine is abstract.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -12,7 +11,6 @@ import pytest
 from backtest.engines.base import BaseEngine, _align, _load_optimizer
 from backtest.engines.china_a import ChinaAEngine
 from backtest.models import Position
-
 
 # ---------------------------------------------------------------------------
 # _align: signal alignment and normalization
@@ -98,6 +96,7 @@ class TestAlign:
 
     def test_with_optimizer(self) -> None:
         """Optimizer callable gets applied."""
+
         data_map, signal_map, dates = _simple_data_and_signals()
 
         def dummy_optimizer(ret, pos, dates_arg):

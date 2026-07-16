@@ -10,15 +10,12 @@ truncated-duplicate routing bug (bare ``RB2410`` getting routed to
 GlobalFutures because composite.py used a suffix-only check) cannot recur.
 """
 
-from __future__ import annotations
 
 import re
-from typing import Dict, List
 
 import pandas as pd
 
 from backtest.models import Position
-
 
 # ── Symbol -> market classification (shared by runner.py + composite.py) ──
 
@@ -112,7 +109,7 @@ def _is_china_futures(code: str) -> bool:
     return False
 
 
-def _detect_submarket(codes: List[str]) -> str:
+def _detect_submarket(codes: list[str]) -> str:
     """Detect US vs HK from symbol suffixes.
 
     Args:
@@ -152,7 +149,7 @@ def calc_crypto_funding_fee(
     symbol: str,
     bar: pd.Series,
     timestamp: pd.Timestamp,
-    positions: Dict[str, Position],
+    positions: dict[str, Position],
     funding_rate: float,
     applied_set: set,
     daily_done_set: set,
@@ -200,7 +197,7 @@ def calc_crypto_funding_fee(
 def check_crypto_liquidation(
     symbol: str,
     bar: pd.Series,
-    positions: Dict[str, Position],
+    positions: dict[str, Position],
 ) -> bool:
     """Check if a crypto position should be liquidated.
 
@@ -253,7 +250,7 @@ def _normalize_symbol(symbol: str) -> str:
 def calc_forex_swap(
     symbol: str,
     timestamp: pd.Timestamp,
-    positions: Dict[str, Position],
+    positions: dict[str, Position],
     lot_size: float,
     last_swap_dates: dict,
 ) -> float:
@@ -269,6 +266,7 @@ def calc_forex_swap(
     Returns:
         Swap amount (positive = credit, negative = debit).
     """
+
     if not hasattr(timestamp, "date"):
         return 0.0
 

@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """CLI handlers for ``vibe-trading hypothesis {list,show,invalidate}``.
 
 All logic lives here; ``agent/cli.py`` only wires this in via :func:`add_subparser`
@@ -11,14 +14,12 @@ Storage path resolution defers to :func:`default_hypotheses_path`, so callers
 passing ``--path``.
 """
 
-from __future__ import annotations
 
 import argparse
 import json
 import sys
 import traceback
 from pathlib import Path
-from typing import Any, Callable
 
 try:
     from rich.console import Console
@@ -36,7 +37,6 @@ from src.hypotheses.registry import (
     Hypothesis,
     HypothesisRegistry,
 )
-
 
 _STATUS_STYLES = {
     "exploring": "cyan",
@@ -302,6 +302,7 @@ def dispatch(args: argparse.Namespace) -> int:
 
     Returns the exit code; ``cli.py`` propagates it via ``_coerce_exit_code``.
     """
+
     sub = getattr(args, "hypothesis_command", None)
     if sub is None:
         if _HYP_PARSER is not None:

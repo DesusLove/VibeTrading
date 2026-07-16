@@ -1,8 +1,6 @@
-"""WebUI fork-chat compatibility for the WebSocket channel."""
-
-from __future__ import annotations
-
 from typing import Any
+
+"""WebUI fork-chat compatibility for the WebSocket channel."""
 
 
 _HANDLE_WEBUI_FORK_CHAT = None
@@ -10,6 +8,7 @@ _HANDLE_WEBUI_FORK_CHAT = None
 
 async def handle_webui_fork_chat(*args: Any, **kwargs: Any) -> None:
     """Return a structured unsupported response for fork-chat requests."""
+
     del kwargs
     if len(args) >= 2:
         channel, connection = args[0], args[1]

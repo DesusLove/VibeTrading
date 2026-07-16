@@ -1,13 +1,13 @@
+from typing import Any
+
 """Shared market data helpers for MCP and local agent tools."""
 
-from __future__ import annotations
 
 import json
 import logging
 import math
 import re
 from collections.abc import Callable
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -126,4 +126,5 @@ def fetch_market_data(
 
 def fetch_market_data_json(**kwargs: Any) -> str:
     """Fetch market data and return strict JSON."""
+
     return json.dumps(fetch_market_data(**kwargs), ensure_ascii=False, indent=2, allow_nan=False)

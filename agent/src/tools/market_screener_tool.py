@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only full-market screener backed by the Eastmoney client.
 
 Eastmoney publishes a free, no-auth full-market quote list via the push2
@@ -15,11 +17,9 @@ temporarily bans bursting clients). The result payload is capped so a full
 market list can never blow up the LLM context.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json
 from src.agent.tools import BaseTool
@@ -223,6 +223,7 @@ class MarketScreenerTool(BaseTool):
             a validation or request failure. The row list nests under ``data``
             so the envelope matches every other tool's ``data:{...}`` shape.
         """
+
         market = kwargs.get("market")
         if not isinstance(market, str) or market not in _MARKET_FS:
             return _error(f"market must be one of {list(_MARKET_FS)}")

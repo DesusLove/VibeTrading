@@ -7,7 +7,6 @@ NaNs treated as equal). Three representative factors are exercised here;
 the remaining academic factors are covered by the AST purity gate plus
 the registry health check.
 """
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -22,6 +21,7 @@ _GOLDEN_DIR = Path(__file__).parent / "fixtures" / "goldens"
 
 def _build_panel() -> dict[str, pd.DataFrame]:
     """Recreate the exact seeded panel used to write the golden CSVs."""
+
     rng = np.random.RandomState(42)
     n_rows, n_cols = 300, 8
     codes = [f"C{i:02d}" for i in range(n_cols)]

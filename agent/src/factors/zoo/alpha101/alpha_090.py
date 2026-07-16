@@ -10,7 +10,6 @@ Formula (paper appendix): (rank(close-ts_max(close,5))^Ts_Rank(correlation(IndNe
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 90.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -84,6 +83,7 @@ def _ind_neutralize(x: pd.DataFrame, panel: dict) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     low = panel["low"]
     volume = panel["volume"]

@@ -20,10 +20,8 @@ cover the window and clips to ``[start_date, end_date]``; very old ranges may
 come back short. For deep history prefer Yahoo.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -131,6 +129,7 @@ class DataLoader:
         fields: Optional[List[str]] = None,
     ) -> Dict[str, pd.DataFrame]:
         """Fetch OHLCV history for ``codes`` from the configured India broker."""
+
         del fields
         if not codes:
             return {}

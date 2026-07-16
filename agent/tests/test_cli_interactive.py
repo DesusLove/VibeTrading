@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the interactive CLI scaffolding.
 
 Covers:
@@ -10,16 +12,13 @@ Covers:
 * ``cli.input.ctrl_c_within_window`` two-press exit confirmation
 """
 
-from __future__ import annotations
 
 import importlib
-from pathlib import Path
 import time
+from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Slash router
@@ -492,6 +491,7 @@ class TestSlashTypoSuggestions:
 
 class TestChatCommandsAreActionable:
     """``/journal`` and ``/shadow`` queue real prompts, not "Coming soon"."""
+
 
     def test_journal_with_path_queues_prompt(self) -> None:
         from cli.commands.chat import cmd_journal

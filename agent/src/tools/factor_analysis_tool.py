@@ -1,15 +1,15 @@
+from typing import Any
+
 """Factor analysis tool: compute IC/IR, layered backtest, and output analysis report."""
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
 from src.agent.tools import BaseTool
-from src.factors.factor_analysis_core import compute_ic_series, compute_group_equity
+from src.factors.factor_analysis_core import compute_group_equity, compute_ic_series
 
 # Backward-compatible aliases for any external imports of the private names.
 _compute_ic_series = compute_ic_series
@@ -134,6 +134,7 @@ class FactorAnalysisTool(BaseTool):
         Returns:
             JSON-formatted analysis summary.
         """
+
         return run_factor_analysis(
             factor_csv=kwargs["factor_csv"],
             return_csv=kwargs["return_csv"],

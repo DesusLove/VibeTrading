@@ -1,23 +1,22 @@
+from typing import Any
+
 """Mochat channel implementation using Socket.IO with HTTP polling fallback."""
 
-from __future__ import annotations
 
 import asyncio
 import json
 from collections import deque
 from contextlib import suppress
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 import httpx
-from pydantic import Field
+from pydantic import BaseModel, Field
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
 from src.channels.utils import get_runtime_subdir
-from pydantic import BaseModel
 
 try:
     import socketio
@@ -100,7 +99,7 @@ def _make_synthetic_event(
         payload["authorInfo"] = _safe_dict(author_info)
     return {
         "type": "message.add",
-        "timestamp": timestamp or datetime.now(timezone.utc).isoformat(),
+        "timestamp": timestamp or datetime.now(UTC).isoformat(),
         "payload": payload,
     }
 
@@ -896,7 +895,7 @@ class MochatChannel(BaseChannel):
         try:
             self._state_dir.mkdir(parents=True, exist_ok=True)
             self._cursor_path.write_text(json.dumps({
-                "schemaVersion": 1, "updatedAt": datetime.now(timezone.utc).isoformat(),
+                "schemaVersion": 1, "updatedAt": datetime.now(UTC).isoformat(),
                 "cursors": self._session_cursor,
             }, ensure_ascii=False, indent=2) + "\n", "utf-8")
         except Exception as e:
@@ -928,6 +927,7 @@ class MochatChannel(BaseChannel):
     async def _api_send(self, path: str, id_key: str, id_val: str,
                         content: str, reply_to: str | None, group_id: str | None = None) -> dict[str, Any]:
         """Unified send helper for session and panel messages."""
+
         body: dict[str, Any] = {id_key: id_val, "content": content}
         if reply_to:
             body["replyTo"] = reply_to

@@ -16,7 +16,6 @@ Heartbeat writes are atomic (same-dir temp + ``os.replace``) so a concurrent
 :func:`last_tick` read can never see a torn timestamp.
 """
 
-from __future__ import annotations
 
 import logging
 import os
@@ -170,6 +169,7 @@ def reap_stale(
         The runner ids whose stale heartbeats were removed (empty list when
         none were stale or the heartbeat dir does not exist).
     """
+
     directory = heartbeats_dir()
     if not directory.is_dir():
         return []

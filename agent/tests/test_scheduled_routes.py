@@ -12,7 +12,6 @@ touches the real runtime root, and the default ``TestClient`` client host
 without a configured API key.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -28,6 +27,7 @@ from src.scheduled_research.store import ScheduledResearchJobStore
 @pytest.fixture
 def store(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> ScheduledResearchJobStore:
     """Isolate the module-level store singleton onto a temp file."""
+
     isolated = ScheduledResearchJobStore(path=tmp_path / "scheduled_jobs.json")
     monkeypatch.setattr(scheduled_routes, "_scheduled_research_store", isolated)
     return isolated

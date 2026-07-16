@@ -17,16 +17,15 @@ The console script entry in ``pyproject.toml`` (``vibe-trading = "cli:main"``)
 hits :func:`main`.
 """
 
-from __future__ import annotations
 
 import importlib
-import os
 import sys
 import threading
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any
 
 from cli.intro import print_banner
 from cli.onboard import run_onboarding
@@ -109,7 +108,7 @@ _HISTORY_RETAINED_TURNS = 6  # how many prior turns to feed the agent loop
 
 # Cached banner-stats and session-store so ``/clear`` and repeat slash handlers
 # don't redo the heavy build_registry() / SessionStore construction.
-_BANNER_STATS_CACHE: Dict[str, Any] = {}
+_BANNER_STATS_CACHE: dict[str, Any] = {}
 _SESSION_STORE_CACHE: Any = None
 
 
@@ -181,7 +180,7 @@ def _probe_session_count() -> int:
         return 0
 
 
-def _collect_banner_stats(*, refresh: bool = False) -> Dict[str, Any]:
+def _collect_banner_stats(*, refresh: bool = False) -> dict[str, Any]:
     """Return the four banner stat values, computing them at most once.
 
     The interactive launch path runs every probe synchronously (the
@@ -197,7 +196,7 @@ def _collect_banner_stats(*, refresh: bool = False) -> Dict[str, Any]:
     """
     if _BANNER_STATS_CACHE and not refresh:
         return dict(_BANNER_STATS_CACHE)
-    stats: Dict[str, Any] = {
+    stats: dict[str, Any] = {
         "model": _probe_model_name(),
         "skills": _probe_skill_count(),
         "tools": _probe_tool_count(),
@@ -347,13 +346,13 @@ class InteractiveContext:
             no proposal is outstanding.
     """
 
-    session_id: Optional[str] = None
-    history: List[Dict[str, str]] = field(default_factory=list)
+    session_id: str | None = None
+    history: list[dict[str, str]] = field(default_factory=list)
     max_iter: int = 50
     debug: bool = False
     last_recap_history_len: int = 0
-    pending_prompt: Optional[str] = None
-    pending_proposal: Optional[Dict[str, Any]] = None
+    pending_prompt: str | None = None
+    pending_proposal: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -394,7 +393,7 @@ def _build_session_history(store: Any, session_id: str) -> list[dict]:
     return history[-_HISTORY_RETAINED_TURNS:]
 
 
-def _new_session(prompt_preview: str) -> Optional[str]:
+def _new_session(prompt_preview: str) -> str | None:
     """Create a fresh session record. Returns the id, or None on failure.
 
     Dual-writes to the filesystem :class:`SessionStore` (canonical JSONL
@@ -466,7 +465,7 @@ def _append_message(session_id: str, role: str, content: str) -> None:
         pass
 
 
-def _maybe_resume_last_session(console: Any) -> Optional[Dict[str, Any]]:
+def _maybe_resume_last_session(console: Any) -> dict[str, Any] | None:
     """Prompt to resume the most recent session, if any exist.
 
     Returns:
@@ -546,7 +545,7 @@ _MULTI_COMMAND_MODULES = frozenset({
 })
 
 
-def _suggest_commands(unknown: str) -> List[str]:
+def _suggest_commands(unknown: str) -> list[str]:
     """Return up to three "did you mean" suggestions for ``unknown``.
 
     Uses :func:`difflib.get_close_matches` (edit-distance based) as the
@@ -659,7 +658,7 @@ def _summarise_tool_result(tool: str, status: str, preview: str) -> str:
 
 def _print_debug_summary(
     console: Any,
-    result: Dict[str, Any],
+    result: dict[str, Any],
     elapsed: float,
     ctx: InteractiveContext,
 ) -> None:
@@ -697,8 +696,9 @@ def _run_one_turn(user_input: str, ctx: InteractiveContext) -> None:
     persistent memory, and the ReAct engine remain untouched — we only
     swap in the Rich dashboard and persist the turn to ``SessionStore``.
     """
-    from cli._legacy import _RunDashboard, _run_agent
     from rich.live import Live
+
+    from cli._legacy import _run_agent, _RunDashboard
 
     console = get_console()
 
@@ -710,9 +710,9 @@ def _run_one_turn(user_input: str, ctx: InteractiveContext) -> None:
     dashboard = _RunDashboard(user_input, ctx.max_iter)
     # Capture the latest live-trading mandate proposal emitted this turn so the
     # REPL can intercept the user's pick before the model (SPEC.md Consent §2).
-    captured_proposal: Dict[str, Any] = {}
+    captured_proposal: dict[str, Any] = {}
 
-    def _capture_proposal(payload: Dict[str, Any]) -> None:
+    def _capture_proposal(payload: dict[str, Any]) -> None:
         captured_proposal.clear()
         captured_proposal.update(payload)
 
@@ -766,7 +766,7 @@ def _run_one_turn(user_input: str, ctx: InteractiveContext) -> None:
         _print_debug_summary(console, result, elapsed, ctx)
 
 
-def _print_interactive_result(console: Any, result: Dict[str, Any], elapsed: float) -> None:
+def _print_interactive_result(console: Any, result: dict[str, Any], elapsed: float) -> None:
     """Print the assistant answer after the rail without boxed run panels."""
 
     from cli.ui.transcript import render_answer, render_elapsed_status
@@ -934,7 +934,7 @@ def _run_data_command_from_repl(console: Any, args: list[str]) -> None:  # QVERI
         _dispatch_data(parsed)  # QVERIS-INTEGRATION
     except Exception as exc:  # noqa: BLE001  # QVERIS-INTEGRATION
         console.print(f"[bold red]/data failed:[/bold red] {exc}")  # QVERIS-INTEGRATION
-def _is_numeric_pick(text: str) -> Optional[int]:
+def _is_numeric_pick(text: str) -> int | None:
     """Return the chosen ordinal if ``text`` is a bare numeric pick, else None.
 
     Only a turn that is *exactly* a positive integer (e.g. ``"2"``) counts as a
@@ -955,7 +955,7 @@ def _is_numeric_pick(text: str) -> Optional[int]:
     return None
 
 
-def _render_mandate_proposal(console: Any, proposal: Dict[str, Any]) -> None:
+def _render_mandate_proposal(console: Any, proposal: dict[str, Any]) -> None:
     """Print the numbered mandate-proposal choice block (SPEC.md Consent §2).
 
     Renders the agent's candidate mandate profiles as a numbered list with their
@@ -1020,7 +1020,7 @@ def _render_mandate_proposal(console: Any, proposal: Dict[str, Any]) -> None:
     console.print()
 
 
-def _commit_mandate(proposal: Dict[str, Any], selected_ordinal: int) -> Dict[str, Any]:
+def _commit_mandate(proposal: dict[str, Any], selected_ordinal: int) -> dict[str, Any]:
     """Commit a mandate selection via the surface commit endpoint.
 
     This is the single privileged write that activates a mandate. The pick is a
@@ -1110,7 +1110,7 @@ def _handle_proposal_reply(text: str, ctx: InteractiveContext) -> bool:
     return True
 
 
-def _interactive_loop(max_iter: int, resume_session_id: Optional[str] = None) -> int:
+def _interactive_loop(max_iter: int, resume_session_id: str | None = None) -> int:
     """Drive the new interactive REPL.
 
     Args:
@@ -1128,7 +1128,7 @@ def _interactive_loop(max_iter: int, resume_session_id: Optional[str] = None) ->
     # the prompt appear only after the user presses Enter.
 
     ctx = InteractiveContext(max_iter=max_iter)
-    pending_input: Optional[str] = None
+    pending_input: str | None = None
 
     if resume_session_id:
         # Resume a specific session by ID (``vibe-trading resume <session-id>``).
@@ -1269,7 +1269,7 @@ def _interactive_loop(max_iter: int, resume_session_id: Optional[str] = None) ->
 # ---------------------------------------------------------------------------
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint returning a process exit code.
 
     Behaviour:
@@ -1354,6 +1354,7 @@ def _entrypoint() -> None:
 
 def _build_typer_app():  # type: ignore[no-untyped-def]
     """Build a typer app that mirrors the legacy surface. Best-effort only."""
+
     try:
         import typer
     except ImportError:

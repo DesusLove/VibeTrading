@@ -4,7 +4,6 @@ Each task is stored independently as tasks/task-{id}.json with full CRUD support
 Provides DAG algorithms: dependency resolution, cycle detection, and topological layering.
 """
 
-from __future__ import annotations
 
 import threading
 from collections import defaultdict, deque
@@ -213,6 +212,7 @@ def topological_layers(tasks: list[SwarmTask]) -> list[list[str]]:
     Raises:
         ValueError: If the DAG contains a cycle (topological sort cannot complete).
     """
+
     in_degree: dict[str, int] = {t.id: 0 for t in tasks}
     dependents: dict[str, list[str]] = defaultdict(list)
 

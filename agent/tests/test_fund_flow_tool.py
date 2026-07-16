@@ -4,7 +4,6 @@ All HTTP is mocked at the Eastmoney client functions the tool imports
 (:func:`get_json` / :func:`resolve_secid`), so no test touches a live endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -166,6 +165,7 @@ class TestRoutingDescription:
     route to either. The fund-flow description must lead with the per-stock,
     order-level scope and point market-wide intent at get_northbound_flow.
     """
+
 
     def test_description_leads_with_per_stock_order_level(self):
         desc = FundFlowTool().description

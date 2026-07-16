@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for the Tiingo US-equity OHLCV loader.
 
 All HTTP is mocked at :func:`backtest.loaders._http.throttled_get_json` (imported
@@ -5,7 +6,7 @@ into the loader module as ``throttled_get_json``), so no test touches a live
 Tiingo endpoint.
 """
 
-from __future__ import annotations
+
 
 from unittest.mock import patch
 
@@ -18,7 +19,6 @@ from backtest.loaders.tiingo_loader import (
     _rows_to_frame,
     _to_tiingo_symbol,
 )
-
 
 # ---------------------------------------------------------------------------
 # Symbol mapping

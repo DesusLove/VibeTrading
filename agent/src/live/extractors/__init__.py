@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 """Per-broker order-intent extractors (SPEC.md Mandate Enforcement §4).
 
 Vibe-Trading does not control a broker's tool arg schema, so the enforcement
@@ -10,9 +12,6 @@ Extractors register themselves in :data:`BROKER_EXTRACTORS`, keyed by broker.
 The gate looks up the broker's extractor and applies it to the raw tool kwargs.
 """
 
-from __future__ import annotations
-
-from typing import Callable
 
 from src.live.enforcement import OrderIntent
 from src.trading.connectors.robinhood.extractor import (
@@ -39,6 +38,7 @@ def get_extractor(broker: str) -> OrderIntentExtractor | None:
         The broker's :data:`OrderIntentExtractor`, or ``None`` when no extractor
         is registered (→ the gate fail-closes / DENIES).
     """
+
     return BROKER_EXTRACTORS.get(broker.strip().lower())
 
 

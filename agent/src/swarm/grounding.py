@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 """Pre-fetch market data for symbols mentioned in a swarm's user_vars.
 
 Why this exists
@@ -47,13 +49,10 @@ are told to cite only symbols they analyze.
   prices from a year ago.
 """
 
-from __future__ import annotations
 
 import logging
-import os
 import re
 from datetime import date, timedelta
-from typing import Iterable
 
 from src.config.accessor import get_env_config
 
@@ -227,6 +226,7 @@ def format_grounding_block(grounding: dict[str, list[dict]]) -> str:
     that as a falsy guard so the section is omitted entirely instead of
     rendering an empty heading.
     """
+
     if not grounding:
         return ""
 

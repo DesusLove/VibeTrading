@@ -11,7 +11,6 @@ Covers the open-file integration seam the orchestrator and parcel R6 own:
 All tests run against stubbed runner/liveness state — no real agent or broker.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -34,6 +33,7 @@ def _client(tmp_path: Path, monkeypatch) -> TestClient:
 
 def _valid_mandate_state(broker: str = "robinhood") -> api_server.ActiveMandateState:
     """Build a committed, unexpired active-mandate snapshot for stubbing."""
+
     return api_server.ActiveMandateState(
         broker=broker,
         account_ref="acct_test",

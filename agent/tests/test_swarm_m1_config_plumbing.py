@@ -11,7 +11,6 @@ in M2 / M3 and bring their own tests. The contract this file defends:
   * When set, the same value reaches ``run_worker`` on every worker call.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import patch
@@ -171,6 +170,7 @@ def test_runtime_construction_with_unreachable_mcp_server_does_not_raise(
     config; it must not touch it. This test pins that invariant before M2
     introduces real discovery.
     """
+
     cfg = AgentConfig(
         mcp_servers={
             "definitely_does_not_exist": MCPServerConfig(

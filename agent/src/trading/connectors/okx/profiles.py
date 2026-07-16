@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in OKX connector profiles.
 
 Layer A ships read-only paper (demo) and live profiles. OKX demo keys live in a
@@ -7,7 +8,7 @@ order-placing profiles (``okx-paper-trade`` / ``okx-live-trade``) add the
 ``orders.place`` capability; the live one is gated behind a mandate.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

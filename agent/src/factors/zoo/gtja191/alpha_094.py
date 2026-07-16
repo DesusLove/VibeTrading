@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #94
@@ -9,7 +10,7 @@
 Formula: SUM(CLOSE>DELAY(CLOSE,1)?VOLUME:(CLOSE<DELAY(CLOSE,1)?-VOLUME:0),30)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 94."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

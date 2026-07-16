@@ -103,6 +103,7 @@ class TestAttributionPromptIntegrity:
     def test_threshold_rationale_self_contained(self):
         """Threshold rationale is documented inline, not via a gitignored docs/ path."""
         from pathlib import Path
+
         import src.agent.context as ctx_module
 
         source = Path(ctx_module.__file__).read_text(encoding="utf-8")

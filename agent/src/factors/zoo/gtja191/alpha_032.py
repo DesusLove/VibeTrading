@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #32 - 高低价差比
@@ -9,7 +10,7 @@
 Formula: (-1 * SUM(RANK(CORR(RANK(HIGH), RANK(VOLUME), 3)), 3))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 32."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

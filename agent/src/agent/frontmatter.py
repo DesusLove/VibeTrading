@@ -1,12 +1,12 @@
+from typing import Any
+
 """Shared YAML-like frontmatter parser for skills and memory files."""
 
-from __future__ import annotations
 
 import re
-from typing import Any, Dict
 
 
-def parse_frontmatter(text: str) -> tuple[Dict[str, Any], str]:
+def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     """Parse YAML-like frontmatter and body from a markdown file.
 
     Supports string, list (``[a, b]``), and boolean values.
@@ -17,11 +17,12 @@ def parse_frontmatter(text: str) -> tuple[Dict[str, Any], str]:
     Returns:
         Tuple of (metadata dict, body text).
     """
+
     match = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)", text, re.DOTALL)
     if not match:
         return {}, text.strip()
 
-    meta: Dict[str, Any] = {}
+    meta: dict[str, Any] = {}
     for line in match.group(1).strip().split("\n"):
         line = line.strip()
         if ":" not in line:

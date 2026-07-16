@@ -18,11 +18,9 @@ empty window yields the literal ``"N/D"`` or an empty body, both treated as
 "no data" for that symbol (skipped, never fatal to the batch).
 """
 
-from __future__ import annotations
 
 import io
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -88,13 +86,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch daily OHLCV bars for ``codes`` over ``[start_date, end_date]``.
 
         Args:
@@ -116,7 +114,7 @@ class DataLoader:
         """
         validate_date_range(start_date, end_date)
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -136,7 +134,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch and parse one symbol's CSV; ``None`` when Stooq has no data."""
         params = {
             "s": map_symbol(code),
@@ -154,7 +152,7 @@ class DataLoader:
         return _parse_csv(response.text)
 
 
-def _parse_csv(body: str) -> Optional[pd.DataFrame]:
+def _parse_csv(body: str) -> pd.DataFrame | None:
     """Convert a Stooq EOD CSV body into our OHLCV frame, ``None`` on no data.
 
     Args:
@@ -165,6 +163,7 @@ def _parse_csv(body: str) -> Optional[pd.DataFrame]:
         A frame indexed by ``trade_date`` with float OHLCV columns sorted
         ascending, or ``None`` when the body carries no usable rows.
     """
+
     text = (body or "").strip()
     if not text or text.upper().startswith("N/D"):
         return None

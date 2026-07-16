@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for the swarm-run retry path (MCP ``retry_run`` tool + HTTP endpoint).
 
 Retry re-launches a brand-new run with the same preset/variables as a prior
@@ -5,10 +6,10 @@ Retry re-launches a brand-new run with the same preset/variables as a prior
 still-``running`` run must be refused so we never fork an active run.
 """
 
-from __future__ import annotations
+
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import mcp_server
 import src.swarm.runtime as rt
@@ -23,7 +24,7 @@ def _make_run(run_id: str, status: RunStatus) -> SwarmRun:
     run = SwarmRun(
         id=run_id,
         preset_name="demo",
-        created_at=datetime.now(timezone.utc).isoformat(),
+        created_at=datetime.now(UTC).isoformat(),
         agents=[agent],
         tasks=[task],
         user_vars={"target": "AAPL.US"},

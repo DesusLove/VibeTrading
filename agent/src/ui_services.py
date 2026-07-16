@@ -1,3 +1,5 @@
+from typing import Any
+
 """UI-oriented services for run analysis and local process management.
 
 This module centralizes the data shaping needed by the frontend workbench:
@@ -9,18 +11,16 @@ This module centralizes the data shaping needed by the frontend workbench:
 - (LocalApiManager removed – dead code)
 """
 
-from __future__ import annotations
 
 import csv
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 DEFAULT_ANALYSIS_PERIODS = [5, 20]
 
 
-def format_run_date(date_str: Optional[str]) -> Optional[str]:
+def format_run_date(date_str: str | None) -> str | None:
     """Normalize supported date strings into ``YYYY-MM-DD``.
 
     Args:
@@ -45,7 +45,7 @@ def format_run_date(date_str: Optional[str]) -> Optional[str]:
     return value
 
 
-def load_json_file(path: Path) -> Optional[Dict[str, Any]]:
+def load_json_file(path: Path) -> dict[str, Any | None]:
     """Load a JSON file if it exists.
 
     Args:
@@ -62,7 +62,7 @@ def load_json_file(path: Path) -> Optional[Dict[str, Any]]:
     return None
 
 
-def load_csv_records(path: Path) -> List[Dict[str, Any]]:
+def load_csv_records(path: Path) -> list[dict[str, Any]]:
     """Load CSV rows as dictionaries.
 
     Args:
@@ -81,7 +81,7 @@ def load_csv_records(path: Path) -> List[Dict[str, Any]]:
         return []
 
 
-def normalize_codes(raw_codes: Any) -> List[str]:
+def normalize_codes(raw_codes: Any) -> list[str]:
     """Normalize a run's code selection into a list of symbols.
 
     Args:
@@ -97,7 +97,7 @@ def normalize_codes(raw_codes: Any) -> List[str]:
     return []
 
 
-def load_run_context(run_dir: Path) -> Dict[str, Any]:
+def load_run_context(run_dir: Path) -> dict[str, Any]:
     """Load normalized request context for a run detail page.
 
     Falls back to planner_output.json when req.json context is empty
@@ -146,7 +146,7 @@ def load_run_context(run_dir: Path) -> Dict[str, Any]:
     }
 
 
-def infer_indicator_periods(run_dir: Path) -> List[int]:
+def infer_indicator_periods(run_dir: Path) -> list[int]:
     """Infer moving-average periods from planner or design artifacts.
 
     Args:
@@ -215,7 +215,7 @@ def infer_run_stage(run_dir: Path) -> str:
     return "unknown"
 
 
-def collect_run_logs(run_dir: Path, line_limit: int = 200) -> List[Dict[str, Any]]:
+def collect_run_logs(run_dir: Path, line_limit: int = 200) -> list[dict[str, Any]]:
     """Read stdout/stderr files into a flat log entry list.
 
     Args:
@@ -225,7 +225,7 @@ def collect_run_logs(run_dir: Path, line_limit: int = 200) -> List[Dict[str, Any
     Returns:
         Tagged log entries ordered by file, then line number.
     """
-    entries: List[Dict[str, Any]] = []
+    entries: list[dict[str, Any]] = []
     log_files = [
         ("stdout", run_dir / "logs" / "runner_stdout.txt"),
         ("stderr", run_dir / "logs" / "runner_stderr.txt"),
@@ -251,9 +251,9 @@ def collect_run_logs(run_dir: Path, line_limit: int = 200) -> List[Dict[str, Any
 
 
 def build_trade_markers(
-    trades: List[Dict[str, Any]],
-    symbols: Optional[set[str]] = None,
-) -> List[Dict[str, Any]]:
+    trades: list[dict[str, Any]],
+    symbols: set[str | None] = None,
+) -> list[dict[str, Any]]:
     """Normalize trade rows into frontend marker objects.
 
     Args:
@@ -262,7 +262,7 @@ def build_trade_markers(
     Returns:
         Marker dictionaries consumed by the detail chart.
     """
-    markers: List[Dict[str, Any]] = []
+    markers: list[dict[str, Any]] = []
     for row in trades:
         code = str(row.get("code") or "")
         if symbols and code not in symbols:
@@ -284,7 +284,7 @@ def build_trade_markers(
     return markers
 
 
-def group_price_rows(price_rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+def group_price_rows(price_rows: list[dict[str, Any]]) -> dict[str, list[Dict[str, Any]]]:
     """Group normalized price rows by symbol.
 
     Args:
@@ -293,7 +293,7 @@ def group_price_rows(price_rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[st
     Returns:
         A dictionary keyed by symbol.
     """
-    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    grouped: dict[str, list[Dict[str, Any]]] = {}
     for row in price_rows:
         code = str(row.get("code") or "UNKNOWN")
         grouped.setdefault(code, []).append(row)
@@ -301,9 +301,9 @@ def group_price_rows(price_rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[st
 
 
 def build_indicator_series(
-    price_rows: List[Dict[str, Any]],
-    periods: Optional[List[int]] = None,
-) -> Dict[str, Dict[str, List[Dict[str, Any]]]]:
+    price_rows: list[dict[str, Any]],
+    periods: list[int | None] = None,
+) -> dict[str, Dict[str, list[Dict[str, Any]]]]:
     """Compute moving-average overlays from normalized price rows.
 
     Args:
@@ -315,7 +315,7 @@ def build_indicator_series(
     """
     grouped = group_price_rows(price_rows)
     indicator_periods = sorted(set(periods or DEFAULT_ANALYSIS_PERIODS))
-    output: Dict[str, Dict[str, List[Dict[str, Any]]]] = {}
+    output: dict[str, Dict[str, list[Dict[str, Any]]]] = {}
 
     for code, rows in grouped.items():
         ordered_rows = sorted(
@@ -329,10 +329,10 @@ def build_indicator_series(
             key=lambda item: item["time"],
         )
         closes = [float(row["close"]) for row in ordered_rows]
-        code_series: Dict[str, List[Dict[str, Any]]] = {}
+        code_series: dict[str, list[Dict[str, Any]]] = {}
         for period in indicator_periods:
             label = f"ma{period}"
-            values: List[Dict[str, Any]] = []
+            values: list[dict[str, Any]] = []
             for index, row in enumerate(ordered_rows):
                 if index + 1 < period:
                     current = None
@@ -346,7 +346,7 @@ def build_indicator_series(
     return output
 
 
-def _load_ohlcv_artifacts(run_dir: Path) -> List[Dict[str, Any]]:
+def _load_ohlcv_artifacts(run_dir: Path) -> list[dict[str, Any]]:
     """Read individual ohlcv_*.csv files saved by the backtest engine.
 
     The engine writes ``ohlcv_{code}.csv`` per symbol with columns
@@ -365,7 +365,7 @@ def _load_ohlcv_artifacts(run_dir: Path) -> List[Dict[str, Any]]:
     ohlcv_files = sorted(artifacts.glob("ohlcv_*.csv"))
     if not ohlcv_files:
         return []
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for f in ohlcv_files:
         code = f.stem.removeprefix("ohlcv_")
         for r in load_csv_records(f):
@@ -381,7 +381,7 @@ def _load_ohlcv_artifacts(run_dir: Path) -> List[Dict[str, Any]]:
     return _normalize_price_rows(rows)
 
 
-def load_price_series(run_dir: Path) -> List[Dict[str, Any]]:
+def load_price_series(run_dir: Path) -> list[dict[str, Any]]:
     """Load chart-ready price rows: price_series.csv > ohlcv_*.csv > API reconstruct.
 
     Args:
@@ -399,7 +399,7 @@ def load_price_series(run_dir: Path) -> List[Dict[str, Any]]:
     return reconstruct_price_series(run_dir)
 
 
-def load_chart_symbols(run_dir: Path, context: Optional[Dict[str, Any]] = None) -> List[str]:
+def load_chart_symbols(run_dir: Path, context: dict[str, Any | None] = None) -> list[str]:
     """Load chart symbol names without materializing all chart rows."""
     artifacts = run_dir / "artifacts"
     symbols: set[str] = set()
@@ -430,7 +430,7 @@ def load_chart_symbols(run_dir: Path, context: Optional[Dict[str, Any]] = None) 
     return sorted(symbols)
 
 
-def reconstruct_price_series(run_dir: Path) -> List[Dict[str, Any]]:
+def reconstruct_price_series(run_dir: Path) -> list[dict[str, Any]]:
     """Rebuild OHLC rows for a historical run using its generated loader.
 
     Args:
@@ -474,7 +474,7 @@ def reconstruct_price_series(run_dir: Path) -> List[Dict[str, Any]]:
         return []
 
     if not data_map:
-        print(f"[WARN] reconstruct_price_series: DataLoader returned empty")
+        print("[WARN] reconstruct_price_series: DataLoader returned empty")
         return []
 
     return _flatten_data_map(data_map, start_date=start_date)
@@ -482,11 +482,11 @@ def reconstruct_price_series(run_dir: Path) -> List[Dict[str, Any]]:
 
 def build_run_analysis(
     run_dir: Path,
-    symbols: Optional[List[str]] = None,
+    symbols: list[str | None] = None,
     *,
     include_payload: bool = True,
     include_symbol_list: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Build the analysis payload consumed by the run detail page.
 
     Args:
@@ -529,7 +529,7 @@ def build_run_analysis(
     }
 
 
-def _safe_float(value: Any) -> Optional[float]:
+def _safe_float(value: Any) -> float | None:
     """Convert values to floats without raising.
 
     Args:
@@ -566,7 +566,7 @@ def _compute_fetch_start_date(run_dir: Path, start_date: str) -> str:
     return (start_dt - timedelta(days=buffer_days)).strftime("%Y-%m-%d")
 
 
-def _normalize_price_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _normalize_price_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Normalize stored price rows for charting.
 
     Args:
@@ -575,7 +575,7 @@ def _normalize_price_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Returns:
         Normalized price rows.
     """
-    normalized: List[Dict[str, Any]] = []
+    normalized: list[dict[str, Any]] = []
     for row in rows:
         timestamp = format_run_date(row.get("timestamp") or row.get("time"))
         if not timestamp:
@@ -595,7 +595,7 @@ def _normalize_price_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return sorted(normalized, key=lambda item: (item["code"], item["time"]))
 
 
-def _flatten_data_map(data_map: Dict[str, Any], start_date: str) -> List[Dict[str, Any]]:
+def _flatten_data_map(data_map: dict[str, Any], start_date: str) -> list[dict[str, Any]]:
     """Convert a fetched ``data_map`` into normalized price rows.
 
     Args:
@@ -605,10 +605,11 @@ def _flatten_data_map(data_map: Dict[str, Any], start_date: str) -> List[Dict[st
     Returns:
         Normalized price rows clipped to ``start_date``.
     """
+
     import pandas as pd
 
     clip_dt = pd.Timestamp(start_date)
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
 
     for code, frame in data_map.items():
         current = frame.copy()

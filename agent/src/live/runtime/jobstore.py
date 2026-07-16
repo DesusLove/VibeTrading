@@ -19,12 +19,11 @@ stop watching the mandate's cadence. This store guarantees:
 State lives under ``live_root()/runtime/`` (see :mod:`src.live.paths`).
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from src.live.paths import live_root
@@ -160,7 +159,7 @@ class JobStore:
             The path the corrupt store was moved to. If the rename itself fails
             the original path is returned (best-effort quarantine).
         """
-        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+        ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
         quarantined = self.path.with_name(f"{self.path.name}.corrupt-{ts}")
         try:
             os.replace(self.path, quarantined)
@@ -270,6 +269,7 @@ class JobStore:
             KeyError: If a required field is absent.
             TypeError: If a field has the wrong type.
         """
+
         job_id = item["id"]
         next_run_at = item["next_run_at"]
         schedule = item["schedule"]

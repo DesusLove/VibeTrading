@@ -1,3 +1,6 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """Alpha Zoo HTTP routes for the Web UI.
 
 Mounted by ``agent/api_server.py`` via ``register_alpha_routes(app, ...)``. Pulled
@@ -28,7 +31,6 @@ logged with full traceback and reported to clients as ``"internal error; see
 server logs"`` to avoid leaking stack frames / paths.
 """
 
-from __future__ import annotations
 
 import asyncio
 import json
@@ -37,8 +39,7 @@ import re
 import threading
 import time
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Awaitable, Callable
+from datetime import UTC, datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
@@ -114,7 +115,7 @@ _BENCH_UNIVERSES = {"csi300", "sp500", "btc-usdt"}
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def _safe_error(exc: BaseException) -> str:
@@ -765,6 +766,7 @@ def _result_for_wire(result: dict[str, Any]) -> dict[str, Any]:
     Drops anything internal (wall_seconds is reported on the `done` event;
     rows / per-alpha skipped[] are stripped server-side to keep payloads small).
     """
+
     wire: dict[str, Any] = {}
     keep = (
         "alive",

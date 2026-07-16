@@ -1,3 +1,5 @@
+from collections.abc import Awaitable, Callable
+
 """Executor for persisted scheduled research jobs.
 
 The executor polls :class:`ScheduledResearchJobStore`, dispatches due jobs via
@@ -6,14 +8,11 @@ attempt. Schedule math is intentionally pure and clock-injected so tests can
 exercise it without sleeping or reading wall-clock time.
 """
 
-from __future__ import annotations
 
 import asyncio
 import logging
-import os
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Awaitable, Callable
+from datetime import UTC, datetime, timedelta
 
 from src.config.accessor import get_env_config
 from src.scheduled_research.models import JobStatus, ScheduledResearchJob, validate_schedule
@@ -83,7 +82,7 @@ def _next_cron_due(schedule: str, after_ms: int) -> int:
     minutes, hours, doms, months, dows = (
         _parse_cron_field(part, low, high) for part, (low, high) in zip(schedule.split(), _CRON_BOUNDS)
     )
-    start = datetime.fromtimestamp(after_ms / 1000.0, timezone.utc) + timedelta(milliseconds=1)
+    start = datetime.fromtimestamp(after_ms / 1000.0, UTC) + timedelta(milliseconds=1)
     # Round up to the next whole minute; cron has minute resolution.
     if start.second or start.microsecond:
         start = (start + timedelta(minutes=1)).replace(second=0, microsecond=0)
@@ -255,7 +254,7 @@ class ScheduledResearchExecutor:
         wakeup.clear()
         try:
             await asyncio.wait_for(wakeup.wait(), timeout=sleep_ms / 1000.0)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pass
 
     async def _run_job(self, job: ScheduledResearchJob, now_ms: int) -> None:
@@ -312,6 +311,7 @@ class ScheduledResearchExecutor:
         (replaced via POST) let the new definition own its lifecycle. Only
         persist our completion when it still refers to the same scheduled run.
         """
+
         current = self._store.get(job.id)
         if current is None:
             logger.info("scheduled research job %s deleted during dispatch; skipping completion write", job.id)

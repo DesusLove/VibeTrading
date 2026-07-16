@@ -19,13 +19,11 @@ isolated and reported one-by-one. When the zoo is empty (current state of
 the repo), the suite emits a single ``pytest.skip``.
 """
 
-from __future__ import annotations
 
 import ast
 from pathlib import Path
 
 import pytest
-
 
 # ---------------------------------------------------------------- constants
 
@@ -267,6 +265,7 @@ _ALPHA_FILES = _discover_alpha_files()
 @pytest.mark.parametrize("alpha_path", _ALPHA_FILES, ids=lambda p: p.relative_to(ZOO_ROOT).as_posix())
 def test_alpha_module_is_pure(alpha_path: Path) -> None:
     """Each zoo alpha must satisfy the AST purity contract."""
+
     source = alpha_path.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(alpha_path))
 

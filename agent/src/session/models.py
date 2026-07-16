@@ -1,16 +1,16 @@
+from typing import Any
+
 """Session data models for the core Session, Message, and Attempt entities."""
 
-from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
 
 
 def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class SessionStatus(str, Enum):
@@ -51,10 +51,10 @@ class Session:
     status: SessionStatus = SessionStatus.ACTIVE
     created_at: str = field(default_factory=_utc_now_iso)
     updated_at: str = field(default_factory=_utc_now_iso)
-    last_attempt_id: Optional[str] = None
-    config: Dict[str, Any] = field(default_factory=dict)
+    last_attempt_id: str | None = None
+    config: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize the session to a dictionary.
 
         Returns:
@@ -65,7 +65,7 @@ class Session:
         return data
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Session:
+    def from_dict(cls, data: dict[str, Any]) -> Session:
         """Deserialize a session from a dictionary.
 
         Args:
@@ -99,10 +99,10 @@ class Message:
     role: str = "user"
     content: str = ""
     created_at: str = field(default_factory=_utc_now_iso)
-    linked_attempt_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    linked_attempt_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize the message to a dictionary.
 
         Returns:
@@ -111,7 +111,7 @@ class Message:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Message:
+    def from_dict(cls, data: dict[str, Any]) -> Message:
         """Deserialize a message from a dictionary.
 
         Args:
@@ -144,18 +144,18 @@ class Attempt:
 
     attempt_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
     session_id: str = ""
-    parent_attempt_id: Optional[str] = None
+    parent_attempt_id: str | None = None
     status: AttemptStatus = AttemptStatus.PENDING
     prompt: str = ""
-    run_dir: Optional[str] = None
-    summary: Optional[str] = None
-    react_trace: List[Dict[str, Any]] = field(default_factory=list)
+    run_dir: str | None = None
+    summary: str | None = None
+    react_trace: list[dict[str, Any]] = field(default_factory=list)
     created_at: str = field(default_factory=_utc_now_iso)
-    completed_at: Optional[str] = None
-    error: Optional[str] = None
-    metrics: Optional[Dict[str, Any]] = None
+    completed_at: str | None = None
+    error: str | None = None
+    metrics: dict[str, Any | None] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize the attempt to a dictionary.
 
         Returns:
@@ -166,7 +166,7 @@ class Attempt:
         return data
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> Attempt:
+    def from_dict(cls, data: dict[str, Any]) -> Attempt:
         """Deserialize an attempt from a dictionary.
 
         Args:
@@ -185,7 +185,7 @@ class Attempt:
         self.status = AttemptStatus.RUNNING
         self.completed_at = None
 
-    def mark_completed(self, summary: Optional[str] = None) -> None:
+    def mark_completed(self, summary: str | None = None) -> None:
         """Mark the attempt as completed.
 
         Args:
@@ -202,6 +202,7 @@ class Attempt:
         Args:
             error: Error message.
         """
+
         self.status = AttemptStatus.FAILED
         self.completed_at = _utc_now_iso()
         self.error = error

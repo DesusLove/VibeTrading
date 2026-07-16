@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #50 - 开盘日内动量
@@ -9,7 +10,7 @@
 Formula: SUM(up_move,12)/(SUM(up_move,12)+SUM(dn_move,12)) - SUM(dn_move,12)/(SUM(up_move,12)+SUM(dn_move,12))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 50."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

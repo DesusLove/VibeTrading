@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: 
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     o = panel["open"]
     v = panel["volume"]
     left = rank(ts_corr(o, ts_mean(v, 60).rolling(9).sum(), 6))

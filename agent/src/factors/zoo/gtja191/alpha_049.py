@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #49 - 指数平滑量比
@@ -9,7 +10,7 @@
 Formula: SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)/(SUM(...,12)+SUM(...,12))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 49."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

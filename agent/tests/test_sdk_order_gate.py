@@ -5,7 +5,6 @@ fail-closed pre-trade checks before any broker call. These tests use a fake
 connector module + a stubbed mandate/halt so they need no broker SDK.
 """
 
-from __future__ import annotations
 
 import pytest
 
@@ -189,6 +188,7 @@ def test_service_place_order_paper_is_direct(monkeypatch) -> None:
 
 def test_service_place_order_live_routes_through_gate(monkeypatch) -> None:
     """Live profile routes through the gate; no mandate → blocked, not placed."""
+
     conn = _FakeConnector()
     conn.build_config = lambda profile_config, overrides: object()
     monkeypatch.setattr(service, "_sdk_module", lambda c: conn)

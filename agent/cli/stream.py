@@ -14,14 +14,13 @@ Tool events use the dexter-style ``⏺ Tool Name (args)  duration · summary``
 format. Tool names are auto-Title-Cased with a small acronym whitelist.
 """
 
-from __future__ import annotations
 
 import re
 import threading
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Iterator, Optional
 
 from rich.console import Console
 from rich.live import Live
@@ -111,9 +110,9 @@ class ThinkingSpinner:
         self._state = _SpinnerState(
             verb=pick_thinking_verb(), started_at=time.monotonic()
         )
-        self._live: Optional[Live] = None
+        self._live: Live | None = None
         self._lock = threading.Lock()
-        self._tick_thread: Optional[threading.Thread] = None
+        self._tick_thread: threading.Thread | None = None
 
     def start(self, verb: str | None = None) -> None:
         """Begin rendering. ``verb`` rerolls per turn if not supplied."""
@@ -206,7 +205,7 @@ class ToolCall:
     name: str
     args: dict | str | None
     started_at: float = field(default_factory=time.monotonic)
-    finished_at: Optional[float] = None
+    finished_at: float | None = None
     summary: str = ""
 
     @property
@@ -229,7 +228,7 @@ class StreamRenderer:
             raise ValueError(f"unknown StreamRenderer mode: {mode!r}")
         self._mode = mode
         self._console = console or get_console()
-        self._spinner: Optional[ThinkingSpinner] = None
+        self._spinner: ThinkingSpinner | None = None
         self._active_calls: dict[str, ToolCall] = {}
 
     @property
@@ -237,7 +236,7 @@ class StreamRenderer:
         return self._mode
 
     @contextmanager
-    def turn(self, *, verb: str | None = None) -> Iterator["StreamRenderer"]:
+    def turn(self, *, verb: str | None = None) -> Iterator[StreamRenderer]:
         """Context manager wrapping one agent turn. Manages spinner lifecycle."""
         if self._mode == "swarm":
             yield self
@@ -315,6 +314,7 @@ class StreamRenderer:
                       duration_ms: int | float | None,
                       token_count: int | None, cost: float | None) -> None:
         """``/show <id> · N tool calls · 4.1s · 1.2k tokens · $0.003``."""
+
         from cli.utils.format import abbreviate_num, format_tokens
 
         line = Text("  ")

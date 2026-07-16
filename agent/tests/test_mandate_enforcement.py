@@ -1,3 +1,5 @@
+from typing import Any
+
 """Mandate enforcement gate tests (SPEC.md Mandate Enforcement §3–§6).
 
 Parametrized per limit: each case submits an order breaching exactly one limit
@@ -6,12 +8,10 @@ forwards through to the underlying mock MCP tool. Universe market-cap/liquidity
 floors are exercised by monkeypatching the loader-backed helpers (no network).
 """
 
-from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -35,7 +35,6 @@ from src.live.mandate.model import (
     UniverseConstraint,
 )
 from src.tools.mcp import MCPRemoteToolSpec
-
 
 # --------------------------------------------------------------------------- #
 # Fixtures + mock MCP adapter                                                  #
@@ -91,7 +90,7 @@ def _spec() -> MCPRemoteToolSpec:
 
 
 def _mandate(expires_in_days: int = 30, **caps_overrides: Any) -> Mandate:
-    created = datetime.now(timezone.utc)
+    created = datetime.now(UTC)
     caps = {
         "account_funding_usd": 5000.0,
         "max_order_notional_usd": 750.0,
@@ -452,6 +451,7 @@ class _QuoteAdapter:
 def test_notional_quantity_bypass_is_closed(live_runtime: Path) -> None:
     """H3: an order carrying a tiny notional but a huge quantity is enforced on
     the quantity-implied notional, so it is NOT waved through."""
+
     _write_mandate(live_runtime, _mandate())  # max_order_notional_usd = 750
     # 100000 shares * $10 = $1,000,000 implied notional, well over the cap; the
     # explicit $10 notional must not be the value enforced.

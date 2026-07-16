@@ -8,7 +8,6 @@ import pytest
 
 from src.tools.path_utils import safe_document_path, safe_path, safe_run_dir, safe_run_id, safe_user_path
 
-
 # ---------------------------------------------------------------------------
 # safe_path — tool-controlled sandbox under a fixed workdir
 # ---------------------------------------------------------------------------

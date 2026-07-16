@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: Downside beta vs. benchmark; uses fallback cross-sectional mean if benchmark_close missing.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -61,6 +60,7 @@ def compute(panel):
     """
     def _bench_close():
         """Benchmark close fallback: cross-sectional mean of `close`."""
+
         if "benchmark_close" in panel:
             return panel["benchmark_close"]
         c = panel["close"]

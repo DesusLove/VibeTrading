@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared redaction helpers (CWE-209/497, P10).
 
 Two independent concerns live here:
@@ -19,13 +21,11 @@ Two independent concerns live here:
    paper-trading surfaces all consume one shared implementation.
 """
 
-from __future__ import annotations
 
 import sys
 import sysconfig
 from functools import cache
 from pathlib import Path
-from typing import Any
 
 _SENTINEL = "<redacted>"
 
@@ -199,6 +199,7 @@ def redact_payload(obj: Any) -> Any:
         A new structure of the same shape with sensitive values replaced. The
         input is never mutated.
     """
+
     if isinstance(obj, dict):
         return {
             key: _REDACTED if is_sensitive_arg(str(key)) else redact_payload(item)

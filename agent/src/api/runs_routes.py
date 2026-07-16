@@ -1,26 +1,26 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """Run listing and detail HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_runs_routes(app, ...)``.
 """
 
-from __future__ import annotations
 
 import csv
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.responses import JSONResponse
-
 
 # ---------------------------------------------------------------------------
 # Helper functions (module-level; host Pydantic models resolved via sys.modules)
 # ---------------------------------------------------------------------------
 
 
-def _load_json_file(path: Path) -> Optional[Dict[str, Any]]:
+def _load_json_file(path: Path) -> dict[str, Any | None]:
     """Load JSON from disk if present."""
     try:
         if path.exists():
@@ -30,7 +30,7 @@ def _load_json_file(path: Path) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _load_csv_to_dict(path: Path, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+def _load_csv_to_dict(path: Path, limit: int | None = None) -> list[dict[str, Any]]:
     """Load CSV rows into a list of dictionaries."""
     try:
         if not path.exists():
@@ -44,7 +44,7 @@ def _load_csv_to_dict(path: Path, limit: Optional[int] = None) -> List[Dict[str,
         return []
 
 
-def _run_response_payload(response: Any) -> Dict[str, Any]:
+def _run_response_payload(response: Any) -> dict[str, Any]:
     """Return a JSON-ready payload for opt-in run response variants."""
     return response.model_dump(mode="json")
 
@@ -54,9 +54,9 @@ def _build_response_from_run_dir(
     elapsed: float,
     *,
     include_analysis: bool = False,
-    chart_symbol: Optional[str] = None,
+    chart_symbol: str | None = None,
     chart_payload: str = "full",
-    chart_symbols_out: Optional[List[str]] = None,
+    chart_symbols_out: list[str | None] = None,
 ):
     """Build a run response from a persisted run directory."""
     import sys as _sys
@@ -175,7 +175,7 @@ def _build_response_from_run_dir(
     if response.artifacts_equity_csv:
         filtered_equity = []
         for row in response.artifacts_equity_csv[:1000]:
-            filtered_row: Dict[str, Any] = {}
+            filtered_row: dict[str, Any] = {}
             if "timestamp" in row:
                 filtered_row["time"] = row["timestamp"]
             if "equity" in row:
@@ -295,8 +295,8 @@ def register_runs_routes(
     @app.get("/runs/{run_id}", response_model=RunResponse, dependencies=[Depends(require_auth)])
     async def get_run_result(
         run_id: str,
-        chart_symbol: Optional[str] = Query(None, description="Opt in to chart payloads for a single symbol"),
-        chart_payload: Optional[str] = Query(
+        chart_symbol: str | None = Query(None, description="Opt in to chart payloads for a single symbol"),
+        chart_payload: str | None = Query(
             None,
             description="Optional chart payload mode. Use 'summary' to omit chart rows and trade markers.",
         ),
@@ -318,7 +318,7 @@ def register_runs_routes(
             )
 
         wants_chart_meta = bool(chart_payload or chart_symbol)
-        chart_symbols: List[str] = []
+        chart_symbols: list[str] = []
         response = _build_response_from_run_dir(
             run_dir,
             elapsed=0.0,
@@ -335,9 +335,10 @@ def register_runs_routes(
 
         return response
 
-    @app.get("/runs", response_model=List[RunInfo], dependencies=[Depends(require_auth)])
+    @app.get("/runs", response_model=list[RunInfo], dependencies=[Depends(require_auth)])
     async def list_runs(limit: int = 20):
         """List recent runs with summary fields."""
+
         from src.ui_services import load_run_context
 
         limit = min(max(1, limit), 100)
@@ -412,7 +413,7 @@ def register_runs_routes(
             metrics_file = d / "artifacts" / "metrics.csv"
             if metrics_file.exists():
                 try:
-                    with open(metrics_file, 'r', encoding='utf-8') as f:
+                    with open(metrics_file, encoding='utf-8') as f:
                         reader = csv.DictReader(f)
                         for row in reader:
                             total_return = float(row.get('total_return', 0) or 0)

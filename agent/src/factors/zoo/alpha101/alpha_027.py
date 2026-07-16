@@ -10,7 +10,6 @@ Formula (paper appendix): (0.5<rank((sum(correlation(rank(volume),rank(vwap),6),
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 27.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -84,6 +83,7 @@ def _where_ternary(cond, a, b):
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     volume = panel["volume"]
     vwap = panel["vwap"]

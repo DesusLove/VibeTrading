@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the dragon-tiger (龙虎榜) tool.
 
 No request leaves the process: the HTTP boundary
@@ -5,10 +7,8 @@ No request leaves the process: the HTTP boundary
 real client + tool parsing runs offline.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -51,6 +51,7 @@ def _appearance_payload() -> dict[str, Any]:
 
 def _seat_payload() -> dict[str, Any]:
     """A datacenter seat payload with one buy seat."""
+
     return {
         "result": {
             "data": [

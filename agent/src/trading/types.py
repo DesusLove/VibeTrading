@@ -1,9 +1,9 @@
+from typing import Any, Literal
+
 """Shared trading connector data types."""
 
-from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Any, Literal
 
 Environment = Literal["paper", "live"]
 Transport = Literal["local_tws", "remote_mcp", "broker_sdk"]
@@ -45,6 +45,7 @@ class TradingProfile:
 
     def to_dict(self, *, selected: bool = False) -> dict[str, Any]:
         """Return a JSON-serializable profile snapshot."""
+
         payload = asdict(self)
         payload["capabilities"] = list(self.capabilities)
         payload["selected"] = selected

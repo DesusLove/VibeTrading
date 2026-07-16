@@ -9,14 +9,12 @@ fails to parse is quarantined and ``load`` raises ``CorruptStoreError`` instead
 of silently returning an empty list.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from src.config.paths import get_runtime_root
 from src.scheduled_research.models import ScheduledResearchJob, validate_schedule
@@ -68,7 +66,7 @@ class ScheduledResearchJobStore:
         path: Absolute path of the backing JSON file.
     """
 
-    def __init__(self, path: Optional[Path] = None) -> None:
+    def __init__(self, path: Path | None = None) -> None:
         """Initialize the store.
 
         Args:
@@ -81,7 +79,7 @@ class ScheduledResearchJobStore:
     # Public API
     # ------------------------------------------------------------------
 
-    def load(self) -> Dict[str, ScheduledResearchJob]:
+    def load(self) -> dict[str, ScheduledResearchJob]:
         """Load all persisted jobs.
 
         Returns:
@@ -97,7 +95,7 @@ class ScheduledResearchJobStore:
             raw = self.path.read_text(encoding="utf-8")
             envelope = json.loads(raw)
             jobs_raw = self._extract_jobs(envelope)
-            result: Dict[str, ScheduledResearchJob] = {}
+            result: dict[str, ScheduledResearchJob] = {}
             for item in jobs_raw:
                 job = ScheduledResearchJob.from_dict(item)
                 result[job.id] = job
@@ -106,7 +104,7 @@ class ScheduledResearchJobStore:
             quarantined = self._quarantine(str(exc))
             raise CorruptStoreError(self.path, quarantined, str(exc)) from exc
 
-    def save(self, jobs: Dict[str, ScheduledResearchJob]) -> None:
+    def save(self, jobs: dict[str, ScheduledResearchJob]) -> None:
         """Atomically persist the full job set.
 
         Write sequence: temp file in same dir -> fsync -> os.replace -> fsync
@@ -151,7 +149,7 @@ class ScheduledResearchJobStore:
         jobs[job.id] = job
         self.save(jobs)
 
-    def get(self, job_id: str) -> Optional[ScheduledResearchJob]:
+    def get(self, job_id: str) -> ScheduledResearchJob | None:
         """Return a job by id, or ``None`` when it does not exist.
 
         Args:
@@ -164,9 +162,9 @@ class ScheduledResearchJobStore:
 
     def list_jobs(
         self,
-        status: Optional[str] = None,
+        status: str | None = None,
         limit: int = 50,
-    ) -> List[ScheduledResearchJob]:
+    ) -> list[ScheduledResearchJob]:
         """Return jobs, optionally filtered by status.
 
         Args:
@@ -194,6 +192,7 @@ class ScheduledResearchJobStore:
             ``True`` when the job was found and removed; ``False`` when it was
             not in the store.
         """
+
         jobs = self.load()
         if job_id not in jobs:
             return False
@@ -206,7 +205,7 @@ class ScheduledResearchJobStore:
     # ------------------------------------------------------------------
 
     def _quarantine(self, cause: str) -> Path:
-        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+        ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
         quarantined = self.path.with_name(f"{self.path.name}.corrupt-{ts}")
         try:
             os.replace(self.path, quarantined)
@@ -240,14 +239,14 @@ class ScheduledResearchJobStore:
             os.close(dir_fd)
 
     @staticmethod
-    def _envelope(jobs: Dict[str, ScheduledResearchJob]) -> dict:
+    def _envelope(jobs: dict[str, ScheduledResearchJob]) -> dict:
         return {
             "schema_version": _SCHEMA_VERSION,
             "jobs": [j.to_dict() for j in jobs.values()],
         }
 
     @staticmethod
-    def _extract_jobs(envelope: object) -> List[dict]:
+    def _extract_jobs(envelope: object) -> list[dict]:
         if not isinstance(envelope, dict):
             raise ValueError("store root is not a JSON object")
         jobs = envelope.get("jobs")

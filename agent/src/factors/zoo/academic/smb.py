@@ -15,7 +15,6 @@ capitalization, which we do not carry in the OHLCV panel. We use average daily
 dollar volume (close * volume) as a liquidity-weighted size proxy — small caps
 typically have low dollar volume. Higher z-scores = smaller (illiquid) names.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return inverse log 60-day dollar-volume z-score per stock."""
+
     close = panel['close']
     volume = panel['volume']
     dollar_volume = volume * close

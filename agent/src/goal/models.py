@@ -1,10 +1,10 @@
+from typing import Any
+
 """Data models for finance research goals."""
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
 
 
 class GoalStatus(str, Enum):
@@ -154,6 +154,7 @@ class EvidenceRecord:
 @dataclass(frozen=True)
 class AuditRow:
     """Completion audit row for one criterion."""
+
 
     criterion_id: str
     result: str

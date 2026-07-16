@@ -16,7 +16,6 @@ from src.agent.progress import (
     emit_progress,
 )
 
-
 # ---------- ProgressEvent ---------------------------------------------------
 
 

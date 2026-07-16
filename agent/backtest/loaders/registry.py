@@ -1,3 +1,5 @@
+from typing import Any
+
 """Loader registry with market-level fallback chains.
 
 Loaders self-register via the ``@register`` decorator when their module is
@@ -7,10 +9,8 @@ known loader module so that callers of ``resolve_loader`` /
 of import order.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any, Type
 
 from backtest.loaders.base import NoAvailableSourceError
 
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Global registry: source_name -> loader class
 # ---------------------------------------------------------------------------
 
-LOADER_REGISTRY: dict[str, Type[Any]] = {}
+LOADER_REGISTRY: dict[str, type[Any]] = {}
 
 _registered = False
 
@@ -55,7 +55,7 @@ VALID_SOURCES: set[str] = {
 }
 
 
-def register(cls: Type[Any]) -> Type[Any]:
+def register(cls: type[Any]) -> type[Any]:
     """Class decorator: register a loader into the global registry.
 
     The class must have a ``name`` class attribute.
@@ -176,7 +176,7 @@ def resolve_loader(market: str) -> Any:
     )
 
 
-def get_loader_cls_with_fallback(source: str) -> Type[Any]:
+def get_loader_cls_with_fallback(source: str) -> type[Any]:
     """Return a loader *class* for *source*, falling back if unavailable.
 
     Args:
@@ -188,6 +188,7 @@ def get_loader_cls_with_fallback(source: str) -> Type[Any]:
     Raises:
         NoAvailableSourceError: If the source and all fallbacks are unavailable.
     """
+
     _ensure_registered()
     if source not in LOADER_REGISTRY:
         raise NoAvailableSourceError(f"Unknown data source: {source}")

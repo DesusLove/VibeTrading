@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """CLI handlers for ``vibe-trading alpha {list,show,bench,compare,export-manifest}``.
 
 All logic lives here; ``agent/cli.py`` only wires this in via :func:`add_subparser`
@@ -13,7 +16,6 @@ Security gates:
       root (``Path(__file__).resolve().parents[3]``) unless ``--force``.
 """
 
-from __future__ import annotations
 
 import argparse
 import json
@@ -21,9 +23,8 @@ import sys
 import time
 import traceback
 import warnings
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
 
 # Silence the noisy ConstantInputWarning that scipy emits from spearmanr when
 # the IC slice has zero variance (very common in alpha bench loops).
@@ -64,9 +65,9 @@ except Exception:  # pragma: no cover — rich is a project dep, fallback only
     TextColumn = None  # type: ignore[assignment]
     TimeElapsedColumn = None  # type: ignore[assignment]
 
-from src.factors.compare_runner import SORT_KEYS as _COMPARE_SORT_KEYS, compare_alphas
+from src.factors.compare_runner import SORT_KEYS as _COMPARE_SORT_KEYS
+from src.factors.compare_runner import compare_alphas
 from src.factors.registry import Registry, RegistryError
-
 
 # Resolve repo root once: this file lives at
 # ``<repo>/agent/src/factors/cli_handlers.py``; parents[3] is the repo root.
@@ -650,12 +651,12 @@ def cmd_alpha_bench(args: argparse.Namespace) -> int:
 
             output_dir = _default_output_dir()
             output_dir.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
             report_path = output_dir / f"alpha_bench_{ts}.html"
             context = {
                 "csp": _CSP,
                 "css": _REPORT_CSS,
-                "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
                 "universe": args.universe,
                 "period": args.period,
                 "n_alphas_tested": len(rows),
@@ -968,6 +969,7 @@ def dispatch(args: argparse.Namespace) -> int:
 
     Returns the exit code; ``cli.py`` propagates it via ``_coerce_exit_code``.
     """
+
     sub = getattr(args, "alpha_command", None)
     if sub is None:
         if _ALPHA_PARSER is not None:

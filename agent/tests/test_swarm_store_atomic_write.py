@@ -13,7 +13,6 @@ is bounded, and POSIX behaviour is unchanged (a plain OSError without
 ``winerror`` is never treated as transient).
 """
 
-from __future__ import annotations
 
 import os
 
@@ -126,6 +125,7 @@ def test_load_run_missing_is_fast_none(tmp_path, monkeypatch):
 def test_posix_oserror_is_not_treated_transient():
     """POSIX no-op guard: a plain OSError (no winerror) is never transient,
     so off-Windows the retry loop runs exactly once — no behavior change."""
+
     from src.swarm.store import _is_transient_windows_error
 
     assert _is_transient_windows_error(OSError("posix")) is False

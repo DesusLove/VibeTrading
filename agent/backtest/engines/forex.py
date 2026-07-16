@@ -10,15 +10,13 @@ Market rules:
   - PnL in quote currency (converted via exit price for cross pairs)
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
-from backtest.engines.base import BaseEngine
 # ``_normalize_symbol`` lives in ``_market_hooks`` (single source of truth);
 # re-imported here so external callers (tests) keep their existing import path.
 from backtest.engines._market_hooks import _normalize_symbol, calc_forex_swap
-
+from backtest.engines.base import BaseEngine
 
 # ── Typical spreads in pips (1 pip = 0.0001 for most pairs, 0.01 for JPY) ──
 
@@ -133,4 +131,5 @@ class ForexEngine(BaseEngine):
 
     def get_contract_multiplier(self, symbol: str) -> float:
         """Forex: multiplier is 1.0 (size is in currency units)."""
+
         return 1.0

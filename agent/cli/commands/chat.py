@@ -9,9 +9,8 @@ clears the screen and reprints the banner. ``/journal``, ``/shadow``, and
 fallback workflows.
 """
 
-from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from rich.console import Console
 from rich.panel import Panel
@@ -20,7 +19,7 @@ from rich.text import Text
 from cli.theme import get_console
 
 
-def _resolve_console(console: Optional[Console] = None) -> Console:
+def _resolve_console(console: Console | None = None) -> Console:
     """Return the shared CLI console, or a caller-supplied override."""
     if console is not None:
         return console
@@ -236,6 +235,7 @@ _DISPATCH = {
 
 def run(ctx: Any = None, command: str = "model", *args: str) -> int:
     """Dispatch ``run("model")`` / ``run("clear")`` / ... to the right handler."""
+
     handler = _DISPATCH.get(command)
     if handler is None:
         console = _resolve_console()

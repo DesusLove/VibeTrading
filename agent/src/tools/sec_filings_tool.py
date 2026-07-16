@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only tool: U.S. SEC EDGAR filing index + XBRL GAAP metric series.
 
 The U.S. SEC publishes free, no-auth JSON for every reporting company: a recent
@@ -17,10 +19,8 @@ Markets: United States only. A ticker that the SEC table does not list returns
 an error envelope.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional
 
 from backtest.loaders.sec_edgar_client import (
     cik_for,
@@ -129,7 +129,7 @@ class SecFilingsTool(BaseTool):
 
         filings = _parse_filings(submissions, form_filter, cik)
 
-        data: Dict[str, Any] = {
+        data: dict[str, Any] = {
             "ticker": ticker,
             "cik": cik,
             "filings": filings,
@@ -158,8 +158,8 @@ def _clamp_limit(value: Any) -> int:
 
 
 def _parse_filings(
-    submissions: Any, form_filter: Optional[str], cik: str
-) -> List[Dict[str, Any]]:
+    submissions: Any, form_filter: str | None, cik: str
+) -> list[dict[str, Any]]:
     """Extract recent filings from a submissions payload, newest first.
 
     The SEC submissions document stores the recent filing index as parallel
@@ -188,7 +188,7 @@ def _parse_filings(
     primary_docs = recent.get("primaryDocument") or []
     descriptions = recent.get("primaryDocDescription") or []
 
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for idx, raw_form in enumerate(forms):
         form_type = str(raw_form).strip() if raw_form is not None else ""
         if form_filter is not None and form_type.upper() != form_filter:
@@ -210,7 +210,7 @@ def _parse_filings(
     return out
 
 
-def _recent_block(submissions: Any) -> Optional[Dict[str, Any]]:
+def _recent_block(submissions: Any) -> dict[str, Any | None]:
     """Return the ``filings.recent`` mapping from a submissions payload, or ``None``."""
     if not isinstance(submissions, dict):
         return None
@@ -221,7 +221,7 @@ def _recent_block(submissions: Any) -> Optional[Dict[str, Any]]:
     return recent if isinstance(recent, dict) else None
 
 
-def _document_url(cik: str, accession: Optional[str], primary_doc: Optional[str]) -> Optional[str]:
+def _document_url(cik: str, accession: str | None, primary_doc: str | None) -> str | None:
     """Build the SEC primary-document URL, or ``None`` when parts are missing.
 
     Args:
@@ -239,7 +239,7 @@ def _document_url(cik: str, accession: Optional[str], primary_doc: Optional[str]
     return f"{_DOC_BASE}/{cik_digits}/{accession_nodash}/{primary_doc}"
 
 
-def _parse_metric(facts: Any, metric_name: str, limit: int) -> Dict[str, Any]:
+def _parse_metric(facts: Any, metric_name: str, limit: int) -> dict[str, Any]:
     """Extract one us-gaap concept's reported series from a companyfacts payload.
 
     XBRL companyfacts nest as ``facts.us-gaap.<Concept>.units.<Unit>`` -> a list
@@ -256,7 +256,7 @@ def _parse_metric(facts: Any, metric_name: str, limit: int) -> Dict[str, Any]:
         ``{"concept", "unit", "label", "points": [...]}``; ``unit`` and
         ``points`` are empty when the concept is absent or carries no data.
     """
-    base: Dict[str, Any] = {"concept": metric_name, "unit": None, "label": None, "points": []}
+    base: dict[str, Any] = {"concept": metric_name, "unit": None, "label": None, "points": []}
     if not isinstance(facts, dict):
         return base
     gaap = (facts.get("facts") or {}).get("us-gaap")
@@ -279,7 +279,7 @@ def _parse_metric(facts: Any, metric_name: str, limit: int) -> Dict[str, Any]:
     return base
 
 
-def _pick_unit(units: Dict[str, Any]) -> tuple[str, List[Any]]:
+def _pick_unit(units: dict[str, Any]) -> tuple[str, list[Any]]:
     """Choose the unit bucket with the most reported rows.
 
     Args:
@@ -289,14 +289,14 @@ def _pick_unit(units: Dict[str, Any]) -> tuple[str, List[Any]]:
         ``(unit_key, rows)`` for the richest unit; ``rows`` is ``[]`` when none.
     """
     best_key = ""
-    best_rows: List[Any] = []
+    best_rows: list[Any] = []
     for key, rows in units.items():
         if isinstance(rows, list) and len(rows) >= len(best_rows):
             best_key, best_rows = str(key), rows
     return best_key, best_rows
 
 
-def _normalize_point(row: Any) -> Optional[Dict[str, Any]]:
+def _normalize_point(row: Any) -> dict[str, Any | None]:
     """Map one XBRL fact row to our metric point, or ``None`` if unusable.
 
     A row without both a value and an end date carries no signal and is dropped.
@@ -325,7 +325,7 @@ def _normalize_point(row: Any) -> Optional[Dict[str, Any]]:
     }
 
 
-def _at(seq: Any, idx: int) -> Optional[str]:
+def _at(seq: Any, idx: int) -> str | None:
     """Return ``seq[idx]`` as a stripped string, or ``None`` when out of range/empty."""
     if not isinstance(seq, list) or idx >= len(seq):
         return None
@@ -336,7 +336,7 @@ def _at(seq: Any, idx: int) -> Optional[str]:
     return text or None
 
 
-def _to_number(value: Any) -> Optional[float]:
+def _to_number(value: Any) -> float | None:
     """Coerce a fact value to ``float``, or ``None`` when absent/non-numeric."""
     if value is None or value == "":
         return None
@@ -348,4 +348,5 @@ def _to_number(value: Any) -> Optional[float]:
 
 def _error(message: str) -> str:
     """Render a failure envelope as a JSON string."""
+
     return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

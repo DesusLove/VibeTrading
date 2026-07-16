@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #6 - 开盘VWAP偏离
@@ -9,7 +10,7 @@
 Formula: (RANK(SIGN(DELTA((OPEN*0.85+HIGH*0.15), 4))) * -1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 6."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -13,10 +13,8 @@ all requests route through :mod:`backtest.loaders._http` for per-host throttling
 and session reuse — Tiingo rate-limits by client and rejects unspaced bursts.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -56,7 +54,7 @@ def _resolve_key() -> str:
     return "" if key.lower() in _KEY_PLACEHOLDERS else key
 
 
-def _to_tiingo_symbol(code: str) -> Optional[str]:
+def _to_tiingo_symbol(code: str) -> str | None:
     """Map a project symbol to a Tiingo ticker, or ``None`` when unsupported.
 
     Args:
@@ -79,7 +77,7 @@ def _to_tiingo_symbol(code: str) -> Optional[str]:
     return upper.lower()
 
 
-def _rows_to_frame(rows: List[dict]) -> Optional[pd.DataFrame]:
+def _rows_to_frame(rows: list[dict]) -> pd.DataFrame | None:
     """Convert Tiingo's per-day records into the normalized OHLCV frame.
 
     Args:
@@ -91,7 +89,7 @@ def _rows_to_frame(rows: List[dict]) -> Optional[pd.DataFrame]:
         with float ``open``/``high``/``low``/``close``/``volume`` columns, or
         ``None`` when no usable bar is present.
     """
-    parsed: List[dict] = []
+    parsed: list[dict] = []
     for row in rows:
         date = row.get("date")
         if date is None:
@@ -148,13 +146,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV history keyed by the original project symbols.
 
         Each symbol is fetched independently so one failing ticker (bad symbol,
@@ -182,7 +180,7 @@ class DataLoader:
             logger.warning("tiingo skipped: %s not configured", _AUTH_ENV)
             return {}
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 frame = cached_loader_fetch(
@@ -202,7 +200,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str, key: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch and normalize a single symbol's daily bars.
 
         Args:
@@ -215,6 +213,7 @@ class DataLoader:
             Normalized OHLCV DataFrame, or ``None`` when the symbol is not a US
             equity or the endpoint returns no usable bars.
         """
+
         ticker = _to_tiingo_symbol(code)
         if ticker is None:
             return None

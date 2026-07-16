@@ -1,16 +1,16 @@
+from typing import Literal
+
 """Cross-asset correlation matrix computation.
 
 Computes pairwise Pearson or Spearman correlation of daily returns
 over a configurable lookback window. Used by the /correlation API endpoint.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, Literal
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.stats import spearmanr
 
 logger = logging.getLogger(__name__)
@@ -186,6 +186,7 @@ def compute_correlation_matrix(
     Returns:
         Dict with keys: labels, matrix, window, method.
     """
+
     from datetime import datetime, timedelta
 
     end_date = datetime.now().strftime("%Y-%m-%d")

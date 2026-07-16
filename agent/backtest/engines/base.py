@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """Base backtest engine with shared bar-by-bar execution loop.
 
 All market engines inherit from BaseEngine and override market-rule methods.
@@ -6,7 +9,6 @@ pre-compute target weights (with optimizer) → bar-by-bar execution with
 market rule enforcement → metrics → artifacts.
 """
 
-from __future__ import annotations
 
 import importlib
 import json
@@ -16,7 +18,6 @@ import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -800,6 +801,7 @@ class BaseEngine(ABC):
         fallback: float,
     ) -> float:
         """Get close price with fallback."""
+
         if ts in close_df.index and symbol in close_df.columns:
             val = close_df.at[ts, symbol]
             if pd.notna(val):

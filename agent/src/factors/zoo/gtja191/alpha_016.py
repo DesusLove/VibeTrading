@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #16 - VWAP位置
@@ -9,7 +10,7 @@
 Formula: (-1 * TSMAX(RANK(CORR(RANK(VOLUME), RANK(VWAP), 5)), 5))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 16."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

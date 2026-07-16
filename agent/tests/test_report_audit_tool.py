@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any
+
 """Tests for the ``report_audit`` agent tool.
 
 Covers the markdown data-point extraction (tables + ``label: value`` lines,
@@ -7,12 +10,9 @@ FAIL that the original upstream logic mishandled), the tool's JSON-Schema
 contract, ``execute`` happy/error paths, and auto-discovery.
 """
 
-from __future__ import annotations
+
 
 import json
-from typing import Any
-
-import pytest
 
 from src.tools import build_registry
 from src.tools.report_audit_tool import (

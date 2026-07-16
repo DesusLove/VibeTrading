@@ -9,7 +9,6 @@
 - _validate_stockid 输入校验
 """
 
-from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
@@ -449,6 +448,7 @@ class TestRecordParserEdgeCases:
 
     def test_multiple_td_after_key_only_first_taken(self, fsp):
         """key 后出现多个 td 时，只取第一个作为 value。"""
+
         html = (
             '<table id="collectFund_1">'
             '<thead><tr><th>警示函 公告日期: 2024-05-12</th></tr></thead>'

@@ -8,7 +8,6 @@ from pathlib import Path
 import cli
 from cli.onboard import PROVIDERS as ONBOARD_PROVIDERS
 
-
 EXPECTED_PROVIDER_DEFAULTS = {
     "openrouter": "deepseek/deepseek-v4-pro",
     "requesty": "openai/gpt-4o-mini",

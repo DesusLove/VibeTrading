@@ -39,7 +39,7 @@ class _FakeMCPClient:
     def __init__(self, tool_names: tuple[str, ...]) -> None:
         self._tool_names = tool_names
 
-    async def __aenter__(self) -> "_FakeMCPClient":
+    async def __aenter__(self) -> _FakeMCPClient:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

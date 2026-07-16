@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """End-to-end SEC EDGAR fetch example.
 
 Resolves a ticker to its CIK, lists recent 10-K filings with their primary
@@ -13,7 +12,7 @@ Run from the ``agent/`` directory so that ``backtest`` resolves on the path::
     python src/skills/sec-edgar/scripts/sec_filings_example.py
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from backtest.loaders.sec_edgar_client import (
     cik_for,
@@ -24,7 +23,7 @@ from backtest.loaders.sec_edgar_client import (
 _DOC_BASE = "https://www.sec.gov/Archives/edgar/data"
 
 
-def resolve_cik(ticker: str) -> Optional[str]:
+def resolve_cik(ticker: str) -> str | None:
     """Resolve a U.S. ticker to its zero-padded 10-digit CIK.
 
     Args:
@@ -44,7 +43,7 @@ def resolve_cik(ticker: str) -> Optional[str]:
     return cik
 
 
-def recent_filings(cik: str, form: str, limit: int) -> List[Dict[str, Any]]:
+def recent_filings(cik: str, form: str, limit: int) -> list[dict[str, Any]]:
     """List recent filings of one form type for a CIK, newest first.
 
     Args:
@@ -69,7 +68,7 @@ def recent_filings(cik: str, form: str, limit: int) -> List[Dict[str, Any]]:
 
     want = form.strip().upper()
     cik_unpadded = str(cik).lstrip("0") or "0"
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for idx, raw_form in enumerate(forms):
         if str(raw_form).strip().upper() != want:
             continue
@@ -91,7 +90,7 @@ def recent_filings(cik: str, form: str, limit: int) -> List[Dict[str, Any]]:
     return out
 
 
-def metric_series(cik: str, concept: str, limit: int) -> List[Dict[str, Any]]:
+def metric_series(cik: str, concept: str, limit: int) -> list[dict[str, Any]]:
     """Pull the most-recent points of one us-gaap concept for a CIK.
 
     Args:
@@ -116,7 +115,7 @@ def metric_series(cik: str, concept: str, limit: int) -> List[Dict[str, Any]]:
 
     units = concept_block.get("units") or {}
     # Pick the unit bucket with the most rows (usually USD for monetary concepts).
-    rows: List[Any] = []
+    rows: list[Any] = []
     for candidate in units.values():
         if isinstance(candidate, list) and len(candidate) >= len(rows):
             rows = candidate

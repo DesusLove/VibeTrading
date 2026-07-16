@@ -14,11 +14,11 @@ agents, tool-evidence only for data agents — tool-less synthesis/editor roles
 are intentionally NOT failed).
 """
 
-from __future__ import annotations
 
 import threading
 from pathlib import Path
 
+import src.swarm.runtime as rt
 from src.swarm.models import (
     RunStatus,
     SwarmAgentSpec,
@@ -33,7 +33,6 @@ from src.swarm.worker import (
     _is_error_result,
     _report_written,
 )
-import src.swarm.runtime as rt
 
 PLAN_STUB = (
     "### Phase 1 — Plan\n"
@@ -204,5 +203,6 @@ def test_is_error_result_non_json_safe():
 def test_is_error_result_other_status_values():
     """Only ``"error"`` counts; ``"warning"`` / ``"degenerate"`` etc. are
     not error envelopes (the worker still credits them as a tool call)."""
+
     assert _is_error_result('{"status": "degenerate", "warning": "T=0"}') is False
     assert _is_error_result('{"status": "warning"}') is False

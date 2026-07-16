@@ -1,10 +1,11 @@
+from typing import Any
+
 """Maximum diversification ratio: maximize (w' sigma) / sqrt(w' Sigma w).
 
 ``sigma`` is the vector of asset volatilities; ``Sigma`` is the covariance matrix.
 Higher DR means more diversification per unit of risk.
 """
 
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd

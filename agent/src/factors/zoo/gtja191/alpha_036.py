@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #36 - 放量下跌信号
@@ -9,7 +10,7 @@
 Formula: RANK(SUM(CORR(RANK(VOLUME), RANK(VWAP), 6), 2))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 36."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

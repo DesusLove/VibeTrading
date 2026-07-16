@@ -1,3 +1,5 @@
+from typing import Any
+
 """Unit + integration tests for ``bench_runner_strict``.
 
 The companion module adds a same-universe random control gate plus an
@@ -11,9 +13,6 @@ and ``_compute_forward_returns`` helpers via ``monkeypatch`` so the suite
 stays hermetic and CI-friendly.
 """
 
-from __future__ import annotations
-
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -28,7 +27,6 @@ from src.factors.bench_runner_strict import (
     run_bench_strict,
     t_stat,
 )
-
 
 # ── Helper builders ─────────────────────────────────────────────────────────
 
@@ -531,6 +529,7 @@ def test_run_bench_strict_catches_planted_alive_signal(
     """Regression for the original code-review finding 'integration test
     cheats': here we plant a genuine momentum signal and assert that the
     strict gate puts it in confirmed_alive."""
+
     panel = _planted_signal_panel()
     monkeypatch.setattr(
         "src.factors.bench_runner_strict._load_universe_panel",

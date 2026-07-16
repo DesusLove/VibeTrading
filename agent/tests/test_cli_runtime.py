@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the live-runtime CLI surface + discoverability (parcel R7).
 
 Covers SPEC.md §7.5 (persistent runner control) + §9 Decision 1 (CLI surface
@@ -18,14 +20,12 @@ The API client is stubbed (``httpx``) and the liveness module is injected into
 ``sys.modules`` so no server / concurrent runtime parcel is needed.
 """
 
-from __future__ import annotations
 
 import importlib
 import sys
 import types
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
 from unittest.mock import patch
 
 import pytest
@@ -57,7 +57,7 @@ def fake_liveness():
     Yields a dict the test can mutate to control ``is_runner_alive`` /
     ``last_tick`` return values. The real module is restored on teardown.
     """
-    state: Dict[str, Any] = {"alive": True, "tick": datetime.now(timezone.utc)}
+    state: Dict[str, Any] = {"alive": True, "tick": datetime.now(UTC)}
     mod = types.ModuleType("src.live.runtime.liveness")
     mod.is_runner_alive = lambda runner_id: bool(state["alive"])  # type: ignore[attr-defined]
     mod.last_tick = lambda runner_id: state["tick"]  # type: ignore[attr-defined]
@@ -248,7 +248,7 @@ class TestStatusLiveness:
         from cli._legacy import cmd_live_status
 
         fake_liveness["alive"] = True
-        fake_liveness["tick"] = datetime.now(timezone.utc) - timedelta(seconds=5)
+        fake_liveness["tick"] = datetime.now(UTC) - timedelta(seconds=5)
         assert cmd_live_status("robinhood") == 0
         out = capsys.readouterr().out
         assert "Runner" in out
@@ -461,6 +461,7 @@ class TestResumeByIdDispatch:
 
     def test_resume_needs_exactly_two_args(self) -> None:
         """Too few or too many args should fall through to the legacy dispatcher."""
+
         with patch("cli._legacy.main", return_value=1) as legacy:
             main.main(["resume"])
         legacy.assert_called_once()

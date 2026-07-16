@@ -1,3 +1,5 @@
+from typing import Any, Protocol, runtime_checkable
+
 """Alpha Zoo base operators.
 
 Operators all act on **wide** ``pd.DataFrame`` where ``index = trading_date``
@@ -12,11 +14,9 @@ Lookahead ban: ``delta(df, d)`` requires ``d >= 1``; the negative-shift
 ``Ref(df, -n)`` form is intentionally absent.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Protocol, runtime_checkable
 
 import numpy as np
 import pandas as pd
@@ -119,7 +119,7 @@ def ts_rank(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
     arr = df.to_numpy(dtype=np.float64)
     T, C = arr.shape
-    if T < n:
+    if n > T:
         return df.rolling(window=n, min_periods=n).apply(_last_rank, raw=True)
 
     windows = sliding_window_view(arr, window_shape=n, axis=0)  # (T-n+1, C, n)
@@ -282,7 +282,7 @@ def decay_linear(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
     arr = df.to_numpy(dtype=np.float64)
     T, C = arr.shape
-    if T < n:
+    if n > T:
         return df.rolling(window=n, min_periods=n).apply(_apply, raw=True)
 
     windows = sliding_window_view(arr, window_shape=n, axis=0)  # (T-n+1, C, n)
@@ -335,6 +335,7 @@ def vwap(panel: dict[str, pd.DataFrame], market: Market | str) -> pd.DataFrame:
 
     Any missing required column → NaN propagation; never silent zero.
     """
+
     if isinstance(market, str):
         market = Market(market)
 

@@ -3,18 +3,15 @@
 Mounted by ``agent/api_server.py`` via ``register_system_routes(app, ...)``.
 """
 
-from __future__ import annotations
 
 import os
 import signal
 import time
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request, Security, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
-
 
 # ---------------------------------------------------------------------------
 # Pydantic models (defined locally -- NO shared modules, per maintainer rule)
@@ -84,7 +81,7 @@ def register_system_routes(
         return HealthResponse(
             status="healthy",
             service="Vibe-Trading API",
-            timestamp=datetime.now(timezone.utc).isoformat()
+            timestamp=datetime.now(UTC).isoformat()
         )
 
     @app.get("/correlation")
@@ -120,7 +117,7 @@ def register_system_routes(
     async def shutdown_local_api(
         background_tasks: BackgroundTasks,
         request: Request,
-        cred: Optional[HTTPAuthorizationCredentials] = Security(_security),
+        cred: HTTPAuthorizationCredentials | None = Security(_security),
     ):
         """Shut down the local API server after explicit local authorization."""
         _require_shutdown_authorization(request=request, cred=cred)
@@ -132,7 +129,7 @@ def register_system_routes(
         return {
             "status": "shutting-down",
             "service": "Vibe-Trading API",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     @app.get("/skills")
@@ -152,6 +149,7 @@ def register_system_routes(
     @app.get("/api")
     async def api_info():
         """Service metadata."""
+
         return {
             "service": "Vibe-Trading API",
             "version": _app_version,

@@ -17,7 +17,6 @@ from src.providers.openai_codex import (
     validate_codex_base_url,
 )
 
-
 DEFAULT_CODEX_MODEL = "openai-codex/gpt-5.4"
 
 
@@ -117,7 +116,7 @@ def test_stream_non_200_response_raises_http_error(monkeypatch: pytest.MonkeyPat
     class _FakeResponse:
         status_code = 401
 
-        def __enter__(self) -> "_FakeResponse":
+        def __enter__(self) -> _FakeResponse:
             return self
 
         def __exit__(self, *args: object) -> None:
@@ -130,7 +129,7 @@ def test_stream_non_200_response_raises_http_error(monkeypatch: pytest.MonkeyPat
         def __init__(self, **kwargs: object) -> None:
             pass
 
-        def __enter__(self) -> "_FakeClient":
+        def __enter__(self) -> _FakeClient:
             return self
 
         def __exit__(self, *args: object) -> None:

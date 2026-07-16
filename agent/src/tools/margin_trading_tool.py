@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only margin-trading (融资融券) balance tool backed by Eastmoney.
 
 Eastmoney's public datacenter exposes the daily exchange-published
@@ -12,11 +14,9 @@ The datacenter is rate-limited by source IP, so every request routes through
 reuse). No credentials are required; the endpoint is read-only public data.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders import eastmoney_client
 from src.agent.tools import BaseTool
@@ -172,6 +172,7 @@ class MarginTradingTool(BaseTool):
             "data": {"code": str, "rows": [...]}}``. On failure:
             ``{"ok": false, "error": str}``.
         """
+
         code = _extract_code(kwargs.get("code", ""))
         if code is None:
             return _err(

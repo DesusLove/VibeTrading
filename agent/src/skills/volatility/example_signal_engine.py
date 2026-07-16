@@ -4,7 +4,6 @@
 低波区间做多等待扩张，高波区间做空等待收缩。纯 pandas 实现。
 """
 
-from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -79,7 +78,7 @@ class SignalEngine:
         self.high_pct = high_pct
         self.annualize = annualize
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """根据波动率百分位生成交易信号。
 
         Args:

@@ -12,12 +12,10 @@ No live API is touched: ``read_file`` performs local filesystem reads of the
 bundled skill docs only.
 """
 
-from __future__ import annotations
 
 import json
 import re
 from pathlib import Path
-from typing import List, Tuple
 
 import pytest
 
@@ -39,7 +37,7 @@ _MD_LINK_RE = re.compile(
 )
 
 
-def _extract_reference_links(skill: str) -> List[str]:
+def _extract_reference_links(skill: str) -> list[str]:
     """Return every markdown link target containing ``references/``.
 
     Args:
@@ -64,9 +62,9 @@ def _read(path: str) -> dict:
     return json.loads(ReadFileTool().execute(path=path))
 
 
-def _all_links() -> List[Tuple[str, str]]:
+def _all_links() -> list[Tuple[str, str]]:
     """Collect (skill, link) pairs across all skills under test."""
-    pairs: List[Tuple[str, str]] = []
+    pairs: list[Tuple[str, str]] = []
     for skill in _SKILLS_UNDER_TEST:
         for link in _extract_reference_links(skill):
             pairs.append((skill, link))
@@ -104,6 +102,7 @@ def test_bare_reference_link_would_fail() -> None:
 
     This documents the exact failure mode the prefix convention prevents.
     """
+
     skill, link = _all_links()[0]
     bare = link[len(f"{skill}/"):]  # strip the skill-name prefix
     body = _read(bare)

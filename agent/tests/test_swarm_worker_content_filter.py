@@ -6,14 +6,13 @@ content. The worker injects a system message telling the agent to move on,
 emits a ``content_filter_skipped`` event, and increments an internal counter.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import patch
 
+import src.swarm.worker as worker_mod
 from src.providers.chat import LLMResponse, ToolCallRequest
 from src.swarm.models import SwarmAgentSpec, SwarmEvent, SwarmTask, WorkerResult
-import src.swarm.worker as worker_mod
 from src.swarm.worker import run_worker
 
 FINAL_TEXT = (
@@ -44,7 +43,7 @@ class _ScriptedChatLLM:
         self.calls = 0
         self.received_messages: list[list[dict]] = []
 
-    def __call__(self, *args, **kwargs) -> "_ScriptedChatLLM":
+    def __call__(self, *args, **kwargs) -> _ScriptedChatLLM:
         return self
 
     def stream_chat(
@@ -210,6 +209,7 @@ def test_content_filter_no_warning_below_threshold(monkeypatch, tmp_path):
 
 def test_content_filter_circuit_breaker(monkeypatch, tmp_path):
     """10 consecutive content filters trip the circuit breaker → worker fails early."""
+
     responses = [LLMResponse(content="", content_filter_triggered=True) for _ in range(15)]
     llm = _ScriptedChatLLM(responses)
 

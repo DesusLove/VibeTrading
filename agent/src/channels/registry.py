@@ -1,6 +1,7 @@
+from typing import TYPE_CHECKING, Any
+
 """Auto-discovery for built-in channel modules and external plugins."""
 
-from __future__ import annotations
 
 import importlib
 import importlib.util
@@ -9,8 +10,6 @@ import pkgutil
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any
-from typing import TYPE_CHECKING
 
 from src.config.schema import ChannelsConfig
 
@@ -279,5 +278,6 @@ def discover_all() -> dict[str, type[BaseChannel]]:
 
     Built-in channels take priority — an external plugin cannot shadow a built-in name.
     """
+
     names = discover_channel_names()
     return discover_enabled(set(names), _names=names, _include_all_external=True)

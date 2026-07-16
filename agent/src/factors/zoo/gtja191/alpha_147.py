@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: Rolling OLS slope of MA12 against linear index, window 12.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     c = panel["close"]
     n = 12
     m = ts_mean(c, 12)

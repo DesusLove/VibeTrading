@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the preemptive kill-switch sweep (src/live/runtime/flatten.py).
 
 SPEC §7.5 component 6. Verifies cancel-then-flatten ordering, the cancel-only
@@ -5,11 +7,9 @@ default when the mandate forbids flatten, the no-retry-on-error contract
 (SPEC §8.5), and that every broker call is audited.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -49,6 +49,7 @@ class _Broker:
 @pytest.fixture
 def live_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Point the live runtime root at an isolated tmp dir."""
+
     monkeypatch.setattr(paths, "get_runtime_root", lambda: tmp_path)
     return tmp_path
 

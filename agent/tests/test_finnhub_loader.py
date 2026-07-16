@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for finnhub_loader: symbol mapping, payload parsing, auth gating, errors.
 
 All HTTP is mocked — no test ever reaches a live Finnhub endpoint. The loader
@@ -5,9 +7,6 @@ imports ``throttled_get_json`` from :mod:`backtest.loaders._http` into its own
 namespace, so we monkeypatch that name on the ``finnhub_loader`` module.
 """
 
-from __future__ import annotations
-
-from typing import Any, Dict, List
 
 import pandas as pd
 
@@ -201,6 +200,7 @@ class TestFetch:
 
 class TestRowParsing:
     """_rows_from_payload tolerance for malformed bodies."""
+
 
     def test_non_dict_payload(self):
         assert finnhub_loader._rows_from_payload(None) == []

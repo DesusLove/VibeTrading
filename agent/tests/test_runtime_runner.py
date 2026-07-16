@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Unit tests for the persistent live-trading runner (SPEC.md §7.5 #2, #7).
 
 The runner is exercised with all external dependencies stubbed — no live agent,
@@ -13,25 +16,22 @@ pytest-asyncio is not a dependency here, so the single async entry
 (:meth:`LiveRunner.run_once`) is driven via :func:`asyncio.run`.
 """
 
-from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta, timezone
-from typing import Any, Mapping
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from src.live.mandate.model import (
+    MANDATE_SCHEMA_VERSION,
     AssetClass,
     ConsentMeta,
     HardCaps,
     InstrumentType,
     Mandate,
     UniverseConstraint,
-    MANDATE_SCHEMA_VERSION,
 )
 from src.live.runtime.runner import (
-    LiveRunner,
     TICK_ERROR,
     TICK_EXPIRED,
     TICK_HALTED,
@@ -39,6 +39,7 @@ from src.live.runtime.runner import (
     TICK_NO_MANDATE,
     TICK_RECONCILE_ERROR,
     TICK_RECONCILE_UNSAFE,
+    LiveRunner,
     _mandate_is_expired,
     _parse_expiry,
     _pin_mandate_prompt,
@@ -46,7 +47,7 @@ from src.live.runtime.runner import (
 )
 
 BROKER = "robinhood"
-_FIXED_NOW = datetime(2026, 6, 1, 12, 0, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
 
 
 # --------------------------------------------------------------------------- #
@@ -144,6 +145,7 @@ def _read_stub() -> list:
 
 def _build_runner(tracker: _OrderTracker, **overrides) -> LiveRunner:
     """Build a runner wired entirely to the tracker stubs, with overrides."""
+
     kwargs: dict[str, Any] = dict(
         agent_caller=tracker.agent_caller,
         reconcile_fn=tracker.reconcile,
@@ -168,12 +170,12 @@ def _build_runner(tracker: _OrderTracker, **overrides) -> LiveRunner:
 
 def test_parse_expiry_handles_z_suffix() -> None:
     parsed = _parse_expiry("2026-06-28T00:00:00Z")
-    assert parsed == datetime(2026, 6, 28, tzinfo=timezone.utc)
+    assert parsed == datetime(2026, 6, 28, tzinfo=UTC)
 
 
 def test_parse_expiry_handles_offset() -> None:
     parsed = _parse_expiry("2026-06-28T00:00:00+00:00")
-    assert parsed == datetime(2026, 6, 28, tzinfo=timezone.utc)
+    assert parsed == datetime(2026, 6, 28, tzinfo=UTC)
 
 
 def test_parse_expiry_unparseable_is_none() -> None:
@@ -543,7 +545,7 @@ def test_real_audit_write_on_halt(monkeypatch, tmp_path) -> None:
     # Isolate the runtime root so the real ledger lands under tmp.
     monkeypatch.setattr("src.config.paths.Path.home", lambda: tmp_path)
     from src.live.audit import audit_ledger_path, write_live_action
-    from src.live.halt import halt_flag_set, trip_halt
+    from src.live.halt import trip_halt
 
     tracker = _OrderTracker()
     runner = LiveRunner(

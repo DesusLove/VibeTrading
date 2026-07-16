@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared decay metrics computation for bench history.
 
 Both ``sdm_decay_scan`` and ``sdm_status`` tools call this to compute
@@ -5,9 +7,6 @@ baseline/rolling IC and Sharpe metrics from a chronologically ordered
 bench-history list.
 """
 
-from __future__ import annotations
-
-from typing import Any
 
 _DECAY_INPUT_KEYS = ("ic_ratio", "rolling_ir", "ic_positive_ratio", "rolling_sharpe")
 
@@ -37,6 +36,7 @@ def compute_decay_metrics(
         ``rolling_ir``, ``ic_positive_ratio``, ``rolling_sharpe``, ``baseline_sharpe``.
         Values are ``None`` when insufficient data (< 3 non-None entries).
     """
+
     result: dict[str, float | None] = {
         "baseline_ic_mean": None,
         "rolling_ic_mean": None,

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #44 - 条件量价积
@@ -9,7 +10,7 @@
 Formula: (TSRANK(DECAYLINEAR(CORR(LOW,MEAN(VOLUME,10),7),6),4)+TSRANK(DECAYLINEAR(DELTA(VWAP,3),10),15))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 44."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

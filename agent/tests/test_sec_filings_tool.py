@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for get_sec_filings: success + error envelopes, HTTP fully mocked.
 
 The SEC client functions (``cik_for`` / ``get_submissions`` /
@@ -5,7 +6,7 @@ The SEC client functions (``cik_for`` / ``get_submissions`` /
 live ``sec.gov`` endpoint.
 """
 
-from __future__ import annotations
+
 
 import json
 from unittest.mock import patch

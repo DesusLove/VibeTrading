@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Shoonya (Finvasia) connector profiles.
 
 Shoonya (https://shoonya.com) by Finvasia offers ZERO brokerage on all
@@ -15,7 +16,7 @@ paper-trade profile, and exposes NO live order placement. The connector's
 order path is structurally capped at paper (see ``sdk.place_order``).
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

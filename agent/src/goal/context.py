@@ -1,8 +1,7 @@
+from typing import Any
+
 """Context helpers for session-scoped research goals."""
 
-from __future__ import annotations
-
-from typing import Any
 
 OPEN_CRITERION_STATUSES = {"", "pending", "open", "unsatisfied", "missing", "stale", "too_weak"}
 CONTINUABLE_GOAL_STATUSES = {"active", "needs_refresh", "insufficient_evidence"}
@@ -168,6 +167,7 @@ def get_current_goal_context(session_id: str) -> tuple[str, str | None]:
         Tuple of formatted context block and active goal id. Both are empty
         when no current goal exists.
     """
+
     if not session_id.strip():
         return "", None
     from src.goal.store import GoalStore

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared serialization helpers for the swarm read boundaries.
 
 Single source of truth for projecting a :class:`SwarmTask` into the per-task
@@ -10,9 +12,6 @@ produced ``status="failed"`` with no diagnosable reason anywhere the caller
 could see, even though the error was captured on disk (see P04).
 """
 
-from __future__ import annotations
-
-from typing import Any
 
 from src.tools.redaction import redact_internal_paths
 
@@ -44,6 +43,7 @@ def run_level_error(run: Any) -> str | None:
     Returns ``None`` (an explicit null, not an absent key) when no task carries
     an error, so a caller that only reads the top level still gets a signal.
     """
+
     for task in getattr(run, "tasks", None) or []:
         err = getattr(task, "error", None)
         if err:

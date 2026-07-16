@@ -1,9 +1,10 @@
+from collections.abc import Iterable
+from typing import Any
+
 """Tushare fundamental data provider with point-in-time safeguards."""
 
-from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Iterable
 
 import pandas as pd
 
@@ -225,6 +226,7 @@ def enrich_price_frames_with_fundamentals(
     ``income_total_revenue`` and ``fina_indicator_roe``. Each row becomes
     visible only on or after its announcement/disclosure date.
     """
+
     if not data_map or not fields_by_table:
         return data_map
 

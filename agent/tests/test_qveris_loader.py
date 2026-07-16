@@ -1,13 +1,13 @@
+from typing import Any
+
 """Tests for qveris_loader: config gating, mocked HTTP fetches, and registry safety.
 
 All QVeris calls are mocked by replacing ``requests.Session`` inside the loader
 module. No test reaches the live QVeris API or a signed full-content URL.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any
 
 import pandas as pd
 import pytest
@@ -450,6 +450,7 @@ def test_auto_fallback_chains_do_not_contain_qveris():
 
 def test_explicit_unavailable_qveris_does_not_fallback_to_network():
     """An unavailable explicit qveris source raises instead of falling back."""
+
     with pytest.raises(NoAvailableSourceError) as excinfo:
         get_loader_cls_with_fallback("qveris")
     assert "qveris" in str(excinfo.value).lower()

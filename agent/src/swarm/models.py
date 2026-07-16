@@ -4,7 +4,6 @@ All Pydantic models defined here, shared by store / task_store / worker / runtim
 Enums use str+Enum to ensure JSON-serialization compatibility.
 """
 
-from __future__ import annotations
 
 from enum import Enum
 
@@ -205,6 +204,7 @@ class WorkerResult(BaseModel):
         input_tokens: Cumulative input tokens (exact or estimated).
         output_tokens: Cumulative output tokens (exact or estimated).
     """
+
 
     status: WorkerStatus
     summary: str

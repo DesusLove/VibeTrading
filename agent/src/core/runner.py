@@ -1,6 +1,7 @@
+from typing import Any
+
 """Runner module for executing generated backtest code and collecting artifacts."""
 
-from __future__ import annotations
 
 import os
 import subprocess
@@ -8,10 +9,8 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
 
 from rich.console import Console
-
 
 console = Console(stderr=True)
 
@@ -184,7 +183,7 @@ _ARTIFACTS_SPEC = {
 }
 
 
-def _expand_artifacts_spec(spec: Dict[str, Any] | None) -> Dict[str, Dict[str, Any]]:
+def _expand_artifacts_spec(spec: dict[str, Any] | None) -> dict[str, Dict[str, Any]]:
     """Expand artifacts_spec into a name -> metadata dict.
 
     Args:
@@ -199,7 +198,7 @@ def _expand_artifacts_spec(spec: Dict[str, Any] | None) -> Dict[str, Dict[str, A
     artifacts = spec.get("artifacts") or {}
     defaults = spec.get("defaults") or {}
     required = set(defaults.get("required") or [])
-    expanded: Dict[str, Dict[str, Any]] = {}
+    expanded: dict[str, Dict[str, Any]] = {}
     for name, meta in artifacts.items():
         if not isinstance(meta, dict):
             continue
@@ -216,7 +215,7 @@ def _expand_artifacts_spec(spec: Dict[str, Any] | None) -> Dict[str, Dict[str, A
 class Runner:
     """Execute entry scripts inside a run directory and collect outputs."""
 
-    def __init__(self, timeout: int = 300, artifacts_spec: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, timeout: int = 300, artifacts_spec: dict[str, Any | None] = None) -> None:
         """Initialize runner.
 
         Args:
@@ -321,6 +320,7 @@ class Runner:
         Returns:
             RunResult object with process output and discovered artifacts.
         """
+
 
         console.print(f"[blue]Runner: executing {entry_script}[/blue]")
         stdout_path = run_dir / "logs" / "runner_stdout.txt"

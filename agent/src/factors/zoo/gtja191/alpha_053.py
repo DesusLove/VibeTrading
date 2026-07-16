@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #53 - 高低价差比
@@ -9,7 +10,7 @@
 Formula: COUNT(CLOSE>DELAY(CLOSE,1),12)/12*100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 53."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Agent tool: research-report data audit (extract → verify → verdict).
 
 A ``BaseTool`` wrapper around the report-audit routines that guard published
@@ -18,13 +20,11 @@ market-data / financial-statement tools: read the report, extract here, fetch
 there, then verdict here. Read-only: returns JSON, writes nothing.
 """
 
-from __future__ import annotations
 
 import json
 import math
 import re
 from random import Random
-from typing import Any
 
 from src.agent.tools import BaseTool
 
@@ -377,6 +377,7 @@ class ReportAuditTool(BaseTool):
             JSON string — ``status="ok"`` with the result on success,
             ``status="error"`` with a message otherwise.
         """
+
         command = str(kwargs.get("command") or "").strip()
         try:
             if command == "extract":

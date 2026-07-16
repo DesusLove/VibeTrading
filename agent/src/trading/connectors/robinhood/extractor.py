@@ -16,7 +16,6 @@ reconciles them to the larger enforced notional (closing the notional+quantity
 bypass).
 """
 
-from __future__ import annotations
 
 from src.live.enforcement import OrderIntent
 from src.live.mandate.model import InstrumentType
@@ -153,6 +152,7 @@ def _extract_size(kwargs: dict) -> tuple[float | None, float | None]:
 
 def _first_positive_float(kwargs: dict, keys: tuple[str, ...]) -> float | None:
     """Return the first present key's value as a positive float, else ``None``."""
+
     for key in keys:
         if key in kwargs:
             try:

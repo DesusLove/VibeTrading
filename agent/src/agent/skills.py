@@ -1,3 +1,5 @@
+from typing import Any
+
 """SkillsLoader: loads scenario guides from the skills/ directory.
 
 Uses progressive disclosure:
@@ -5,11 +7,9 @@ Uses progressive disclosure:
 - Full docs loaded on demand (get_content, called by the load_skill tool).
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -29,10 +29,10 @@ class Skill:
     description: str = ""
     category: str = "other"
     body: str = ""
-    dir_path: Optional[Path] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    dir_path: Path | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def load_support_file(self, filename: str) -> Optional[str]:
+    def load_support_file(self, filename: str) -> str | None:
         """Load a supporting file on demand.
 
         Args:
@@ -55,7 +55,7 @@ class Skill:
 from src.agent.frontmatter import parse_frontmatter as _parse_frontmatter  # shared util
 
 
-def _load_skill_dir(dir_path: Path) -> Optional[Skill]:
+def _load_skill_dir(dir_path: Path) -> Skill | None:
     """Load a skill from a directory.
 
     Args:
@@ -97,8 +97,8 @@ class SkillsLoader:
         skills: Loaded skill list (bundled + user-created).
     """
 
-    def __init__(self, skills_dir: Optional[Path] = None,
-                 user_skills_dir: Optional[Path] = None) -> None:
+    def __init__(self, skills_dir: Path | None = None,
+                 user_skills_dir: Path | None = None) -> None:
         """Initialize SkillsLoader.
 
         Args:
@@ -107,7 +107,7 @@ class SkillsLoader:
         """
         self.skills_dir = skills_dir or Path(__file__).resolve().parents[1] / "skills"
         self._user_skills_dir = user_skills_dir or USER_SKILLS_DIR
-        self.skills: List[Skill] = []
+        self.skills: list[Skill] = []
         self._load()
 
     def _load(self) -> None:
@@ -142,14 +142,14 @@ class SkillsLoader:
         if not self.skills:
             return "(no skills)"
 
-        groups: Dict[str, List[Skill]] = {}
+        groups: dict[str, list[Skill]] = {}
         for skill in self.skills:
             groups.setdefault(skill.category, []).append(skill)
 
         ordered_cats = [c for c in self._CATEGORY_ORDER if c in groups]
         ordered_cats += [c for c in sorted(groups) if c not in ordered_cats]
 
-        lines: List[str] = []
+        lines: list[str] = []
         for cat in ordered_cats:
             lines.append(f"\n### {cat}")
             for skill in groups[cat]:
@@ -167,6 +167,7 @@ class SkillsLoader:
         Returns:
             XML-wrapped full skill document, or an error message.
         """
+
         for skill in self.skills:
             if skill.name == name:
                 return f'<skill name="{name}">\n{skill.body}\n</skill>'

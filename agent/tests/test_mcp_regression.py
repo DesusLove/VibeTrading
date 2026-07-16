@@ -1,3 +1,5 @@
+from typing import Any
+
 """Regression tests: existing MCP server mode and no-config behavior.
 
 These tests guard against regressions introduced by the MCP client integration:
@@ -21,12 +23,10 @@ IMPORTANT notes:
   to-end in Phase 6+.
 """
 
-from __future__ import annotations
 
 import importlib
 import sys
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -214,6 +214,7 @@ def test_trading_mcp_wrappers_do_not_send_implicit_local_overrides(monkeypatch: 
 
 def test_trading_mcp_wrappers_forward_explicit_local_overrides(monkeypatch: pytest.MonkeyPatch) -> None:
     """Explicit local override fields are still forwarded to the backend."""
+
     mod = _import_mcp_server()
     registry = _RecordingRegistry()
     monkeypatch.setattr(mod, "_get_registry", lambda: registry)

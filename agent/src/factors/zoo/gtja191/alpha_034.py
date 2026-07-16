@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #34 - 量价波动偏度
@@ -9,7 +10,7 @@
 Formula: MEAN(CLOSE,12)/CLOSE
 Source: 国泰君安 191 alpha 研报 (2014), alpha 34."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

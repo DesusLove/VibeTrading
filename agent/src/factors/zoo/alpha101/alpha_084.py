@@ -10,7 +10,6 @@ Formula (paper appendix): SignedPower(Ts_Rank(vwap-ts_max(vwap,15), 21), delta(c
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 84.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ __alpha_meta__ = {
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     vwap = panel["vwap"]
 

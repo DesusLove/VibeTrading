@@ -9,7 +9,8 @@
 from __future__ import annotations
 
 import pandas as pd
-from src.factors.base import safe_div, delta
+
+from src.factors.base import delta, safe_div
 
 __alpha_meta__ = {
     'id': 'qlib158_beta5',

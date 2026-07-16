@@ -1,14 +1,15 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """Upload and Shadow Account report HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_uploads_routes(app, ...)``.
 """
 
-from __future__ import annotations
 
 import re
 import uuid
 from pathlib import Path
-from typing import Any, Awaitable, Callable
 
 from fastapi import Depends, FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse
@@ -122,6 +123,7 @@ def register_uploads_routes(
         CSV/TSV, plain text, JSON, and TOML. Executables, executable-adjacent
         source/config/template files, and archives are rejected.
         """
+
         if not file.filename:
             raise HTTPException(status_code=400, detail="Missing filename")
         filename = Path(file.filename).name

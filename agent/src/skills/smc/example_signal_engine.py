@@ -9,7 +9,6 @@
 
 import os
 import sys
-from typing import Dict, Optional
 
 # smartmoneyconcepts prints emoji on import — force UTF-8 on Windows
 if sys.platform == "win32":
@@ -17,7 +16,6 @@ if sys.platform == "win32":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-import numpy as np
 import pandas as pd
 from smartmoneyconcepts import smc
 
@@ -78,7 +76,7 @@ class SignalEngine:
         self.swing_length = swing_length
         self.close_break = close_break
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """根据 Smart Money Concepts 生成交易信号。
 
         Args:

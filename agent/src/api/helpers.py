@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Dict
 
 from fastapi import HTTPException, Request, status
 from fastapi.responses import FileResponse
 
 from src.api._compat import host_attr as _host_attr
-
 
 # ============================================================================
 # Path constants
@@ -82,9 +80,9 @@ def _strip_env_value(value: str) -> str:
     return value.strip()
 
 
-def _read_env_values(path: Path) -> Dict[str, str]:
+def _read_env_values(path: Path) -> dict[str, str]:
     """Read active KEY=value entries from a dotenv file."""
-    values: Dict[str, str] = {}
+    values: dict[str, str] = {}
     if not path.exists():
         return values
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -121,7 +119,7 @@ def _format_env_value(value: str) -> str:
     return value
 
 
-def _write_env_values(path: Path, updates: Dict[str, str]) -> None:
+def _write_env_values(path: Path, updates: dict[str, str]) -> None:
     """Upsert active dotenv values while preserving comments and ordering."""
     _ensure_agent_env_file()
     lines = path.read_text(encoding="utf-8").splitlines()

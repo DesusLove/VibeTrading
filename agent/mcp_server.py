@@ -37,13 +37,10 @@ Claude Desktop config:
     }
 """
 
-from __future__ import annotations
 
 # ruff: noqa: E402
-
 import json
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -54,6 +51,7 @@ if str(AGENT_DIR) not in sys.path:
     sys.path.insert(0, str(AGENT_DIR))
 
 from fastmcp import Context, FastMCP
+
 from cli._version import __version__ as APP_VERSION
 from src.market_data import (
     DEFAULT_MAX_ROWS,
@@ -930,6 +928,7 @@ async def run_swarm(
     """
     import asyncio
     import time
+
     from src.config import load_swarm_agent_config
     from src.swarm.runtime import SwarmRuntime
     from src.swarm.store import SwarmStore, swarm_runs_root
@@ -1891,6 +1890,7 @@ def scan_shadow_signals(
 
 def main():
     """Entry point for `vibe-trading-mcp` CLI command."""
+
     global _include_shell_tools, _registry
     import argparse
 

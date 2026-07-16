@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #37 - 开盘累计变化
@@ -9,7 +10,7 @@
 Formula: (-1*RANK(((SUM(OPEN,5)*SUM(RET,5))-DELAY((SUM(OPEN,5)*SUM(RET,5)),10))))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 37."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

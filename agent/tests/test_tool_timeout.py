@@ -1,11 +1,11 @@
+from typing import Any
+
 """Tool timeout/liveness regression tests."""
 
-from __future__ import annotations
 
 import json
 import time
 from types import SimpleNamespace
-from typing import Any
 
 from src.agent import loop as loop_mod
 from src.agent.loop import AgentLoop
@@ -65,6 +65,7 @@ def test_tool_timeout_returns_error_and_stops_heartbeats(monkeypatch) -> None:
 
 def test_write_tool_timeout_warns_but_does_not_return_before_completion(monkeypatch) -> None:
     """Write tools must not report failure while their side effect continues."""
+
     monkeypatch.setattr(loop_mod, "TOOL_TIMEOUT_SECONDS", 0.02)
     monkeypatch.setattr(loop_mod, "HEARTBEAT_INTERVAL_S", 0.01)
     events: list[tuple[str, dict[str, Any]]] = []

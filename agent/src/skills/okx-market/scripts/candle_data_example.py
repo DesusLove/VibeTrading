@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """加密货币K线数据获取示例脚本。"""
 
-from typing import Optional
 
-import requests
 import pandas as pd
-from datetime import datetime
+import requests
 
 BASE_URL = "https://www.okx.com/api/v5"
 
@@ -14,7 +11,7 @@ CANDLE_COLUMNS = ["ts", "open", "high", "low", "close", "vol", "volCcy", "volCcy
 INDEX_CANDLE_COLUMNS = ["ts", "open", "high", "low", "close", "confirm"]
 
 
-def get_candles(inst_id: str, bar: str = "1D", limit: int = 100) -> Optional[pd.DataFrame]:
+def get_candles(inst_id: str, bar: str = "1D", limit: int = 100) -> pd.DataFrame | None:
     """获取K线数据并转为 DataFrame。
 
     Args:
@@ -45,7 +42,7 @@ def get_candles(inst_id: str, bar: str = "1D", limit: int = 100) -> Optional[pd.
         return None
 
 
-def get_index_candles(inst_id: str, bar: str = "1D", limit: int = 100) -> Optional[pd.DataFrame]:
+def get_index_candles(inst_id: str, bar: str = "1D", limit: int = 100) -> pd.DataFrame | None:
     """获取指数K线数据。
 
     Args:

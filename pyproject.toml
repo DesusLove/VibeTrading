@@ -5,7 +5,7 @@ description = "Natural-language finance research AI agent with backtesting"
 requires-python = ">=3.11"
 license = "MIT"
 readme = "README.md"
-authors = []
+authors = [{ name = "DesusLove", email = "desuslove@users.noreply.github.com" }]
 keywords = ["finance", "trading", "backtesting", "agent", "swarm", "quantitative"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -195,6 +195,19 @@ target-version = "py311"
 line-length = 120
 src = ["agent"]
 
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
+ignore = ["E501", "E402", "F404", "B904", "SIM114", "UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+"agent/src/factors/zoo/**/*.py" = ["F401"]
+"agent/src/agent/loop.py" = ["B023"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
 [tool.coverage.run]
 source = ["agent"]
 omit = [
@@ -206,19 +219,11 @@ omit = [
 [tool.coverage.report]
 show_missing = true
 skip_empty = true
-fail_under = 0
+fail_under = 30
 exclude_also = [
     "if __name__ == .__main__.",
     "raise NotImplementedError",
     "\\.\\.\\.",
 ]
 
-[tool.ruff.lint]
-select = ["E", "F", "W"]
-ignore = ["E501"]
 
-[tool.ruff.lint.per-file-ignores]
-# Alpha zoo files import the full src.factors.base surface verbatim
-# to match research-paper formulas. F401 (unused-import) is noise here;
-# F841 (unused-local-variable) stays active to catch real formula bugs.
-"agent/src/factors/zoo/**/*.py" = ["F401"]

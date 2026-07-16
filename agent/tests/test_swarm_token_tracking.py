@@ -15,7 +15,6 @@ reading them. These tests pin down both ends of the new contract:
   report usage.
 """
 
-from __future__ import annotations
 
 from types import SimpleNamespace
 
@@ -23,7 +22,6 @@ import pytest
 
 from src.providers.chat import ChatLLM, LLMResponse
 from src.swarm.worker import _estimate_tokens
-
 
 # --------------------------------------------------------------------------- #
 # ChatLLM._parse_response — usage_metadata propagation
@@ -149,6 +147,7 @@ def test_estimate_tokens_handles_non_llmresponse_object_safely() -> None:
 def test_estimate_tokens_ignores_extra_metadata_fields(metadata_keys_extra: dict) -> None:
     """LangChain occasionally returns extra fields (cache hits, reasoning
     sub-counts). They should not interfere with the bare input/output read."""
+
     metadata = {"input_tokens": 100, "output_tokens": 20, **metadata_keys_extra}
     response = LLMResponse(content="x", usage_metadata=metadata)
     in_tok, out_tok = _estimate_tokens([], response)

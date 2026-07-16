@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """AgentLoop single stream retry on ProviderStreamError.
 
 Mirrors the swarm worker policy: a transient mid-stream failure (connection
@@ -7,12 +10,8 @@ request. Deltas from the failed attempt are dropped so the trace does not
 contain duplicated thinking text.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable
-
-import pytest
 
 import src.agent.loop as loop_mod
 from src.providers.chat import LLMResponse, ProviderStreamError
@@ -184,6 +183,7 @@ def test_double_stream_failure_fails_run(monkeypatch, tmp_path: Path) -> None:
 
 def test_non_retryable_4xx_fails_without_retry(monkeypatch, tmp_path: Path) -> None:
     """A deterministic 4xx ProviderStreamError fails immediately (1 call)."""
+
     llm = _FlakyLoopLLM([_bad_request_error()], "Final answer.")
 
     result = _run(monkeypatch, tmp_path, llm)

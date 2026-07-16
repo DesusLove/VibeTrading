@@ -8,7 +8,6 @@ and only place the version is ever written. There is deliberately no hardcoded
 version constant to drift out of sync on release (issue #156).
 """
 
-from __future__ import annotations
 
 from typing import Final
 
@@ -21,6 +20,7 @@ def _version_from_pyproject() -> str:
         or parsed (only reachable for an un-installed checkout whose tree has
         been moved away from its ``pyproject.toml``).
     """
+
     import tomllib
     from pathlib import Path
 
@@ -33,7 +33,8 @@ def _version_from_pyproject() -> str:
 
 
 try:
-    from importlib.metadata import PackageNotFoundError, version as _pkg_version
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _pkg_version
 
     try:
         __version__: Final[str] = _pkg_version("vibe-trading-ai")

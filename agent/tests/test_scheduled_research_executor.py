@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+
 from src.scheduled_research.executor import (
     ScheduledResearchExecutor,
     is_due,
@@ -18,7 +19,7 @@ from src.scheduled_research.store import ScheduledResearchJobStore
 
 
 def _ms(year: int, month: int, day: int, hour: int, minute: int) -> int:
-    return int(datetime(year, month, day, hour, minute, tzinfo=timezone.utc).timestamp() * 1000)
+    return int(datetime(year, month, day, hour, minute, tzinfo=UTC).timestamp() * 1000)
 
 
 def _store(tmp_path: Path) -> ScheduledResearchJobStore:

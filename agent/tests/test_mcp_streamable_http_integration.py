@@ -1,3 +1,5 @@
+from typing import Any
+
 """Integration tests: full-stack streamable HTTP MCP client path with FastMCP.
 
 These tests spawn an actual FastMCP streamable HTTP server process
@@ -11,10 +13,8 @@ entire path:
                     -> remote tool callable from registry
 """
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -109,6 +109,7 @@ def test_enabled_tools_filter_limits_remote_streamable_http_tools(tmp_path: Path
 
 def test_unreachable_streamable_http_server_does_not_block_local_tools(tmp_path: Path) -> None:
     """An unreachable streamable HTTP server must be skipped with a warning."""
+
     from src.config.loader import load_agent_config
     from src.tools import build_registry
 

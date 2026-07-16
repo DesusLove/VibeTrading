@@ -1,6 +1,7 @@
+from typing import Any, Literal, NamedTuple
+
 """WhatsApp channel implementation using neonize."""
 
-from __future__ import annotations
 
 import asyncio
 import mimetypes
@@ -10,15 +11,13 @@ import time
 from collections import OrderedDict
 from contextlib import suppress
 from pathlib import Path
-from typing import Any, Literal, NamedTuple
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
 from src.channels.utils import get_media_dir, get_runtime_subdir
-from pydantic import BaseModel
 
 
 class WhatsAppConfig(BaseModel):
@@ -268,6 +267,7 @@ def _media_message(message: Any) -> _MediaInfo | None:
 
 class WhatsAppChannel(BaseChannel):
     """WhatsApp channel using neonize's async WhatsApp client."""
+
 
     name = "whatsapp"
     display_name = "WhatsApp"

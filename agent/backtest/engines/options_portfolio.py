@@ -1,3 +1,5 @@
+from typing import Any
+
 """Options portfolio backtest engine (v2).
 
 Supports European and American options via Black-Scholes model with
@@ -17,12 +19,10 @@ Artifacts: equity.csv, metrics.csv, trades.csv, greeks.csv.
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-
 
 # --- Black-Scholes pricing ---
 

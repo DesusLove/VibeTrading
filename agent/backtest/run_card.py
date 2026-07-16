@@ -1,14 +1,14 @@
+from collections.abc import Mapping, Sequence
+from typing import Any
+
 """Trust Layer run card generator for backtest runs."""
 
-from __future__ import annotations
 
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
-
 
 SCHEMA_VERSION = "0.1"
 BACKTEST_SUMMARY_KEYS = (
@@ -47,6 +47,7 @@ def write_run_card(
     Returns:
         The run card payload written to ``run_card.json``.
     """
+
     run_dir = Path(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
 
@@ -96,7 +97,7 @@ def write_run_card(
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def _json_hash(value: Mapping[str, Any]) -> str:

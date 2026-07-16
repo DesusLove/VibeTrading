@@ -9,17 +9,15 @@ File-system-based persistence for SwarmRun. Directory structure:
     └── artifacts/       # agent outputs
 """
 
-from __future__ import annotations
 
 import json
 import os
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from src.config.accessor import get_env_config
-
 from src.swarm.models import SwarmEvent, SwarmRun
 from src.tools.redaction import redact_internal_paths
 
@@ -32,8 +30,8 @@ def _parse_iso(value: str | None) -> datetime | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
 def _last_event_timestamp(events_file: Path) -> datetime | None:
@@ -255,9 +253,8 @@ class SwarmStore:
         if not rd.exists():
             raise FileNotFoundError(f"Run directory not found: {rd.name}")
         events_file = rd / "events.jsonl"
-        with self._write_lock:
-            with events_file.open("a", encoding="utf-8") as f:
-                f.write(event.model_dump_json() + "\n")
+        with self._write_lock, events_file.open("a", encoding="utf-8") as f:
+            f.write(event.model_dump_json() + "\n")
 
     def read_events(self, run_id: str, after_index: int = 0) -> list[SwarmEvent]:
         """Read the event log with optional offset for SSE incremental streaming.
@@ -356,7 +353,7 @@ class SwarmStore:
         last_activity = last_activity or _parse_iso(run.created_at)
         if last_activity is None:
             return False
-        now = now or datetime.now(timezone.utc)
+        now = now or datetime.now(UTC)
         return (now - last_activity).total_seconds() > self.compute_stale_threshold(run)
 
     def reconcile_run(self, run: SwarmRun, *, write: bool = True) -> SwarmRun:
@@ -392,7 +389,7 @@ class SwarmStore:
         from src.swarm.models import RunStatus, TaskStatus
 
         hydrated = self.hydrate_run(run)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         terminal_run = {RunStatus.completed, RunStatus.failed, RunStatus.cancelled}
         terminal_task = {TaskStatus.completed, TaskStatus.failed, TaskStatus.cancelled}
 
@@ -520,7 +517,7 @@ class SwarmStore:
                 SwarmEvent(
                     type=kind,
                     data=data,
-                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    timestamp=datetime.now(UTC).isoformat(),
                 ),
             )
         except Exception:  # pragma: no cover
@@ -557,6 +554,7 @@ class SwarmStore:
             path: Target file path.
             content: File content.
         """
+
         tmp_path = path.with_suffix(".tmp")
         with self._write_lock:
             tmp_path.write_text(content, encoding="utf-8")

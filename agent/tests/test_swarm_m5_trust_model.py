@@ -1,3 +1,5 @@
+from typing import Any
+
 """M5 — SWARM external MCP tools: trust-model regression tests.
 
 Covers requirements R-06 and tests T-16, T-17, T-18 in
@@ -29,12 +31,10 @@ file on disk); the MCP caller only owns ``preset_name`` + ``variables``
 which carry no config authority.
 """
 
-from __future__ import annotations
 
 import asyncio
 import logging
 from pathlib import Path
-from typing import Any
 from unittest.mock import patch
 
 import mcp_server
@@ -42,7 +42,6 @@ from src.config.schema import AgentConfig
 from src.providers.chat import LLMResponse
 from src.swarm.models import RunStatus, SwarmAgentSpec, SwarmRun, SwarmTask
 from src.swarm.worker import run_worker
-
 
 # --------------------------------------------------------------------------- #
 # T-16 — FastMCP schema introspection (R-06)
@@ -350,6 +349,7 @@ def test_unknown_mcp_server_tool_drops_cleanly_with_attack_shaped_variables(
         server — the only authority for which servers exist is the
         boot ``agent_config``.
     """
+
     # Boot allowlist is empty: operator has approved zero MCP servers.
     boot_cfg = AgentConfig.model_validate({"mcpServers": {}})
 

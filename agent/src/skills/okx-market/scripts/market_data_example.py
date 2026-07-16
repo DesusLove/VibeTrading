@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """加密货币行情数据获取示例脚本。"""
 
-from typing import Optional
 
-import requests
 import pandas as pd
-from datetime import datetime
+import requests
 
 BASE_URL = "https://www.okx.com/api/v5"
 
 
-def get_ticker(inst_id: str) -> Optional[dict]:
+def get_ticker(inst_id: str) -> dict | None:
     """获取单个产品的实时行情。
 
     Args:
@@ -37,7 +34,7 @@ def get_ticker(inst_id: str) -> Optional[dict]:
         return None
 
 
-def get_top_tickers(inst_type: str = "SPOT", top_n: int = 10) -> Optional[pd.DataFrame]:
+def get_top_tickers(inst_type: str = "SPOT", top_n: int = 10) -> pd.DataFrame | None:
     """获取成交额排名前N的交易对。
 
     Args:
@@ -62,7 +59,7 @@ def get_top_tickers(inst_type: str = "SPOT", top_n: int = 10) -> Optional[pd.Dat
         return None
 
 
-def get_funding_rates(symbols: Optional[list] = None) -> Optional[pd.DataFrame]:
+def get_funding_rates(symbols: list | None = None) -> pd.DataFrame | None:
     """获取永续合约资金费率。
 
     Args:

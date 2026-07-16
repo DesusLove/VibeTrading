@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shadow Account — strategy extraction from profitable roundtrips.
 
 Pipeline:
@@ -17,11 +19,9 @@ Design constraints:
     * Rules are immutable ShadowRule objects — codegen's only input.
 """
 
-from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -607,6 +607,7 @@ def _render_profile_text(
     preferred_markets: tuple[str, ...],
 ) -> str:
     """Build the Section 1 one-paragraph portrait (English)."""
+
     median, p75 = typical_holding
     markets_label = ", ".join(_MARKET_LABELS.get(m, m) for m in preferred_markets[:3])
     source_label = _MARKET_LABELS.get(source_market, source_market)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated read/write classification for Binance (ccxt) spot operations.
 
 Keys are the ccxt unified method names this connector uses. Order-mutating ccxt
@@ -6,7 +7,7 @@ anything unlisted and not a known read is treated as WRITE (fail-closed) by the
 gate.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

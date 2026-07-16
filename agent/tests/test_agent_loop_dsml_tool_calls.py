@@ -1,10 +1,10 @@
+from typing import Any
+
 """Regression tests for DSML textual tool calls in the ReAct loop."""
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from src.agent.loop import AgentLoop
 from src.agent.tools import BaseTool, ToolRegistry
@@ -22,7 +22,7 @@ class _Chunk:
         self.response_metadata = {"finish_reason": "stop"}
         self.usage_metadata = None
 
-    def __add__(self, other: "_Chunk") -> "_Chunk":
+    def __add__(self, other: _Chunk) -> _Chunk:
         return _Chunk(f"{self.content}{other.content}")
 
 
@@ -32,7 +32,7 @@ class _ScriptedStreamingLLM:
     def __init__(self, responses: list[str]) -> None:
         self._responses = responses
 
-    def bind_tools(self, tools: list[dict[str, Any]]) -> "_ScriptedStreamingLLM":
+    def bind_tools(self, tools: list[dict[str, Any]]) -> _ScriptedStreamingLLM:
         return self
 
     def stream(self, messages: list[dict[str, Any]], config: dict[str, Any] | None = None):
@@ -65,6 +65,7 @@ def _chat_llm(fake_llm: _ScriptedStreamingLLM) -> ChatLLM:
 
 def test_agent_loop_executes_dsml_textual_tool_call(tmp_path: Path) -> None:
     """A pure DSML response must execute as a tool call instead of final text."""
+
     dsml = (
         '<｜｜DSML｜｜tool_calls>'
         '<｜｜DSML｜｜invoke name="echo_probe">'

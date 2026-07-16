@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only tool: FRED macroeconomic time series (St. Louis Fed).
 
 The Federal Reserve Bank of St. Louis publishes hundreds of thousands of
@@ -16,12 +18,9 @@ project's IP-throttled HTTP layer under the ``fred`` host bucket so the API is
 never hit un-throttled.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-import os
-from typing import Any
 
 from backtest.loaders._http import resolve_min_interval, throttled_get_json
 from src.agent.tools import BaseTool
@@ -257,4 +256,5 @@ def _to_number(value: Any) -> float | None:
 
 def _error(message: str) -> str:
     """Render a failure envelope as a JSON string."""
+
     return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

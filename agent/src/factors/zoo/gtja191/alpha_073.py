@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #73
@@ -9,7 +10,7 @@
 Formula: ((TSRANK(DECAYLINEAR(DECAYLINEAR(CORR((CLOSE),VOLUME,10),16),4),5) - RANK(DECAYLINEAR(CORR(VWAP,MEAN(VOLUME,30),4),3))) * -1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 73."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

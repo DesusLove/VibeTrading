@@ -10,8 +10,8 @@ from unittest.mock import patch
 
 import pytest
 
-from src.trading.connectors.ibkr import local
 from src.tools.trading_connector_tool import TradingPositionsTool
+from src.trading.connectors.ibkr import local
 
 pytestmark = pytest.mark.unit
 

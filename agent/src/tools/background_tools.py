@@ -1,13 +1,13 @@
+from typing import Any
+
 """Background tasks: thread execution + notification queue."""
 
-from __future__ import annotations
 
 import json
 import subprocess
 import threading
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 from src.agent.tools import BaseTool
 
@@ -18,8 +18,8 @@ class BackgroundManager:
     """Background thread execution + notification queue."""
 
     def __init__(self) -> None:
-        self.tasks: Dict[str, dict] = {}
-        self._notifications: List[dict] = []
+        self.tasks: dict[str, dict] = {}
+        self._notifications: list[dict] = []
         self._lock = threading.Lock()
 
     def run(self, command: str) -> str:
@@ -55,7 +55,7 @@ class BackgroundManager:
                 "command": command[:80], "result": (output or "")[:500],
             })
 
-    def check(self, task_id: Optional[str] = None) -> str:
+    def check(self, task_id: str | None = None) -> str:
         if task_id:
             t = self.tasks.get(task_id)
             if not t:
@@ -65,7 +65,7 @@ class BackgroundManager:
         lines = [f"{tid}: [{t['status']}] {t['command'][:60]}" for tid, t in self.tasks.items()]
         return "\n".join(lines) if lines else "No background tasks."
 
-    def drain_notifications(self) -> List[dict]:
+    def drain_notifications(self) -> list[dict]:
         with self._lock:
             notifs = list(self._notifications)
             self._notifications.clear()
@@ -77,6 +77,7 @@ _BG = BackgroundManager()
 
 def get_background_manager() -> BackgroundManager:
     """Return the global BackgroundManager singleton."""
+
     return _BG
 
 

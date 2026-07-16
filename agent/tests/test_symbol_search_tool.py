@@ -5,7 +5,6 @@ All HTTP is mocked at the client functions the tool imports
 ``sec_edgar_client.cik_for``), so no test ever reaches a live endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -164,6 +163,7 @@ class TestSymbolSearchSuccess:
 
 class TestSymbolSearchErrors:
     """Error envelopes and per-source resilience."""
+
 
     def test_missing_query_returns_error_envelope(self):
         out = ss.SymbolSearchTool().execute(query="   ")

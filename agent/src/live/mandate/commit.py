@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """The single mandate writer — the COMMIT half of the consent state machine.
 
 This module is deliberately **not** a tool and **not** importable/registerable
@@ -24,7 +27,6 @@ Storage layout (under :func:`src.live.paths.live_root`)::
     <runtime_root>/live/<broker>/consent/<id>.json   # 0600, consent records
 """
 
-from __future__ import annotations
 
 import hashlib
 import json
@@ -32,9 +34,8 @@ import logging
 import os
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Mapping
 
 from src.live.mandate.model import MANDATE_SCHEMA_VERSION
 from src.live.paths import broker_dir
@@ -112,7 +113,7 @@ class CommitError(ValueError):
 
 def _utcnow() -> datetime:
     """Return the current UTC time (seam for tests)."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _new_id(prefix: str) -> str:
@@ -491,6 +492,7 @@ def _profile_to_universe(profile: Mapping[str, Any]) -> dict[str, Any]:
     Returns:
         A ``universe`` dict in the persisted mandate schema.
     """
+
     return {
         "asset_classes": list(profile.get("asset_classes") or ["us_equity"]),
         "min_market_cap_usd": profile.get("min_market_cap_usd"),

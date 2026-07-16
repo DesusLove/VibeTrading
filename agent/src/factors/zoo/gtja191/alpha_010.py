@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #10 - 条件收益平方极值
@@ -9,7 +10,7 @@
 Formula: RANK(MAX(((RET<0)?STD(RET,20):CLOSE)^2,5))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 10."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

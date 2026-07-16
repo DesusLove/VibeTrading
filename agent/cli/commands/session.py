@@ -6,7 +6,6 @@
 * ``/export`` is a placeholder — the rich export lives in the Web bubble.
 """
 
-from __future__ import annotations
 
 from typing import Any
 
@@ -87,6 +86,7 @@ _DISPATCH = {
 
 def run(ctx: Any = None, command: str = "history", *args: str) -> int:
     """Dispatch ``run("history")`` / ``run("search", ...)`` / ``run("export")``."""
+
     handler = _DISPATCH.get(command)
     if handler is None:
         console = _resolve_console()

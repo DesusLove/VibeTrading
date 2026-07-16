@@ -1,10 +1,10 @@
+from collections.abc import Mapping
+
 """Provider capability definitions for OpenAI-compatible chat adapters."""
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
 from importlib.metadata import PackageNotFoundError, version
-from typing import Mapping, Optional
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ class ProviderCapabilities:
     """
 
     name: str
-    api_key_env: Optional[str]
+    api_key_env: str | None
     base_url_env: str
     capture_reasoning: bool = False
     send_reasoning_content: bool = False
@@ -37,7 +37,7 @@ class ProviderCapabilities:
     normalize_assistant_content: bool = False
     openrouter_reasoning_body: bool = False
     default_headers: Mapping[str, str] = field(default_factory=dict)
-    native_adapter_package: Optional[str] = None
+    native_adapter_package: str | None = None
 
 
 # Distribution name from pyproject.toml [project].name.
@@ -189,5 +189,6 @@ def get_provider_capabilities(
 
 def provider_env_names(provider: str | None, model: str | None = None) -> tuple[str | None, str]:
     """Return the API-key and base-URL env names for a provider/model pair."""
+
     caps = get_provider_capabilities(provider, model)
     return caps.api_key_env, caps.base_url_env

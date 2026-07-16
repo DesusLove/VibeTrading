@@ -6,20 +6,18 @@ from pathlib import Path
 from typing import Any
 
 import httpx
-from pydantic import Field
+from pydantic import BaseModel, Field
 from slack_sdk.socket_mode.request import SocketModeRequest
 from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.websockets import SocketModeClient
 from slack_sdk.web.async_client import AsyncWebClient
 from slackify_markdown import slackify_markdown
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
 from src.channels.pairing import is_approved
-from src.channels.utils import safe_filename, split_message
+from src.channels.utils import get_media_dir, safe_filename, split_message
 
 
 class SlackDMConfig(BaseModel):
@@ -122,7 +120,7 @@ class SlackChannel(BaseChannel):
                 self._socket_client.connect(),
                 timeout=SLACK_SOCKET_CONNECT_TIMEOUT_S,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.logger.error(
                 "Slack Socket Mode WebSocket handshake timed out after {:.0f}s. "
                 "auth_test uses HTTPS and may still succeed while WSS is blocked. "

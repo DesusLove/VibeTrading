@@ -7,7 +7,6 @@ forced failure — everything a test suite needs to exercise the advisory
 orchestrator and gate integration without any network dependency.
 """
 
-from __future__ import annotations
 
 import time
 
@@ -74,6 +73,7 @@ class MockAdvisory(PreTradeAdvisoryInterface):
         Raises:
             RuntimeError: When ``raise_on_review`` is ``True``.
         """
+
         self.call_history.append(context)
         if self._delay_s > 0:
             time.sleep(self._delay_s)

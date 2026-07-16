@@ -7,7 +7,6 @@ label (or "none") plus the resolved provider/model/base. The absolute
 path, OS username, and API key are never logged (CWE-209).
 """
 
-from __future__ import annotations
 
 import getpass
 import logging
@@ -85,6 +84,7 @@ def test_logs_redacted_base_url_without_credentials(tmp_path, fresh, monkeypatch
 
 def test_latch_still_skips_second_call(tmp_path, fresh, monkeypatch, caplog):
     """Behavior preserved: still loads once per process (no log on re-entry)."""
+
     monkeypatch.setattr(llm, "_ENV_CANDIDATES", [tmp_path / "nope.env"])
     llm._ensure_dotenv()
     with caplog.at_level(logging.INFO, logger=LOGGER):

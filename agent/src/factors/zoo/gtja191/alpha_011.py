@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #11 - 条件高低价差
@@ -9,7 +10,7 @@
 Formula: SUM(((CLOSE-LOW)-(HIGH-CLOSE))/(HIGH-LOW)*VOLUME,6)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 11."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -19,10 +19,8 @@ all three are surfaced as a transient-classified error so one symbol's failure
 never aborts the batch.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -73,7 +71,7 @@ def _min_interval() -> float:
     return resolve_min_interval(_MIN_INTERVAL_ENV, _DEFAULT_MIN_INTERVAL)
 
 
-def _extract_provider_message(payload: object) -> Optional[str]:
+def _extract_provider_message(payload: object) -> str | None:
     """Return any rate-limit / error envelope message from a payload.
 
     Alpha Vantage signals quota exhaustion and bad requests in-band with a 200
@@ -111,13 +109,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch daily OHLCV bars for ``codes`` within ``[start_date, end_date]``.
 
         Args:
@@ -139,7 +137,7 @@ class DataLoader:
             logger.warning("alphavantage skipped: %s not set", _API_KEY_ENV)
             return {}
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -161,7 +159,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str, api_key: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch and slice one symbol's daily bars into an OHLCV DataFrame.
 
         Args:
@@ -225,7 +223,7 @@ class DataLoader:
         return df
 
 
-def _parse_bar(date: str, bar: object) -> Optional[dict]:
+def _parse_bar(date: str, bar: object) -> dict | None:
     """Parse one ``{date: {"1. open": ...}}`` entry into an OHLCV row dict.
 
     Args:
@@ -236,6 +234,7 @@ def _parse_bar(date: str, bar: object) -> Optional[dict]:
         A ``{trade_date, open, high, low, close, volume}`` dict, or ``None``
         when the entry is malformed or non-numeric.
     """
+
     if not isinstance(bar, dict):
         return None
     try:

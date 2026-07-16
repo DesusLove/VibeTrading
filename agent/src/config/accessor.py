@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 """Lazy singleton accessor for EnvConfig.
 
 Use :func:`get_env_config` to get the cached config instance.  The first call
@@ -13,11 +15,9 @@ swarm workers and the agent loop both run in threads and may call
 :func:`get_env_config` concurrently.
 """
 
-from __future__ import annotations
 
 import os
 import threading
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.config.env_schema import EnvConfig
@@ -123,6 +123,7 @@ def get_env_or(primary: str, fallback: str, default: str = "") -> str:
     Returns:
         The first non-empty value found, or *default*.
     """
+
     value = os.getenv(primary)
     if value:
         return value

@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 """No-look-ahead guarantee for RSSHub event enrichment.
 
 Echoes the discipline of ``agent/tests/factors/test_lookahead.py``: corrupting
@@ -5,9 +7,6 @@ the future must not change the present. Here, adding a future-dated event must
 not alter ``event_score`` on any earlier bar.
 """
 
-from __future__ import annotations
-
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -21,6 +20,7 @@ class _StubProvider:
     Ignoring ``as_of`` is deliberate: it forces the *enricher's* per-bar masking
     to be the only thing standing between a future event and an earlier bar.
     """
+
 
     def __init__(self, events: pd.DataFrame) -> None:
         self._events = events

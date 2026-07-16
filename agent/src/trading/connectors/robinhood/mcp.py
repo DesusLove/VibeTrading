@@ -1,8 +1,7 @@
+from typing import Any
+
 """Robinhood remote MCP generic-operation mapping."""
 
-from __future__ import annotations
-
-from typing import Any
 
 _REMOTE_TOOL_NAMES = {
     "account": "get_portfolio",
@@ -33,6 +32,7 @@ def runner_tool_name(operation: str) -> str | None:
 
 def remote_arguments(operation: str, arguments: dict[str, Any]) -> dict[str, Any]:
     """Normalize generic arguments for a Robinhood remote MCP operation."""
+
     if operation == "quote":
         symbol = arguments.get("symbol")
         symbols = arguments.get("symbols")

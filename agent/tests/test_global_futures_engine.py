@@ -10,7 +10,6 @@ Validates:
   - Product code extraction
 """
 
-from __future__ import annotations
 
 import pandas as pd
 import pytest
@@ -18,12 +17,7 @@ import pytest
 from backtest.engines.global_futures import (
     GlobalFuturesEngine,
     _extract_product,
-    _MULTIPLIER,
-    _MARGIN_PER_CONTRACT,
-    _COMMISSION_PER_CONTRACT,
 )
-from backtest.models import Position
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -159,6 +153,7 @@ class TestRoundSize:
 class TestCommission:
     def test_es_commission_via_active_symbol(self) -> None:
         """calc_commission uses _active_symbol for product lookup."""
+
         engine = _make_engine()
         engine._active_symbol = "ESZ4"
         comm = engine.calc_commission(2, 5000.0, 1, is_open=True)

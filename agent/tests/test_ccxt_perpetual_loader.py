@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import pytest
 import pandas as pd
+import pytest
 
 from backtest.loaders.base import make_loader_cache_key
 from backtest.loaders.ccxt_loader import _parse_ccxt_symbol

@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any, Literal, Protocol
+
 """Live-action audit ledger (SPEC.md Consent §5).
 
 Every live action — order placed, order rejected by the gate, mandate committed,
@@ -28,15 +31,13 @@ authorizing mandate is intentionally NOT a record field here and is preserved
 elsewhere as the mandate→consent accountability chain.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Literal, Protocol
 
 from src.live.paths import live_root
 from src.tools.redaction import redact_payload
@@ -89,7 +90,7 @@ def _new_audit_id() -> str:
 
 def _utc_now_iso_ms() -> str:
     """Return the current UTC time as an ISO-8601 string with ms precision."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return now.isoformat(timespec="milliseconds")
 
 
@@ -217,6 +218,7 @@ def write_live_action(
         The redacted record dict — identical to what was written to every sink —
         for the caller to embed or re-emit.
     """
+
     record = event.to_record()
 
     # Sink 1: dedicated compliance ledger (always, append-only).

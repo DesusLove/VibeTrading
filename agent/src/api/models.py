@@ -1,8 +1,7 @@
+from typing import Any
+
 """Pydantic response models shared across API route modules."""
 
-from __future__ import annotations
-
-from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -45,46 +44,47 @@ class RunInfo(BaseModel):
     run_id: str
     status: str
     created_at: str
-    prompt: Optional[str] = None
-    total_return: Optional[float] = None
-    sharpe: Optional[float] = None
-    codes: List[str] = Field(default_factory=list)
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+    prompt: str | None = None
+    total_return: float | None = None
+    sharpe: float | None = None
+    codes: list[str] = Field(default_factory=list)
+    start_date: str | None = None
+    end_date: str | None = None
 
 
 class RunResponse(BaseModel):
     """API response payload for a single run."""
 
+
     status: str = Field(..., description="Run status: success, failed, aborted")
     run_id: str = Field(..., description="Run identifier")
     elapsed_seconds: float = Field(..., description="Execution time in seconds")
-    reason: Optional[str] = Field(None, description="Failure reason when available")
+    reason: str | None = Field(None, description="Failure reason when available")
 
-    planner_output: Optional[Dict[str, Any]] = Field(None, description="Planner output")
-    strategy_spec: Optional[Dict[str, Any]] = Field(None, description="Strategy specification")
-    rag_selection: Optional[RAGSelection] = Field(None, description="Selected RAG metadata")
+    planner_output: dict[str, Any | None] = Field(None, description="Planner output")
+    strategy_spec: dict[str, Any | None] = Field(None, description="Strategy specification")
+    rag_selection: RAGSelection | None = Field(None, description="Selected RAG metadata")
 
-    metrics: Optional[BacktestMetrics] = Field(None, description="Backtest metrics")
-    artifacts: List[Artifact] = Field(default_factory=list, description="Run artifacts")
-    run_card: Optional[Dict[str, Any]] = Field(None, description="Trust Layer run card payload")
-    llm_usage: Optional[Dict[str, Any]] = Field(None, description="Provider-reported AgentLoop usage summary")
+    metrics: BacktestMetrics | None = Field(None, description="Backtest metrics")
+    artifacts: list[Artifact] = Field(default_factory=list, description="Run artifacts")
+    run_card: dict[str, Any | None] = Field(None, description="Trust Layer run card payload")
+    llm_usage: dict[str, Any | None] = Field(None, description="Provider-reported AgentLoop usage summary")
 
-    equity_curve: Optional[List[Dict[str, Any]]] = Field(None, description="Equity preview")
-    trade_log: Optional[List[Dict[str, Any]]] = Field(None, description="Trade preview")
+    equity_curve: list[dict[str, Any | None]] = Field(None, description="Equity preview")
+    trade_log: list[dict[str, Any | None]] = Field(None, description="Trade preview")
 
-    artifacts_equity_csv: Optional[List[Dict[str, Any]]] = Field(None, description="Full equity rows")
-    artifacts_metrics_csv: Optional[List[Dict[str, Any]]] = Field(None, description="Full metrics rows")
-    artifacts_trades_csv: Optional[List[Dict[str, Any]]] = Field(None, description="Full trade rows")
-    validation: Optional[Dict[str, Any]] = Field(None, description="Statistical validation results")
+    artifacts_equity_csv: list[dict[str, Any | None]] = Field(None, description="Full equity rows")
+    artifacts_metrics_csv: list[dict[str, Any | None]] = Field(None, description="Full metrics rows")
+    artifacts_trades_csv: list[dict[str, Any | None]] = Field(None, description="Full trade rows")
+    validation: dict[str, Any | None] = Field(None, description="Statistical validation results")
 
     run_directory: str = Field(..., description="Run directory path")
-    run_stage: Optional[str] = Field(None, description="UI-facing run stage")
-    run_context: Optional[Dict[str, Any]] = Field(None, description="Normalized request context")
-    price_series: Optional[Dict[str, List[Dict[str, Any]]]] = Field(None, description="Grouped OHLC series")
-    indicator_series: Optional[Dict[str, Dict[str, List[Dict[str, Any]]]]] = Field(
+    run_stage: str | None = Field(None, description="UI-facing run stage")
+    run_context: dict[str, Any | None] = Field(None, description="Normalized request context")
+    price_series: dict[str, list[Dict[str, Any | None]]] = Field(None, description="Grouped OHLC series")
+    indicator_series: dict[str, Dict[str, list[Dict[str, Any | None]]]] = Field(
         None,
         description="Grouped indicator overlays",
     )
-    trade_markers: Optional[List[Dict[str, Any]]] = Field(None, description="Trade markers for charts")
-    run_logs: Optional[List[Dict[str, Any]]] = Field(None, description="Structured stdout/stderr lines")
+    trade_markers: list[dict[str, Any | None]] = Field(None, description="Trade markers for charts")
+    run_logs: list[dict[str, Any | None]] = Field(None, description="Structured stdout/stderr lines")

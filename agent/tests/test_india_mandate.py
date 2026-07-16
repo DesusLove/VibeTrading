@@ -1,3 +1,4 @@
+from __future__ import annotations
 """India (IN_EQUITY) mandate-enforcement wiring.
 
 Confirms the ``in_equity`` asset class flows through the live mandate gate:
@@ -7,7 +8,7 @@ Confirms the ``in_equity`` asset class flows through the live mandate gate:
   - The enforcement loader chain resolves IN_EQUITY to the india_equity market.
 """
 
-from __future__ import annotations
+
 
 from src.live.enforcement import (
     BREACH_KIND_UNIVERSE,

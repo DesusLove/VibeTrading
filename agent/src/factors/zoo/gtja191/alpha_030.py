@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #30 - 开盘相对强度
@@ -9,7 +10,7 @@
 Formula: WMA((REGRESI(CLOSE/DELAY(CLOSE,1)-1, MKT_RET, SMB, HML, 60))^2, 20)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 30."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

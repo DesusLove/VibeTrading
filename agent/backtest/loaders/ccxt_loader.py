@@ -5,13 +5,11 @@ Defaults to Binance; configurable via CCXT_EXCHANGE env var.
 No API key required for public market data.
 """
 
-from __future__ import annotations
 
 import logging
 import os
 import re
 import time
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -98,6 +96,7 @@ class DataLoader:
     def _get_exchange(self, instrument_type: str = "spot"):
         """Create an exchange instance for spot or Binance USD-M swaps."""
         import ccxt
+
         from src.config.accessor import get_env_config
 
         exchange_id = get_env_config().data.ccxt_exchange.lower()
@@ -120,13 +119,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch crypto OHLCV via CCXT.
 
         Args:
@@ -147,14 +146,14 @@ class DataLoader:
 
         # Build the exchange lazily so a full cache hit never imports ccxt or
         # opens an exchange object.
-        exchange_holder: Dict[str, object] = {}
+        exchange_holder: dict[str, object] = {}
 
         def get_exchange(instrument_type: str):
             if instrument_type not in exchange_holder:
                 exchange_holder[instrument_type] = self._get_exchange(instrument_type)
             return exchange_holder[instrument_type]
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             instrument_type = "spot"
             try:
@@ -219,8 +218,9 @@ class DataLoader:
         end_ms: int,
         *,
         params: dict[str, str] | None = None,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Paginated OHLCV fetch for one symbol."""
+
         import ccxt
 
         all_rows: list = []

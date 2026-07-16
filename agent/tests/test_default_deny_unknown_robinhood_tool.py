@@ -1,3 +1,5 @@
+from typing import Any
+
 """Default-deny / fail-closed classification gate (SPEC §7.3 threat (d), §7.4).
 
 Stands up a MOCK MCP server (reusing the ``client_factory`` seam in
@@ -19,9 +21,6 @@ Asserts the live-channel wrapping that the registry assembles:
 No Robinhood access required — discovery runs entirely against the mock client.
 """
 
-from __future__ import annotations
-
-from typing import Any
 
 import pytest
 from fastmcp.client.client import CallToolResult
@@ -30,8 +29,8 @@ from mcp import types as mcp_types
 from src.live.classification import ToolClass, classify_tool
 from src.live.order_guard import LiveOrderGuardTool
 from src.live.registry import wrap_live_broker_tools
-from src.trading.connectors.robinhood.classification import ROBINHOOD_TOOL_CLASS
 from src.tools.mcp import MCPRemoteTool, build_mcp_tool_wrappers
+from src.trading.connectors.robinhood.classification import ROBINHOOD_TOOL_CLASS
 
 pytestmark = pytest.mark.unit
 
@@ -50,7 +49,8 @@ assert _UNKNOWN_TOOL not in ROBINHOOD_TOOL_CLASS
 class _MockMCPServer:
     """Mock MCP client exposing the four classification shapes."""
 
-    async def __aenter__(self) -> "_MockMCPServer":
+
+    async def __aenter__(self) -> _MockMCPServer:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:

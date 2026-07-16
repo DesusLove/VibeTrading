@@ -5,7 +5,6 @@ Minute data uses ``pro.stk_mins()`` (Tushare points >= 2000).
 """
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 

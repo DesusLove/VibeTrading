@@ -1,3 +1,5 @@
+from typing import Any
+
 """Integration tests: full-stack MCP client path with a real stdio subprocess.
 
 These tests spawn an actual fake MCP server process (agent/tests/fixtures/
@@ -22,12 +24,10 @@ TODO(v1): Add Swarm-path integration tests once Swarm worker registries are
 allowed to load MCP config.
 """
 
-from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -188,6 +188,7 @@ def test_broken_server_command_does_not_block_local_tools(tmp_path: Path) -> Non
     external MCP server must never prevent the agent from using its built-in
     local toolset.
     """
+
     from src.config.loader import load_agent_config
     from src.tools import build_registry
 

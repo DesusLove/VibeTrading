@@ -1,3 +1,5 @@
+from typing import Any
+
 """Skill management tools: full CRUD + auxiliary file support.
 
 User-created skills are stored separately from bundled skills:
@@ -9,13 +11,11 @@ User-created skills are stored separately from bundled skills:
         assets/             # Static files
 """
 
-from __future__ import annotations
 
 import json
 import re
 import shutil
 from pathlib import Path
-from typing import Any
 
 from src.agent.skills import USER_SKILLS_DIR
 from src.agent.tools import BaseTool
@@ -328,6 +328,7 @@ class SkillFileTool(BaseTool):
     @staticmethod
     def _remove_file(skill_dir: Path, skill_name: str, kwargs: dict) -> str:
         """Remove a file from a skill directory."""
+
         rel_path = kwargs.get("path", "").strip()
         if not rel_path:
             return json.dumps({"status": "error", "error": "path required for remove"})

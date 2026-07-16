@@ -22,14 +22,12 @@ alphas this finishes in well under 60 s on commodity CI hardware. We skip
 the suite cleanly when the registry is empty (current repo state).
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 import pytest
 
 from src.factors.registry import Registry, RegistryError, SkipAlpha
-
 
 # ---------------------------------------------------------------- constants
 
@@ -148,6 +146,7 @@ _ALPHA_IDS = _registered_alpha_ids()
 @pytest.mark.parametrize("alpha_id", _ALPHA_IDS)
 def test_alpha_has_no_lookahead(alpha_id: str) -> None:
     """Future corruption at row ``>=60`` must not alter factor value at row 50."""
+
     registry = Registry()
     alpha = registry.get(alpha_id)
 

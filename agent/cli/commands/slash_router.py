@@ -9,7 +9,6 @@ mutation. ``match_commands`` powers the typeahead in
 :mod:`agent.cli.completer`.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 
@@ -148,6 +147,7 @@ def find_exact(name: str) -> Command | None:
     Returns ``None`` if no match — callers handle the "unknown command"
     response themselves so error UX stays consistent.
     """
+
     key = name.lstrip("/").strip()
     key = _ALIASES.get(key, key)
     for cmd in SLASH_COMMANDS:

@@ -8,13 +8,13 @@ like ``/runs/{id}/code`` and ``/runs/{id}/pine`` keep returning the
 correct API response.
 """
 
-from __future__ import annotations
 
 import pytest
 
 
 class TestSpaHtmlRouteMatcher:
     """Pin the matcher used by ``_spa_html_deep_link_fallback`` middleware."""
+
 
     @pytest.mark.parametrize(
         "path",

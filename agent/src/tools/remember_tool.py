@@ -1,9 +1,9 @@
+from typing import Any
+
 """Remember tool: LLM-initiated persistent memory operations (save / recall / forget)."""
 
-from __future__ import annotations
 
 import json
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.memory.persistent import PersistentMemory
@@ -70,6 +70,7 @@ class RememberTool(BaseTool):
         Returns:
             JSON result string.
         """
+
         action = kwargs.get("action", "save")
 
         if action == "save":

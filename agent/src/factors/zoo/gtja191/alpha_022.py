@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #22 - 均线截距
@@ -9,7 +10,7 @@
 Formula: SMA(((CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6) - DELAY((CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6),3)),12,1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 22."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #3 - 条件量价反转
@@ -9,7 +10,7 @@
 Formula: SUM((CLOSE=DELAY(CLOSE,1)?0:CLOSE-(CLOSE>DELAY(CLOSE,1)?MIN(LOW,DELAY(CLOSE,1)):MAX(HIGH,DELAY(CLOSE,1)))),6)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 3."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

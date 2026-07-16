@@ -13,7 +13,6 @@ Two responsibilities:
    socket hook is scoped to factors-only.
 """
 
-from __future__ import annotations
 
 try:
     from pytest_socket import disable_socket, enable_socket
@@ -30,5 +29,6 @@ def pytest_runtest_setup(item) -> None:  # noqa: D401 - pytest hook
 
 def pytest_runtest_teardown(item) -> None:  # noqa: D401 - pytest hook
     """Re-enable sockets after each test so non-factors tests stay untouched."""
+
     if enable_socket is not None:
         enable_socket()

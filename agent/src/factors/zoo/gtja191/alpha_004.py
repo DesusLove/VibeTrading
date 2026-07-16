@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #4 - 条件止损信号
@@ -9,7 +10,7 @@
 Formula: ((((SUM(CLOSE,8)/8)+STD(CLOSE,8))<(SUM(CLOSE,2)/2))?(-1):((SUM(CLOSE,2)/2<(SUM(CLOSE,8)/8-STD(CLOSE,8)))?1:((1<(VOLUME/MEAN(VOLUME,20)))?1:(-1))))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 4."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

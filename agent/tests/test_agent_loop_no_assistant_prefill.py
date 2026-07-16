@@ -1,3 +1,5 @@
+from typing import Any
+
 """Regression test: agent loop must not end messages with assistant prefill.
 
 Claude Opus 4.8+ (and other new Anthropic models) reject API requests
@@ -7,10 +9,8 @@ support.  Two code paths in AgentLoop used to emit such messages:
 background notification acknowledgments and auto-compact handoff notes.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -66,8 +66,8 @@ class _StubLLM:
 
 
 def _build_agent(llm: Any, max_iter: int = 3, tmp_run_dir: Path | None = None) -> AgentLoop:
-    from src.tools import build_registry
     from src.memory.persistent import PersistentMemory
+    from src.tools import build_registry
 
     pm = PersistentMemory()
     agent = AgentLoop(
@@ -128,6 +128,7 @@ def test_auto_compact_handoff_summary_is_reintroduced_as_user_message(
     tmp_path: Path,
 ) -> None:
     """Auto-compact used to append a trailing assistant handoff ack."""
+
     llm = _StubLLM()
     agent = _build_agent(llm, max_iter=1, tmp_run_dir=tmp_path / "run")
     trace = TraceWriter(tmp_path / "trace")

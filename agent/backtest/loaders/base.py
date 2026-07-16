@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Protocol, TypeVar, runtime_checkable
+
 """DataLoader Protocol, shared exceptions, retry helpers, and loader cache.
 
 The retry/budget helpers are the canonical pattern for any loader that calls
@@ -7,7 +10,6 @@ import :func:`check_budget` and :func:`retry_with_budget` rather than
 re-implementing the loop.
 """
 
-from __future__ import annotations
 
 import datetime as dt
 import hashlib
@@ -17,7 +19,6 @@ import os
 import time
 import uuid
 from pathlib import Path
-from typing import Callable, Protocol, TypeVar, runtime_checkable
 
 import pandas as pd
 
@@ -606,4 +607,5 @@ class DataLoaderProtocol(Protocol):
         Returns:
             Mapping ``{symbol: DataFrame(trade_date, open, high, low, close, volume)}``.
         """
+
         ...

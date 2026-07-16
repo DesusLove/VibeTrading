@@ -1,8 +1,7 @@
+from typing import Any
+
 """Goal-state payload helpers for WebSocket channel adapters."""
 
-from __future__ import annotations
-
-from typing import Any
 
 
 def goal_state_ws_blob(meta: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -13,6 +12,7 @@ def goal_state_ws_blob(meta: dict[str, Any] | None = None) -> dict[str, Any]:
     or compact goal metadata into the client event shape. It returns an inactive
     payload when no goal metadata is present.
     """
+
     if not isinstance(meta, dict):
         return {"active": False, "active_goals": [], "completed_goals": []}
     goal_state = meta.get("goal_state")

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for the live-runtime scheduler (src/live/runtime/scheduler.py,
 SPEC.md §7.5 #1).
 
@@ -10,7 +11,7 @@ Two layers:
   without real sleeping.
 """
 
-from __future__ import annotations
+
 
 import asyncio
 

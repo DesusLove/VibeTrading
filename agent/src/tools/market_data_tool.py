@@ -1,8 +1,7 @@
+from typing import Any
+
 """Local market data tool backed by the shared loader layer."""
 
-from __future__ import annotations
-
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.market_data import DEFAULT_MAX_ROWS, fetch_market_data_json
@@ -10,6 +9,7 @@ from src.market_data import DEFAULT_MAX_ROWS, fetch_market_data_json
 
 class MarketDataTool(BaseTool):
     """Fetch normalized OHLCV data through repository loaders."""
+
 
     name = "get_market_data"
     description = (

@@ -6,7 +6,6 @@ with zero validation surface the agent could exploit. See
 the live-trading SPEC, Mandate §1.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
@@ -131,6 +130,7 @@ class Mandate:
             Read by ``src.live.runtime.flatten`` on a halt trip (SPEC §7.5 #6
             "optionally, per mandate").
     """
+
 
     schema_version: int
     hard_caps: HardCaps

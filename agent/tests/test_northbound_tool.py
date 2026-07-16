@@ -4,12 +4,9 @@ All Eastmoney HTTP is mocked at ``src.tools.northbound_tool.get_json`` (the name
 the tool imported), so no test touches a live Eastmoney endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
-
-import pytest
 
 from src.tools import northbound_tool as nb
 
@@ -124,6 +121,7 @@ class TestRoutingDescription:
     route to either. The northbound description must lead with the market-wide
     Stock-Connect scope and point per-stock intent at get_fund_flow.
     """
+
 
     def test_description_leads_with_market_wide_stock_connect(self):
         desc = nb.NorthboundFlowTool().description

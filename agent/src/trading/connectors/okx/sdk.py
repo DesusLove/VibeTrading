@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only OKX connector via the optional ``python-okx`` SDK.
 
 Wraps ``AccountAPI`` (account/positions), ``TradeAPI`` (orders/fills) and
@@ -15,13 +18,11 @@ as an error. The guard marker recorded on every payload is
 payload and never flipped implicitly.
 """
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -73,7 +74,7 @@ class OKXConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "OKXConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> OKXConfig:
         """Build a config from a JSON-like mapping, normalizing the profile."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
@@ -99,7 +100,7 @@ class OKXConfig:
         profile: str | None = None,
         host: str | None = None,
         expected_uid: str | None = None,
-    ) -> "OKXConfig":
+    ) -> OKXConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if api_key is not None:
@@ -135,7 +136,7 @@ class OKXConfig:
 _OVERRIDE_KEYS = ("api_key", "api_secret", "passphrase", "profile", "host", "expected_uid")
 
 
-def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> "OKXConfig":
+def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> OKXConfig:
     """Resolve config: saved file ← profile defaults ← CLI overrides."""
     base = asdict(load_config())
     for key, value in dict(profile_config or {}).items():
@@ -769,6 +770,7 @@ def _safe_call(obj: Any, name: str, *args: Any, **kwargs: Any) -> Any:
     the no-arg form so a signature drift degrades to a usable call instead of an
     error.
     """
+
     fn = getattr(obj, name, None)
     if fn is None:
         return None

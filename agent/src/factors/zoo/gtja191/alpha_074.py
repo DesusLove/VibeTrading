@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #74
@@ -9,7 +10,7 @@
 Formula: (RANK(CORR(SUM(((LOW*0.35)+(VWAP*0.65)),20),SUM(MEAN(VOLUME,40),20),7)) + RANK(CORR(RANK(VWAP),RANK(VOLUME),6)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 74."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

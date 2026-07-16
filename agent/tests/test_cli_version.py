@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Regression tests for issue #156 — CLI version must track pyproject.toml.
 
 The shipped 0.1.8 wheel reported ``0.1.7`` because a hardcoded constant was
@@ -6,7 +7,7 @@ metadata, falling back to reading ``pyproject.toml`` directly, so there is no
 constant left to drift. These tests pin both invariants.
 """
 
-from __future__ import annotations
+
 
 import tomllib
 from pathlib import Path

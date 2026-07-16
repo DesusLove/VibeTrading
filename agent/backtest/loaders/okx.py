@@ -7,7 +7,6 @@ Up to 300 bars per request; paginates with ``after`` for longer history.
 
 import logging
 import time
-from typing import Dict, List, Optional
 
 import pandas as pd
 import requests

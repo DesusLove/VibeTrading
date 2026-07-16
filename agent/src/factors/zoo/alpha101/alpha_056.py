@@ -10,7 +10,6 @@ Formula (paper appendix): 0 - 1*(rank(sum(returns,10)/sum(sum(returns,2),3)) * r
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 56.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -63,6 +62,7 @@ def _make_one(ref: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
 
 

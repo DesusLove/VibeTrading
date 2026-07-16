@@ -11,7 +11,6 @@ events knowable on or before ``t``. This engine therefore just reads the column;
 it never shifts it forward.
 """
 
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -36,7 +35,7 @@ class SignalEngine:
         self.score_threshold = score_threshold
         self.top_n = top_n
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """Equal-weight long the top-sentiment names on each bar.
 
         Args:
@@ -52,10 +51,10 @@ class SignalEngine:
 
         all_dates = sorted(set().union(*(df.index for df in data_map.values())))
         date_index = pd.DatetimeIndex(all_dates)
-        signals: Dict[str, pd.Series] = {code: pd.Series(0.0, index=date_index) for code in codes}
+        signals: dict[str, pd.Series] = {code: pd.Series(0.0, index=date_index) for code in codes}
 
         for dt in date_index:
-            scored: List[tuple[str, float]] = []
+            scored: list[tuple[str, float]] = []
             for code, df in data_map.items():
                 if dt not in df.index:
                     continue

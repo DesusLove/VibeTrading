@@ -6,11 +6,8 @@
 优先使用 pyharmonics 库，若不可用则回退到内置检测器。
 """
 
-from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
-
 
 # ---------------------------------------------------------------------------
 # Harmonic pattern definitions: (b_ratio_range, d_ratio_range, name)
@@ -67,7 +64,7 @@ def _find_swings(
     high: pd.Series,
     low: pd.Series,
     window: int = 10,
-) -> Tuple[pd.Series, pd.Series]:
+) -> tuple[pd.Series, pd.Series]:
     """检测摆动高低点。
 
     使用滚动窗口方法：当某根K线的高点等于前后 window 根K线的最大值时，
@@ -94,7 +91,7 @@ def _find_swings(
 def _merge_swings(
     swing_highs: pd.Series,
     swing_lows: pd.Series,
-) -> List[Tuple]:
+) -> list[tuple]:
     """合并摆动高低点为时间排序的序列。
 
     Args:
@@ -132,7 +129,7 @@ def _classify_pattern(
     c_price: float,
     d_price: float,
     tol: float = 0.08,
-) -> Optional[str]:
+) -> str | None:
     """根据 Fibonacci 比率判断 XABCD 属于哪种谐波形态。
 
     Args:
@@ -178,7 +175,7 @@ def _detect_patterns_fallback(
     df: pd.DataFrame,
     swing_window: int = 10,
     tol: float = 0.08,
-) -> List[Dict]:
+) -> list[dict]:
     """内置谐波形态检测（回退方案）。
 
     流程：找摆动点 → 枚举5点组合 → 验证 Fibonacci 比率 → 输出形态。
@@ -247,7 +244,7 @@ def _detect_patterns_fallback(
 def _detect_patterns_pyharmonics(
     df: pd.DataFrame,
     is_stock: bool = False,
-) -> List[Dict]:
+) -> list[dict]:
     """使用 pyharmonics 库检测谐波形态。
 
     Args:
@@ -361,7 +358,7 @@ class SignalEngine:
         except ImportError:
             return False
 
-    def _detect(self, df: pd.DataFrame) -> List[Dict]:
+    def _detect(self, df: pd.DataFrame) -> list[dict]:
         """检测单个标的的谐波形态。
 
         优先 pyharmonics，失败则回退内置检测器。
@@ -384,8 +381,8 @@ class SignalEngine:
         )
 
     def generate(
-        self, data_map: Dict[str, pd.DataFrame]
-    ) -> Dict[str, pd.Series]:
+        self, data_map: dict[str, pd.DataFrame]
+    ) -> dict[str, pd.Series]:
         """根据谐波形态在 D 点生成交易信号。
 
         Args:

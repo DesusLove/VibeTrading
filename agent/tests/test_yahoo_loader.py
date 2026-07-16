@@ -3,7 +3,6 @@
 All network access is mocked at the loader's ``yahoo_client.get_chart`` import
 site, so no test ever reaches a live Yahoo endpoint.
 """
-from __future__ import annotations
 
 import datetime as dt
 from unittest.mock import patch
@@ -23,7 +22,7 @@ from backtest.loaders.yahoo_loader import (
 def _epoch(date_str: str) -> int:
     """UTC-midnight epoch seconds for a date, used to build fake chart rows."""
     day = pd.Timestamp(date_str).date()
-    return int(dt.datetime(day.year, day.month, day.day, tzinfo=dt.timezone.utc).timestamp())
+    return int(dt.datetime(day.year, day.month, day.day, tzinfo=dt.UTC).timestamp())
 
 
 def _open_epoch(date_str: str) -> int:
@@ -293,6 +292,7 @@ class TestFetch:
 
 class TestLoaderMetadata:
     """Static loader attributes match the registry contract."""
+
 
     def test_name_and_markets(self):
         loader = DataLoader()

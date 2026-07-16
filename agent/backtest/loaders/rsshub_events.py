@@ -1,3 +1,6 @@
+from collections.abc import Callable, Iterable, Mapping
+from typing import Any
+
 """RSSHub event/sentiment provider with point-in-time safeguards.
 
 A news / announcement / sentiment provider that runs parallel to the Tushare
@@ -18,14 +21,11 @@ default; callers may pass any ``scorer(title, summary) -> float`` (e.g. an LLM
 judge, as the ``event-driven`` skill describes) to override it.
 """
 
-from __future__ import annotations
 
 import logging
-import os
 import time
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
-from typing import Any, Callable, Iterable, Mapping
 from xml.etree.ElementTree import ParseError
 
 import numpy as np
@@ -530,6 +530,7 @@ def enrich_price_frames_with_events(
     Returns:
         A new mapping with the same frames plus ``event_score``/``event_count``.
     """
+
     if not data_map:
         return data_map
 

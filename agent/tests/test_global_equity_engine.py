@@ -7,13 +7,11 @@ Validates:
   - Both directions allowed
 """
 
-from __future__ import annotations
 
 import pandas as pd
 import pytest
 
 from backtest.engines.global_equity import GlobalEquityEngine
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -118,6 +116,7 @@ class TestCommission:
 
     def test_hk_commission_components(self) -> None:
         """Verify HK commission includes all components."""
+
         engine = _hk_engine()
         size, price = 1000, 350.0
         notional = size * price  # 350,000

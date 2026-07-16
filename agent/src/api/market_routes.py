@@ -1,17 +1,19 @@
+from __future__ import annotations
+from typing import Any
+
 """Live market ticker and history routes.
 
 Primary: Yahoo Finance v8/chart API (free, no auth).
 Fallbacks: CoinGecko (crypto), synthetic data (demo mode).
 """
 
-from __future__ import annotations
+
 
 import asyncio
 import logging
 import random
 import time
-from datetime import datetime, timedelta
-from typing import Any
+from datetime import datetime
 from urllib.parse import quote
 
 import requests
@@ -256,7 +258,7 @@ async def get_ticker() -> list[dict[str, Any]]:
             entry = await asyncio.wait_for(coro, timeout=10.0)
             if entry:
                 results.append(entry)
-        except (asyncio.TimeoutError, Exception):
+        except (TimeoutError, Exception):
             logger.debug("Timeout or error fetching ticker")
 
     return results

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Research Autopilot: goal-hypothesis bridge + backtest config generation.
 
 Phase 1: Connects the Hypothesis Registry to the Research Goal runtime.
@@ -7,13 +9,11 @@ Phase 3: Scaffolds a contract-correct signal_engine.py stub and links
     hypothesis -> backtest -> evidence loop.
 """
 
-from __future__ import annotations
 
 import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.hypotheses import HypothesisRegistry
@@ -383,7 +383,6 @@ and you can run a smoke backtest immediately, then replace the body with real
 logic derived from the signal definition.
 """
 
-from __future__ import annotations
 
 import pandas as pd
 

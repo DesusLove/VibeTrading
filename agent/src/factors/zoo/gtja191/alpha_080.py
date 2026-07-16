@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #80
@@ -9,7 +10,7 @@
 Formula: (VOLUME-DELAY(VOLUME,5))/DELAY(VOLUME,5)*100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 80."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

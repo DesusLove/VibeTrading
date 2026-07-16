@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #56 - 开盘位序
@@ -9,7 +10,7 @@
 Formula: (RANK(OPEN-TSMIN(OPEN,12)) < RANK((RANK(CORR(SUM(((HIGH+LOW)/2),19),SUM(MEAN(VOLUME,40),19),13))^5)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 56."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

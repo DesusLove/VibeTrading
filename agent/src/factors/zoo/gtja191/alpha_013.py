@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #13 - 开盘涨幅
@@ -9,7 +10,7 @@
 Formula: (((HIGH*LOW)^0.5) - VWAP)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 13."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

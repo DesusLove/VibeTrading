@@ -7,7 +7,6 @@ message keeps the actionable bits (name, Available list, the boundary) but
 not the absolute path.
 """
 
-from __future__ import annotations
 
 import threading
 from pathlib import Path
@@ -15,9 +14,9 @@ from pathlib import Path
 import pytest
 
 import src.swarm.runtime as rt
+from src.swarm.models import SwarmAgentSpec, SwarmRun, SwarmTask, WorkerResult
 from src.swarm.presets import load_preset
 from src.swarm.store import SwarmStore
-from src.swarm.models import SwarmAgentSpec, SwarmRun, SwarmTask, WorkerResult
 from src.tools.path_utils import safe_path
 
 _LEAKS = (str(Path.home()), "site-packages", ".venvs", str(Path.cwd()))
@@ -111,6 +110,7 @@ def test_run_error_event_does_not_leak_abs_path(tmp_path, monkeypatch):
     WorkerResult by _execute_layer, so the run_error branch is only reachable
     by a structural failure of the layer machinery itself — injected here by
     failing _execute_layer. Pre-fix: raw str(exc) → FAIL."""
+
 
     def boom(*a, **k):
         raise RuntimeError(f"fatal: config missing under {_ABS_LEAK}/.venvs/cfg")

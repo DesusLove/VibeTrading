@@ -11,11 +11,9 @@ timestamp; this loader converts those to a tz-naive ``DatetimeIndex`` and clips
 the ascending series to the requested inclusive date window.
 """
 
-from __future__ import annotations
 
 import datetime as dt
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -101,12 +99,12 @@ def _epoch_seconds(date_str: str) -> int:
         Epoch seconds for that date's UTC midnight.
     """
     day = pd.Timestamp(date_str).normalize().date()
-    moment = dt.datetime(day.year, day.month, day.day, tzinfo=dt.timezone.utc)
+    moment = dt.datetime(day.year, day.month, day.day, tzinfo=dt.UTC)
     return int(moment.timestamp())
 
 
 def _rows_to_frame(
-    rows: List[dict], start_date: str, end_date: str, interval: str = "1D"
+    rows: list[dict], start_date: str, end_date: str, interval: str = "1D"
 ) -> pd.DataFrame:
     """Build the OHLCV frame from chart rows, clipped to the inclusive window.
 
@@ -171,13 +169,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV history keyed by the original project symbols.
 
         Args:
@@ -197,7 +195,7 @@ class DataLoader:
             return {}
         validate_date_range(start_date, end_date)
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -219,7 +217,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str, interval: str
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch and normalize one symbol's chart, or ``None`` when unusable.
 
         Args:
@@ -232,6 +230,7 @@ class DataLoader:
             The OHLCV DataFrame for *code*, ``None`` if it is not a US/HK/India
             symbol or Yahoo returns no usable bars.
         """
+
         if not _is_supported(code):
             return None
 

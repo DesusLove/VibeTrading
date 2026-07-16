@@ -1,3 +1,6 @@
+from collections.abc import Callable  # noqa: E402 — additive import kept local to the hook section
+from typing import Any
+
 """Kill switch for the live trading channel (SPEC.md Consent §4).
 
 The kill switch is a single, instant, global halt of all live activity. It is
@@ -25,13 +28,11 @@ unreadable / malformed contents is still treated as tripped (fail-closed: the
 file's *existence* is the halt, the JSON is only attribution metadata).
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 from src.live.paths import broker_dir, live_root
 
@@ -91,7 +92,7 @@ def trip_halt(by: str, reason: str, broker: str | None = None) -> Path:
     """
     path = broker_halt_path(broker) if broker is not None else halt_path()
     payload: dict[str, Any] = {
-        "tripped_at": datetime.now(timezone.utc).isoformat(),
+        "tripped_at": datetime.now(UTC).isoformat(),
         "by": by,
         "reason": reason,
     }
@@ -208,7 +209,6 @@ def read_halt(broker: str | None = None) -> dict[str, Any] | None:
 # runner observing the sentinel is the single place that drives the preemptive
 # action, so the broker-call side effect is never coupled to the flag write.
 
-from typing import Callable  # noqa: E402 — additive import kept local to the hook section
 
 #: Per-broker preemptive-halt actions, keyed by broker. A ``None`` key is the
 #: global default action used when no broker-specific action is registered.
@@ -268,6 +268,7 @@ def on_halt_action(broker: str) -> object | None:
         Whatever the registered action returns (e.g. the flatten report dict),
         or ``None`` when no action is registered for ``broker``.
     """
+
     action = _HALT_ACTIONS.get(broker) or _HALT_ACTIONS.get(None)
     if action is None:
         logger.warning(

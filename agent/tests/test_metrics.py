@@ -7,7 +7,6 @@ Validates:
   - calc_metrics (Sharpe, drawdown, Sortino, Calmar, etc.)
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -21,7 +20,6 @@ from backtest.metrics import (
     win_rate_and_stats,
 )
 from backtest.models import TradeRecord
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -276,6 +274,7 @@ class TestCalcMetrics:
 
     def test_calmar_positive_for_drawdown(self) -> None:
         """Growing equity with a dip should have positive Calmar."""
+
         dates = pd.bdate_range("2025-01-01", periods=100)
         values = np.concatenate([
             np.linspace(1_000_000, 900_000, 30),  # dip

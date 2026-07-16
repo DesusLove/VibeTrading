@@ -7,10 +7,8 @@ eastmoney.com.  Completely free, no API token required.
 Covers: A-shares (SH/SZ), does NOT cover HK/US/crypto.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -50,13 +48,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV data via BaoStock.
 
         Args:
@@ -77,7 +75,7 @@ class DataLoader:
             logger.error("baostock login failed: %s", lg.error_msg)
             return {}
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         try:
             for code in codes:
                 try:
@@ -101,8 +99,9 @@ class DataLoader:
 
     def _fetch_one(
         self, bs, code: str, start_date: str, end_date: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch a single A-share symbol."""
+
         if not _is_a_share(code):
             return None
 

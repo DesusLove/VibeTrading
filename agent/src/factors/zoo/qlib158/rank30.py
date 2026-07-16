@@ -9,7 +9,8 @@
 from __future__ import annotations
 
 import pandas as pd
-from src.factors.base import ts_rank, rank
+
+from src.factors.base import rank, ts_rank
 
 __alpha_meta__ = {
     'id': 'qlib158_rank30',

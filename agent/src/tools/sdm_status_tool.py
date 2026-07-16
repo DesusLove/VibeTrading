@@ -1,19 +1,19 @@
+from typing import Any
+
 """BaseTool wrapper for querying and updating strategy store artifact status."""
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict
-from typing import Any
 
 from src.agent.tools import BaseTool
+from src.strategy_store._shared import get_store as _get_store
 from src.strategy_store.decay import DecayEvaluator
 from src.strategy_store.metrics import compute_decay_metrics, has_decay_inputs
 from src.strategy_store.models import (
     ArtifactStatus,
     ArtifactType,
 )
-from src.strategy_store._shared import get_store as _get_store
 
 
 def _ok(payload: dict[str, Any]) -> str:
@@ -186,6 +186,7 @@ class SdmStatusTool(BaseTool):
         self, store: Any, kwargs: dict[str, Any]
     ) -> str:
         """Evaluate decay state for an artifact."""
+
         artifact_id = str(kwargs.get("artifact_id", ""))
         if not artifact_id:
             return _error(ValueError("artifact_id is required for decay_check"))

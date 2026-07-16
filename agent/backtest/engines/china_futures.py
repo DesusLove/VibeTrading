@@ -10,14 +10,12 @@ Market rules (exchange-level, CFFEX / SHFE / DCE / ZCE / INE / GFEX):
   - Night session: 21:00-02:30 (varies by product, not enforced in bar-level sim)
 """
 
-from __future__ import annotations
 
 import re
 
 import pandas as pd
 
 from backtest.engines.futures_base import FuturesBaseEngine
-
 
 # ── Contract multiplier lookup ──
 
@@ -258,6 +256,7 @@ def _calc_pct_change(bar: pd.Series):
     Priority: settle/pre_settle (futures native) > close/pre_close > pct_chg.
     pct_chg from tushare is always in percentage points (0.5 = 0.5%).
     """
+
     # Prefer settlement prices (unambiguous for futures)
     settle = bar.get("settle")
     pre_settle = bar.get("pre_settle")

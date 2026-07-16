@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #66
@@ -9,7 +10,7 @@
 Formula: (CLOSE-MEAN(CLOSE,6))/MEAN(CLOSE,6)*100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 66."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

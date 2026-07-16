@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #58 - 均线偏离度
@@ -9,7 +10,7 @@
 Formula: COUNT(CLOSE>DELAY(CLOSE,1),20)/20*100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 58."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

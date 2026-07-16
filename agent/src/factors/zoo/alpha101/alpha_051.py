@@ -10,7 +10,6 @@ Formula (paper appendix): (...< -0.05) ? 1 : -1*(close-delay(close,1))
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 51.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -86,6 +85,7 @@ def _where_ternary(cond, a, b):
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
 
 

@@ -13,10 +13,8 @@ Symbol routing is delegated to :func:`eastmoney_client.resolve_secid`:
 * US — ``AAPL.US`` (market prefix discovered via Eastmoney search, cached)
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -62,13 +60,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV for each symbol; a single failure never aborts the batch.
 
         Args:
@@ -89,7 +87,7 @@ class DataLoader:
         """
         validate_date_range(start_date, end_date)
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -111,7 +109,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str, interval: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Resolve one symbol and build its OHLCV frame, or ``None`` on a miss.
 
         Args:
@@ -143,7 +141,7 @@ class DataLoader:
         return self._frame_from_rows(rows)
 
     @staticmethod
-    def _frame_from_rows(rows: List[dict]) -> Optional[pd.DataFrame]:
+    def _frame_from_rows(rows: list[dict]) -> pd.DataFrame | None:
         """Assemble the canonical OHLCV DataFrame from client kline rows.
 
         Args:
@@ -154,6 +152,7 @@ class DataLoader:
             A DataFrame indexed by ``trade_date`` with float OHLCV columns, or
             ``None`` when ``rows`` is empty or fully unparseable.
         """
+
         if not rows:
             return None
 

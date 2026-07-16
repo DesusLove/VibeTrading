@@ -1,6 +1,7 @@
+from typing import TYPE_CHECKING, Any, Literal
+
 """Discord channel implementation using discord.py."""
 
-from __future__ import annotations
 
 import asyncio
 import importlib.util
@@ -8,17 +9,13 @@ import time
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
-from src.channels.utils import safe_filename, split_message
+from src.channels.utils import get_media_dir, safe_filename, split_message
 
 DISCORD_AVAILABLE = importlib.util.find_spec("discord") is not None
 if TYPE_CHECKING:
@@ -806,6 +803,7 @@ class DiscordChannel(BaseChannel):
 
     async def _reset_runtime_state(self, close_client: bool) -> None:
         """Reset client and typing state."""
+
         await self._cancel_all_typing()
         self._stream_bufs.clear()
         self._known_channels.clear()

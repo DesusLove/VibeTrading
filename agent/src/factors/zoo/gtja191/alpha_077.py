@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #77
@@ -9,7 +10,7 @@
 Formula: MIN(RANK(DECAYLINEAR(((HIGH+LOW)/2+HIGH-(VWAP+HIGH)),20)),RANK(DECAYLINEAR(CORR(((HIGH+LOW)/2),MEAN(VOLUME,40),3),6)))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 77."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

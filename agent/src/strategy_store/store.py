@@ -1,3 +1,6 @@
+from collections.abc import Callable, Sequence
+from typing import Protocol, TypeVar, runtime_checkable
+
 """Strategy and factor artifact store — Protocol + in-memory reference implementation.
 
 The ``StrategyStoreProtocol`` defines the abstract interface for persisting
@@ -10,16 +13,12 @@ by Python dicts and lists, suitable for tests and as a template for concrete
 backends.
 """
 
-from __future__ import annotations
 
-import copy
 import threading
 import uuid
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import wraps
-from typing import Callable, Sequence, TypeVar, runtime_checkable
-from typing import Protocol
 
 from src.strategy_store.models import (
     Artifact,
@@ -27,9 +26,7 @@ from src.strategy_store.models import (
     ArtifactType,
     BenchResult,
     DecaySnapshot,
-    DecaySignal,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -38,7 +35,7 @@ from src.strategy_store.models import (
 
 def _now_iso() -> str:
     """Return the current UTC time as an ISO-8601 string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _new_artifact_id() -> str:
@@ -311,6 +308,7 @@ class InMemoryStrategyStore:
         self, artifact_id: str, *, limit: int = 20
     ) -> Sequence[DecaySnapshot]:
         """Return decay snapshots for an artifact, newest first."""
+
         matched = [s for s in self._decay_snapshots if s.artifact_id == artifact_id]
         matched.sort(key=lambda s: s.created_at or "", reverse=True)
         return matched[:limit]

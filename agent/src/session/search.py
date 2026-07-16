@@ -7,7 +7,6 @@ layer on top.
 Database location: ~/.vibe-trading/sessions.db (WAL mode for concurrent reads).
 """
 
-from __future__ import annotations
 
 import json
 import logging
@@ -16,7 +15,6 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +69,7 @@ class SessionSearchIndex:
         """
         self.db_path = db_path
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn: Optional[sqlite3.Connection] = None
+        self._conn: sqlite3.Connection | None = None
         self._init_db()
 
     def _get_conn(self) -> sqlite3.Connection:
@@ -135,7 +133,7 @@ class SessionSearchIndex:
         self,
         session_id: str,
         title: str = "",
-        ts: Optional[float] = None,
+        ts: float | None = None,
     ) -> None:
         """Upsert a session record.
 
@@ -165,7 +163,7 @@ class SessionSearchIndex:
         conn.commit()
 
     def index_message(self, session_id: str, role: str, content: str,
-                      tool_name: Optional[str] = None) -> None:
+                      tool_name: str | None = None) -> None:
         """Index a single message.
 
         Args:
@@ -210,7 +208,7 @@ class SessionSearchIndex:
         # Quote each token and join with OR for broader matching
         return " OR ".join(f'"{t}"' for t in tokens)
 
-    def search(self, query: str, max_sessions: int = 3) -> List[SearchMatch]:
+    def search(self, query: str, max_sessions: int = 3) -> list[SearchMatch]:
         """Full-text search across all sessions.
 
         Args:
@@ -342,7 +340,7 @@ class SessionSearchIndex:
 
 import threading as _threading
 
-_shared_index: Optional[SessionSearchIndex] = None
+_shared_index: SessionSearchIndex | None = None
 _shared_lock = _threading.Lock()
 
 
@@ -353,6 +351,7 @@ def get_shared_index() -> SessionSearchIndex:
     SessionService (indexing) and SessionSearchTool (searching)
     so they share one SQLite connection.
     """
+
     global _shared_index
     if _shared_index is None:
         with _shared_lock:

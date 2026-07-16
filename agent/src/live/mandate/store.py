@@ -19,7 +19,6 @@ mismatch (so an unknown future version is surfaced at the gate, not silently
 coerced here).
 """
 
-from __future__ import annotations
 
 import json
 import logging
@@ -129,4 +128,5 @@ def _require_dict(value: object, field: str) -> dict:
 
 def _opt_float(value: object) -> float | None:
     """Coerce an optional numeric field to ``float | None``."""
+
     return None if value is None else float(value)

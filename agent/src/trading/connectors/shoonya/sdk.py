@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only + order Shoonya (Finvasia) connector via ``NorenRestApiPy`` SDK.
 
 Wraps the Shoonya/NorenApi client for account, positions, orders, quotes, and
@@ -16,13 +19,12 @@ Paper-vs-live: Shoonya has no sandbox. Paper mode uses the same API for market
 data reads but simulates orders locally.
 """
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
+from datetime import UTC
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -82,7 +84,7 @@ class ShoonyaConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "ShoonyaConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> ShoonyaConfig:
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
         if profile not in PROFILE_ENVIRONMENTS:
@@ -98,7 +100,7 @@ class ShoonyaConfig:
             readonly=bool(payload.get("readonly", True)),
         )
 
-    def with_overrides(self, **kw: Any) -> "ShoonyaConfig":
+    def with_overrides(self, **kw: Any) -> ShoonyaConfig:
         payload = asdict(self)
         for key in ("user_id", "password", "vendor_code", "api_secret", "totp_secret", "profile"):
             if kw.get(key) is not None:
@@ -120,7 +122,7 @@ _OVERRIDE_KEYS = ("user_id", "password", "vendor_code", "api_secret", "totp_secr
 def build_config(
     profile_config: Mapping[str, Any] | None = None,
     overrides: Mapping[str, Any] | None = None,
-) -> "ShoonyaConfig":
+) -> ShoonyaConfig:
     base = asdict(load_config())
     for key, value in dict(profile_config or {}).items():
         if value is not None:
@@ -338,9 +340,9 @@ def get_historical_bars(
     api = _login(cfg)
 
     clean = symbol.strip().upper()
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
-    end = datetime.now(timezone.utc)
+    end = datetime.now(UTC)
     if period in ("1m", "5m", "15m", "30m"):
         start = end - timedelta(days=5)
     else:
@@ -519,6 +521,7 @@ def _login(cfg: ShoonyaConfig):
     Sessions are cached per ``user_id`` so distinct accounts never share an
     authenticated client.
     """
+
     missing = _missing_fields(cfg)
     if missing:
         raise ShoonyaConfigError(

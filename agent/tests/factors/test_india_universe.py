@@ -8,7 +8,6 @@ Verifies that the ``equity_in`` universe was wired end-to-end:
     whose ``vwap`` is built the India way (typical price, no Tushare scaling).
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -25,6 +24,7 @@ def registry() -> Registry:
 
 def _india_panel(n_rows: int = 40, symbols=("RELIANCE.NS", "TCS.NS")) -> dict:
     """Synthetic NSE-shape OHLCV panel; vwap injected as India typical price."""
+
     rng = np.random.RandomState(7)
     idx = pd.bdate_range("2024-01-01", periods=n_rows)
     cols = list(symbols)

@@ -1,9 +1,9 @@
+from typing import Any
+
 """BaseTool wrappers for the durable hypothesis registry."""
 
-from __future__ import annotations
 
 import json
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.hypotheses import HypothesisRegistry
@@ -165,6 +165,7 @@ class SearchHypothesesTool(BaseTool):
 
     def execute(self, **kwargs: Any) -> str:
         """Search hypotheses and return matching records."""
+
         try:
             results = HypothesisRegistry().search(
                 query=str(kwargs.get("query", "")),

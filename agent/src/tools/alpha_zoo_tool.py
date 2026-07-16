@@ -1,3 +1,5 @@
+from typing import Any
+
 """Alpha-Zoo browse tool: list / get / health on the frozen Registry contract.
 
 A single agent-facing tool with an ``action`` discriminator (list_alphas /
@@ -9,11 +11,9 @@ get large, and the CLI/inspection path handles that case. The agent gets
 metadata only.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from src.agent.tools import BaseTool
 
@@ -148,6 +148,7 @@ def run_alpha_zoo(**kwargs: Any) -> dict[str, Any]:
 
 class AlphaZooTool(BaseTool):
     """Browse the bundled alpha zoo: list_alphas / get_alpha / health."""
+
 
     name = "alpha_zoo"
     description = (

@@ -1,18 +1,18 @@
+from typing import Any, Literal
+
 """QVeris settings and status routes."""
 
-from __future__ import annotations
 
 import sys as _sys
-from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from src.tools.qveris_tool import (
+    DEFAULT_BASE_URL,
     INVITE_CODE,
     SIGNUP_URL,
-    DEFAULT_BASE_URL,
     QVerisClient,
     QVerisConfig,
     _read_config_file,
@@ -184,6 +184,7 @@ async def put_qveris_config(update: QVerisConfigUpdate) -> QVerisConfigResponse:
 )
 async def get_qveris_status() -> QVerisStatusResponse:
     """Return QVeris availability, credits, and recent usage."""
+
     cfg = load_qveris_config()
     if not has_qveris_credentials(cfg):
         return QVerisStatusResponse(

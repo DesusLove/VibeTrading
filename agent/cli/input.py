@@ -15,13 +15,11 @@ the agent runner in :mod:`cli.main`. Here we only handle the *input
 editing* and *idle* states.
 """
 
-from __future__ import annotations
 
-import sys
 import shutil
+import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import FormattedText
@@ -31,7 +29,6 @@ from prompt_toolkit.layout.containers import Window
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.layout.dimension import Dimension
 from prompt_toolkit.styles import Style
-
 
 # Sentinel raised by the Ctrl+C path so the caller can distinguish
 # "user pressed Ctrl+C on an empty line" from real EOF. We reuse
@@ -128,7 +125,7 @@ def _has_unbalanced_brackets(text: str) -> bool:
     stack: list[str] = []
     pairs = {")": "(", "]": "[", "}": "{"}
     openers = set(pairs.values())
-    in_str: Optional[str] = None
+    in_str: str | None = None
     escape = False
     for ch in text:
         if escape:
@@ -255,7 +252,7 @@ def _default_history_path() -> Path:
     return home / "history"
 
 
-def make_session(history_path: Optional[Path] = None) -> PromptSession:
+def make_session(history_path: Path | None = None) -> PromptSession:
     """Construct a configured :class:`PromptSession`.
 
     Args:
@@ -300,7 +297,7 @@ def make_session(history_path: Optional[Path] = None) -> PromptSession:
         ),
     )
     # Expose the state so the outer loop can implement two-press exit.
-    setattr(session, "vibe_ctrl_c_state", ctrl_c_state)
+    session.vibe_ctrl_c_state = ctrl_c_state
     return session
 
 
@@ -310,7 +307,7 @@ def make_session(history_path: Optional[Path] = None) -> PromptSession:
 def get_user_input(
     prompt_message: str = "❯ ",
     *,
-    session: Optional[PromptSession] = None,
+    session: PromptSession | None = None,
 ) -> str:
     """Prompt the user with the configured session and return the input.
 
@@ -364,6 +361,7 @@ def ctrl_c_within_window(session: PromptSession, window_sec: float = _EXIT_HINT_
     Returns:
         ``True`` iff the loop should now exit.
     """
+
     state = getattr(session, "vibe_ctrl_c_state", None)
     if state is None:
         return False

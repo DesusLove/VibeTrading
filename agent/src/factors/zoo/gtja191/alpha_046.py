@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #46 - 条件量价排名
@@ -9,7 +10,7 @@
 Formula: (MEAN(CLOSE,3)+MEAN(CLOSE,6)+MEAN(CLOSE,12)+MEAN(CLOSE,24))/(4*CLOSE)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 46."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

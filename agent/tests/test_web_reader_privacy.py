@@ -6,7 +6,6 @@ via `cached: true`; `no_cache=True` sends the x-no-cache header while
 the default path is byte-identical (no extra header).
 """
 
-from __future__ import annotations
 
 import json
 
@@ -69,6 +68,7 @@ def test_cached_snapshot_is_flagged(captured):
 
 def test_fresh_response_has_no_cached_key(captured):
     """Test that fresh responses don't include the cached flag."""
+
     captured["resp"] = _Resp(200, "Title: X\n\nlive body content")
     out = json.loads(read_url(URL))
     assert out["status"] == "ok", f"Expected ok status, got: {out}"

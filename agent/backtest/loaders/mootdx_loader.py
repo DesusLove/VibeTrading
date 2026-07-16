@@ -10,10 +10,8 @@ extended-market endpoint (futures/options) is upstream-broken as of
 v0.11.7 — falls through to tushare/akshare for those markets.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -90,13 +88,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch A-share OHLCV via mootdx.
 
         Args:
@@ -120,7 +118,7 @@ class DataLoader:
                 f"Supported: {sorted(_DAILY_FREQ) + sorted(_INTRADAY_FREQ)}"
             )
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             if not _is_a_share(code):
                 logger.debug("mootdx: skipping non-A-share symbol %s", code)
@@ -149,7 +147,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str, interval: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         symbol = code.split(".")[0]
         client = self._get_client()
 
@@ -166,7 +164,7 @@ class DataLoader:
     @staticmethod
     def _fetch_bars_paginated(
         client, symbol: str, freq: int, start_date: str, end_date: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Walk backward through ``bars()`` pages until the requested
         window is covered, then clip and concatenate.
 
@@ -201,7 +199,7 @@ class DataLoader:
         return DataLoader._normalize_bars(combined, start_date, end_date)
 
     @staticmethod
-    def _normalize_daily(df: Optional[pd.DataFrame]) -> Optional[pd.DataFrame]:
+    def _normalize_daily(df: pd.DataFrame | None) -> pd.DataFrame | None:
         """Normalize `get_k_data()` output to the OHLCV contract.
 
         get_k_data returns columns ``[open, close, high, low, vol, amount,
@@ -221,8 +219,8 @@ class DataLoader:
 
     @staticmethod
     def _normalize_bars(
-        df: Optional[pd.DataFrame], start_date: str, end_date: str,
-    ) -> Optional[pd.DataFrame]:
+        df: pd.DataFrame | None, start_date: str, end_date: str,
+    ) -> pd.DataFrame | None:
         """Normalize `bars()` output and clip to the requested window.
 
         bars() returns ``[open, close, high, low, vol, amount, year, month,
@@ -230,6 +228,7 @@ class DataLoader:
         ``volume`` (lowercase, last column) is the canonical share count;
         ``vol`` is a historical alias kept by mootdx for compatibility.
         """
+
         if df is None or df.empty:
             return None
         out = df.copy()

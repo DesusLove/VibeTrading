@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only fund-flow (capital-flow) tool backed by the Eastmoney client.
 
 Eastmoney publishes a free, no-auth capital-flow series that splits each bar's
@@ -13,11 +15,9 @@ Markets: A-share (``.SH`` / ``.SZ`` / ``.BJ``), Hong Kong (``.HK``) and US
 (``.US``). One unresolvable or failing symbol never aborts the batch.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json, resolve_secid
 from src.agent.tools import BaseTool
@@ -197,6 +197,7 @@ class FundFlowTool(BaseTool):
             "eastmoney", "data": {...}}`` on success, or ``{"ok": false,
             "error": ...}`` on a request-level failure.
         """
+
         codes = kwargs.get("codes")
         if not isinstance(codes, list) or not codes:
             return _error("codes must be a non-empty list of symbols")

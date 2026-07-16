@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """Universal document reader: dispatches by file extension.
 
 Supported formats:
@@ -13,11 +16,9 @@ All handlers return the same JSON envelope: status, file, format, char_count,
 truncated, text. PDF/Excel add format-specific metadata (pages, sheets, ...).
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Callable
 
 from src.agent.progress import emit_progress
 from src.agent.tools import BaseTool
@@ -346,6 +347,7 @@ def read_document(file_path: str, pages: str = "") -> str:
 
 class DocReaderTool(BaseTool):
     """Universal document reader — PDF/Word/Excel/PowerPoint/images/text."""
+
 
     name = "read_document"
     description = (

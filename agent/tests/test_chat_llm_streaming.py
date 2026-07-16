@@ -1,9 +1,9 @@
+from typing import Any
+
 """ChatLLM streaming liveness and error semantics."""
 
-from __future__ import annotations
 
 import os
-from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -25,7 +25,7 @@ class _FakeChunk:
         self.response_metadata = {"finish_reason": finish_reason}
         self.usage_metadata = None
 
-    def __add__(self, other: "_FakeChunk") -> "_FakeChunk":
+    def __add__(self, other: _FakeChunk) -> _FakeChunk:
         merged = _FakeChunk(
             content=f"{self.content}{other.content}",
             reasoning=(
@@ -43,7 +43,7 @@ class _FakeStreamingLLM:
         self.exc = exc
         self.invoke_called = False
 
-    def bind_tools(self, tools: list[dict[str, Any]]) -> "_FakeStreamingLLM":
+    def bind_tools(self, tools: list[dict[str, Any]]) -> _FakeStreamingLLM:
         return self
 
     def stream(self, messages: list[dict[str, Any]], config: dict[str, Any] | None = None):
@@ -193,9 +193,8 @@ def test_stream_failure_raises_provider_error_without_silent_fallback() -> None:
         os.environ,
         {"LANGCHAIN_PROVIDER": "deepseek", "LANGCHAIN_MODEL_NAME": "deepseek-v4-pro"},
         clear=True,
-    ):
-        with pytest.raises(ProviderStreamError) as excinfo:
-            _client(fake).stream_chat([{"role": "user", "content": "hi"}])
+    ), pytest.raises(ProviderStreamError) as excinfo:
+        _client(fake).stream_chat([{"role": "user", "content": "hi"}])
 
     assert "provider=deepseek" in str(excinfo.value)
     assert "model=deepseek-v4-pro" in str(excinfo.value)
@@ -213,9 +212,8 @@ def test_stream_error_redacts_configured_secret_values() -> None:
             "DEEPSEEK_API_KEY": "sk-live-secret-123456",
         },
         clear=True,
-    ):
-        with pytest.raises(ProviderStreamError) as excinfo:
-            _client(fake).stream_chat([{"role": "user", "content": "hi"}])
+    ), pytest.raises(ProviderStreamError) as excinfo:
+        _client(fake).stream_chat([{"role": "user", "content": "hi"}])
 
     assert "sk-live-secret-123456" not in str(excinfo.value)
     assert "[redacted]" in str(excinfo.value)
@@ -258,6 +256,7 @@ def test_content_filter_triggered_flag() -> None:
 
 def test_content_filter_triggered_flag_false_on_stop() -> None:
     """Normal stop reason leaves content_filter_triggered=False."""
+
     response = ChatLLM._parse_response(
         _FakeChunk(content="text", finish_reason="stop")
     )

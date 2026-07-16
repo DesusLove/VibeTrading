@@ -6,7 +6,6 @@ import ast
 import re
 from pathlib import Path
 
-
 AGENT_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = AGENT_ROOT / "SKILL.md"
 SKILLS_DIR = AGENT_ROOT / "src" / "skills"

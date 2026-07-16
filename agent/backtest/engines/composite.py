@@ -6,26 +6,23 @@ calculations (commission, slippage, lot rounding, etc.).
 All state (capital, positions, trades) lives in CompositeEngine.
 """
 
-from __future__ import annotations
-
-from typing import Dict, List
 
 import pandas as pd
 
-from backtest.engines.base import BaseEngine
 from backtest.engines._market_hooks import (
     _detect_market,
     _is_china_futures,
     calc_crypto_funding_fee,
-    check_crypto_liquidation,
     calc_forex_swap,
+    check_crypto_liquidation,
 )
+from backtest.engines.base import BaseEngine
 
 
-def _build_rule_engines(config: dict, codes: List[str]) -> Dict[str, BaseEngine]:
+def _build_rule_engines(config: dict, codes: list[str]) -> dict[str, BaseEngine]:
     """Instantiate one sub-engine per market type detected in codes."""
     markets = {_detect_market(c) for c in codes}
-    engines: Dict[str, BaseEngine] = {}
+    engines: dict[str, BaseEngine] = {}
 
     for market in markets:
         if market == "a_share":
@@ -71,11 +68,11 @@ class CompositeEngine(BaseEngine):
         codes: List of instrument codes spanning multiple markets.
     """
 
-    def __init__(self, config: dict, codes: List[str]):
+    def __init__(self, config: dict, codes: list[str]):
         super().__init__(config)
 
         # Build symbol -> market mapping
-        self._symbol_market: Dict[str, str] = {c: _detect_market(c) for c in codes}
+        self._symbol_market: dict[str, str] = {c: _detect_market(c) for c in codes}
 
         # Build sub-engines (one per market type)
         self._rule_engines = _build_rule_engines(config, codes)
@@ -159,6 +156,7 @@ class CompositeEngine(BaseEngine):
 
     def on_bar(self, symbol: str, bar: pd.Series, timestamp: pd.Timestamp) -> None:
         """Per-bar hooks dispatched by market type."""
+
         market = self._symbol_market.get(symbol)
 
         if market == "crypto":

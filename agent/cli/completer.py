@@ -8,9 +8,8 @@ back to ``ansibrightyellow`` so the file is importable before Parcel α
 ships ``theme.py``).
 """
 
-from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from prompt_toolkit.completion import CompleteEvent, Completer, Completion
 from prompt_toolkit.document import Document
@@ -53,6 +52,7 @@ class SlashCompleter(Completer):
     types ``/help `` (with a trailing space) we get out of the way so they
     can fill in arguments without the menu re-popping.
     """
+
 
     def __init__(self, commands: Iterable[Command] = SLASH_COMMANDS) -> None:
         # Snapshot the registry; commands is a tuple of frozen dataclasses

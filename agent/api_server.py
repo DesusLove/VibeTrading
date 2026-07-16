@@ -6,25 +6,22 @@ modules, and re-exports symbols for test compatibility.  All shared
 infrastructure lives in ``src.api.{security,models,helpers,state}``.
 """
 
-from __future__ import annotations
 
 import logging
-import os
-from pathlib import Path
-from typing import Any, Dict
-
-from fastapi import FastAPI, HTTPException, Request, status  # noqa: F401
-from fastapi.responses import FileResponse  # noqa: F401
-from fastapi.middleware.cors import CORSMiddleware
-from rich.console import Console
-
-from cli._version import __version__ as APP_VERSION
-from src.ui_services import build_run_analysis, load_run_context  # noqa: F401
 
 # UTF-8 on Windows
 import sys as _sys
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI, HTTPException, Request, status  # noqa: F401
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse  # noqa: F401
+from rich.console import Console
 
 import __main__ as _main_mod
+from cli._version import __version__ as APP_VERSION
+from src.ui_services import build_run_analysis, load_run_context  # noqa: F401
 
 _sys.modules.setdefault("api_server", _main_mod)
 _sys.modules.setdefault("agent.api_server", _main_mod)
@@ -38,6 +35,35 @@ for _s in ("stdout", "stderr"):
 # Extracted infrastructure — re-exported for route-module and test access
 # ---------------------------------------------------------------------------
 
+from src.api.helpers import (  # noqa: F401, E402
+    _FRONTEND_DIST,
+    _SAFE_PATH_PARAM_RE,
+    AGENT_DIR,
+    ENV_EXAMPLE_PATH,
+    ENV_PATH,
+    RUNS_DIR,
+    SESSIONS_DIR,
+    UPLOADS_DIR,
+    _coerce_float,
+    _coerce_int,
+    _ensure_agent_env_file,
+    _format_env_value,
+    _is_configured_secret,
+    _is_spa_html_route,
+    _project_relative_path,
+    _read_env_values,
+    _spa_html_deep_link_fallback,
+    _strip_env_value,
+    _validate_path_param,
+    _write_env_values,
+)
+from src.api.models import (  # noqa: F401, E402
+    Artifact,
+    BacktestMetrics,
+    RAGSelection,
+    RunInfo,
+    RunResponse,
+)
 from src.api.security import (  # noqa: F401, E402
     _API_KEY,
     _CORS_ORIGINS,
@@ -69,38 +95,6 @@ from src.api.security import (  # noqa: F401, E402
     require_local_or_auth,
     require_settings_write_auth,
 )
-
-from src.api.models import (  # noqa: F401, E402
-    Artifact,
-    BacktestMetrics,
-    RAGSelection,
-    RunInfo,
-    RunResponse,
-)
-
-from src.api.helpers import (  # noqa: F401, E402
-    AGENT_DIR,
-    ENV_EXAMPLE_PATH,
-    ENV_PATH,
-    RUNS_DIR,
-    SESSIONS_DIR,
-    UPLOADS_DIR,
-    _coerce_float,
-    _coerce_int,
-    _ensure_agent_env_file,
-    _format_env_value,
-    _FRONTEND_DIST,
-    _is_configured_secret,
-    _is_spa_html_route,
-    _project_relative_path,
-    _read_env_values,
-    _SAFE_PATH_PARAM_RE,
-    _spa_html_deep_link_fallback,
-    _strip_env_value,
-    _validate_path_param,
-    _write_env_values,
-)
-
 from src.api.state import (  # noqa: F401, E402
     _channel_bus,
     _channel_manager,
@@ -157,6 +151,7 @@ from src.api.scheduled_routes import (  # noqa: E402
 async def _run_startup_preflight() -> None:
     """Run preflight checks on server startup."""
     from pathlib import Path
+
     from fastapi.staticfiles import StaticFiles
     from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -196,16 +191,18 @@ async def _stop_scheduled_research_on_shutdown() -> None:
 
 # --- Runs ---
 from src.api.runs_routes import register_runs_routes  # noqa: E402
+
 register_runs_routes(app)
 
 from src.api.runs_routes import (  # noqa: F401, E402
-    _load_json_file,
-    _load_csv_to_dict,
     _build_response_from_run_dir,
+    _load_csv_to_dict,
+    _load_json_file,
 )
 
 # --- Sessions ---
 from src.api.sessions_routes import register_sessions_routes  # noqa: E402
+
 register_sessions_routes(app)
 
 from src.api.sessions_routes import (  # noqa: F401, E402
@@ -216,36 +213,39 @@ from src.api.sessions_routes import (  # noqa: F401, E402
 
 # --- System ---
 from src.api.system_routes import register_system_routes  # noqa: E402
-register_system_routes(app)
 
-from src.api.system_routes import _terminate_current_process  # noqa: F401, E402
+register_system_routes(app)
 
 # --- Settings ---
 from src.api.settings_routes import register_settings_routes  # noqa: E402
+from src.api.system_routes import _terminate_current_process  # noqa: F401, E402
+
 register_settings_routes(app)
 
 from src.api.settings_routes import (  # noqa: F401, E402
-    _baostock_supported,
     _baostock_installed,
+    _baostock_supported,
     _load_llm_providers,
 )
 
 # --- Uploads ---
 from src.api.uploads_routes import register_uploads_routes  # noqa: E402
+
 register_uploads_routes(app)
 
+# --- Channels ---
+from src.api.channels_routes import register_channels_routes  # noqa: E402
 from src.api.uploads_routes import (  # noqa: F401, E402
-    MAX_UPLOAD_SIZE,
     _BLOCKED_UPLOAD_EXT,
     _BLOCKED_UPLOAD_NAMES,
     _SHADOW_ID_RE,
     _UPLOAD_CHUNK_SIZE,
+    MAX_UPLOAD_SIZE,
 )
 
-# --- Channels ---
-from src.api.channels_routes import register_channels_routes  # noqa: E402
 register_channels_routes(app)
 from src.api.qveris_routes import qveris_router  # noqa: E402  # QVERIS-INTEGRATION
+
 app.include_router(qveris_router)  # QVERIS-INTEGRATION
 
 from src.api.channels_routes import (  # noqa: F401, E402
@@ -254,45 +254,47 @@ from src.api.channels_routes import (  # noqa: F401, E402
 
 # --- Swarm ---
 from src.api.swarm_routes import register_swarm_routes  # noqa: E402
-register_swarm_routes(app)
 
-from src.api.swarm_routes import _get_swarm_runtime  # noqa: F401, E402
+register_swarm_routes(app)
 
 # --- Live trading ---
 from src.api.live_routes import register_live_routes  # noqa: E402
-register_live_routes(app)
+from src.api.swarm_routes import _get_swarm_runtime  # noqa: F401, E402
 
-from src.api.live_routes import (  # noqa: F401, E402
-    CommitMandateRequest,
-    LiveHaltRequest,
-    LiveAuthorizeRequest,
-    LiveRunnerControlRequest,
-    BrokerAuthState,
-    MandateLimits,
-    ActiveMandateState,
-    RunnerLivenessState,
-    LiveBrokerStatus,
-    LiveStatusResponse,
-    LiveRunnerUnavailable,
-    _runner_tasks,
-    _runner_factory,
-    _emit_live_event,
-    _fetch_broker_ceilings,
-    _known_live_brokers,
-    _oauth_token_present,
-    _active_mandate_state,
-    _runner_liveness_state,
-    _live_broker_adapter,
-    _build_live_runner,
-    _drive_runner,
-)
+register_live_routes(app)
 
 # --- Alpha Zoo ---
 from src.api.alpha_routes import register_alpha_routes  # noqa: E402
+from src.api.live_routes import (  # noqa: F401, E402
+    ActiveMandateState,
+    BrokerAuthState,
+    CommitMandateRequest,
+    LiveAuthorizeRequest,
+    LiveBrokerStatus,
+    LiveHaltRequest,
+    LiveRunnerControlRequest,
+    LiveRunnerUnavailable,
+    LiveStatusResponse,
+    MandateLimits,
+    RunnerLivenessState,
+    _active_mandate_state,
+    _build_live_runner,
+    _drive_runner,
+    _emit_live_event,
+    _fetch_broker_ceilings,
+    _known_live_brokers,
+    _live_broker_adapter,
+    _oauth_token_present,
+    _runner_factory,
+    _runner_liveness_state,
+    _runner_tasks,
+)
+
 register_alpha_routes(app)
 
 # --- Market Data ---
 from src.api.market_routes import router as market_router  # noqa: E402
+
 app.include_router(market_router)
 
 
@@ -305,6 +307,7 @@ app.include_router(market_router)
 # guarded separately by VIBE_TRADING_ENABLE_SCHEDULER.
 
 from src.api.scheduled_routes import register_scheduled_routes  # noqa: E402
+
 register_scheduled_routes(app)
 
 from src.api.scheduled_routes import (  # noqa: E402, F401
@@ -316,7 +319,6 @@ from src.api.scheduled_routes import (  # noqa: E402, F401
     _scheduled_research_scheduler_enabled,
 )
 
-
 # ============================================================================
 # Main Entry Point
 # ============================================================================
@@ -325,6 +327,7 @@ def serve_main(argv: list[str] | None = None) -> int:
     """Start the API server from CLI-style arguments."""
     import argparse
     import subprocess
+
     import uvicorn
     from fastapi.staticfiles import StaticFiles
     from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -332,7 +335,8 @@ def serve_main(argv: list[str] | None = None) -> int:
     class SPAStaticFiles(StaticFiles):
         """Serve index.html for browser refreshes on client-side routes."""
 
-        async def get_response(self, path: str, scope: Dict[str, Any]):
+
+        async def get_response(self, path: str, scope: dict[str, Any]):
             try:
                 return await super().get_response(path, scope)
             except StarletteHTTPException as exc:

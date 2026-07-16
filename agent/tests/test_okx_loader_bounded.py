@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Regression tests for the P12-b okx.py parity fix — the OKX loader must
 fail fast on a transient disconnect instead of silently dropping the symbol
 or stalling ~max_pages*timeout.
@@ -8,7 +9,7 @@ requests.RequestException family + a hard budget raising a clear TimeoutError;
 the happy path still issues one request per page (no behavior change).
 """
 
-from __future__ import annotations
+
 
 import importlib
 

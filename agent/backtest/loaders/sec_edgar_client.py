@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared SEC EDGAR REST client: ticker->CIK mapping + filings/facts fetch.
 
 The U.S. SEC publishes free, no-auth JSON endpoints for company filings and
@@ -22,11 +24,9 @@ implementation: it returns raw decoded JSON for downstream loaders/tools to
 shape. The ticker->CIK table is fetched once per process and memoized.
 """
 
-from __future__ import annotations
 
 import logging
 import threading
-from typing import Any, Dict, Optional
 
 from backtest.loaders._http import (
     DEFAULT_USER_AGENT,
@@ -211,6 +211,7 @@ def get_company_facts(cik: str | int) -> Dict[str, Any]:
 
 def _reset_ticker_cache_for_tests() -> None:
     """Clear the memoized ticker map. Test-only hook; never called in prod."""
+
     global _TICKER_CACHE
     with _TICKER_CACHE_LOCK:
         _TICKER_CACHE = None

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Northbound (Stock-Connect) net-flow tool backed by Eastmoney push2his.
 
 Northbound flow is the net capital moving from Hong Kong into mainland China
@@ -12,11 +14,9 @@ recent-daily history and returns them in the standard JSON envelope. It performs
 no order placement and reaches no live trading endpoint.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json
 from src.agent.tools import BaseTool
@@ -212,6 +212,7 @@ class NorthboundFlowTool(BaseTool):
             "source": "eastmoney", "data": {...}}`` on success, or
             ``{"ok": false, "error": str}`` on failure.
         """
+
         lookback_days = _clamp_lookback(kwargs.get("lookback_days", _DEFAULT_LOOKBACK_DAYS))
 
         try:

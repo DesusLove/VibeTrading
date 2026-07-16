@@ -25,11 +25,10 @@ The verdict is a :class:`BreachEvent` whose ``kind`` is one of
 ``check_mandate`` returns ``None`` when the order is fully in-mandate (ALLOW).
 """
 
-from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
@@ -172,7 +171,7 @@ class BreachEvent:
 
 def _utc_now_iso() -> str:
     """Return the current UTC time as an ISO-8601 string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _breach(
@@ -255,7 +254,7 @@ def last_price_usd(symbol: str, asset_class: AssetClass) -> float | None:
         loader = _resolve_loader(asset_class)
     except UniverseDataUnavailable:
         return None
-    end = datetime.now(timezone.utc).date()
+    end = datetime.now(UTC).date()
     start = end - timedelta(days=_QUOTE_WINDOW_DAYS)
     try:
         frames = loader.fetch(
@@ -651,7 +650,7 @@ def avg_daily_dollar_volume(symbol: str, asset_class: AssetClass) -> float | Non
         return usable OHLCV for the symbol (→ fail-closed DENY upstream).
     """
     loader = _resolve_loader(asset_class)
-    end = datetime.now(timezone.utc).date()
+    end = datetime.now(UTC).date()
     start = end - timedelta(days=_ADV_WINDOW_DAYS)
     try:
         frames = loader.fetch(
@@ -695,6 +694,7 @@ def market_cap_usd(symbol: str, asset_class: AssetClass) -> float | None:
     Returns:
         Market cap in USD, or ``None`` when unavailable.
     """
+
     if asset_class not in (AssetClass.US_EQUITY, AssetClass.US_ETF):
         # No unified market-cap source for crypto/other here — fail-closed.
         return None

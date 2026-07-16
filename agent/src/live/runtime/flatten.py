@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 """Preemptive kill-switch action: cancel resting orders, then flatten positions.
 
 SPEC.md §7.5 component 6. The filesystem ``HALT`` sentinel (``src.live.halt``)
@@ -34,10 +37,8 @@ to the live-action audit ledger via :func:`src.live.audit.write_live_action`
 BEFORE the report is returned, so the preemptive sweep is fully reconstructable.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any, Callable
 
 from src.live.audit import LiveActionEvent, write_live_action
 from src.live.mandate.store import load_mandate
@@ -302,6 +303,7 @@ def _audit(
         outcome: ``"accepted"`` on success, ``"error"`` on failure.
         error: Error string when ``outcome == "error"``, else ``None``.
     """
+
     write_live_action(
         LiveActionEvent(
             kind="order_placed" if outcome == "accepted" else "order_rejected",

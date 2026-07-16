@@ -1,3 +1,6 @@
+from collections.abc import Iterable
+from typing import Any
+
 """QVeris loader: explicit, key-gated OHLCV fetches through QVeris tools.
 
 This loader is intentionally self-contained for the QVeris integration parcel:
@@ -11,7 +14,6 @@ requests ``source="qveris"``. The registry keeps it out of every auto fallback
 chain.
 """
 
-from __future__ import annotations
 
 import json
 import logging
@@ -19,7 +21,6 @@ import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
 
 import pandas as pd
 import requests
@@ -535,6 +536,7 @@ def _result_to_frame(result: Any, start_date: str, end_date: str) -> Optional[pd
 
 def _iter_ohlcv_records(payload: Any) -> Iterable[dict[str, Any]]:
     """Yield dict-like OHLCV records from common QVeris/provider shapes."""
+
     if isinstance(payload, list):
         for item in payload:
             yield from _iter_ohlcv_records(item)

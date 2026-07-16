@@ -1,3 +1,5 @@
+from typing import Any
+
 """Vision analysis for local images via the configured multimodal LLM.
 
 The document reader only OCRs images, which fails on charts, candlestick
@@ -7,13 +9,10 @@ adapter's ``input_image`` path) and returns the model's answer, so IM-channel
 users can send a chart screenshot and ask about it.
 """
 
-from __future__ import annotations
 
 import base64
 import json
 import logging
-from pathlib import Path
-from typing import Any
 
 from src.agent.tools import BaseTool
 from src.tools.path_utils import allowed_file_roots, resolve_safe_path
@@ -94,6 +93,7 @@ class AnalyzeImageTool(BaseTool):
             on success, or ``{"ok": false, "error": ...}`` on invalid input,
             unreadable file or provider failure.
         """
+
         raw_path = kwargs.get("path")
         if not isinstance(raw_path, str) or not raw_path.strip():
             return _error("path is required")

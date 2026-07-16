@@ -19,7 +19,6 @@ renderer, status bar) renders to the same TTY. ``NO_COLOR`` is honoured by
 forcing Rich into no-color mode at construction time.
 """
 
-from __future__ import annotations
 
 import os
 import sys
@@ -216,6 +215,7 @@ class Theme:
         >>> from cli.theme import Theme, get_console
         >>> get_console().print("Vibe-Trading", style=Theme.primary)
     """
+
 
     primary: Final[Style] = _styles.primary
     primary_dim: Final[Style] = _styles.primary_dim

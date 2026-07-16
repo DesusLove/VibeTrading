@@ -111,8 +111,8 @@ class TestFetchFallsThroughChain:
         )
 
     def test_falls_through_to_next_loader_when_first_returns_empty(self, monkeypatch):
-        from backtest.loaders import registry
         from backtest.correlation import compute_correlation_matrix
+        from backtest.loaders import registry
 
         good_df = self._price_df()
 

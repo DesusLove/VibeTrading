@@ -4,10 +4,8 @@ AKShare (https://github.com/akfamily/akshare) is a completely free financial
 data aggregator covering Chinese and global markets.  No API token required.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -78,13 +76,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch OHLCV data via AKShare.
 
         Args:
@@ -99,7 +97,7 @@ class DataLoader:
         """
         validate_date_range(start_date, end_date)
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -119,7 +117,7 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str, interval: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch a single symbol."""
         import akshare as ak
 
@@ -139,7 +137,7 @@ class DataLoader:
 
     def _fetch_a_share(
         self, ak, code: str, start_date: str, end_date: str, interval: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch A-share via stock_zh_a_hist."""
         symbol = code.split(".")[0]
         period = _INTERVAL_MAP_DAILY.get(interval, "daily")
@@ -156,7 +154,7 @@ class DataLoader:
             return None
         return self._normalize(df, date_col="日期")
 
-    def _fetch_us(self, ak, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    def _fetch_us(self, ak, code: str, start_date: str, end_date: str) -> pd.DataFrame | None:
         """Fetch US stock via stock_us_hist."""
         symbol = code.replace(".US", "")
         # akshare uses the format like "105.AAPL" for NASDAQ
@@ -176,7 +174,7 @@ class DataLoader:
                 continue
         return None
 
-    def _fetch_etf(self, ak, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    def _fetch_etf(self, ak, code: str, start_date: str, end_date: str) -> pd.DataFrame | None:
         """Fetch exchange-listed ETF / LOF via fund_etf_hist_sina.
 
         Sina symbol format is ``sh518880`` / ``sz159915``. The endpoint returns
@@ -191,7 +189,7 @@ class DataLoader:
         # fund_etf_hist_sina returns full history — clip to window.
         return df.loc[start_date:end_date]
 
-    def _fetch_forex(self, ak, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    def _fetch_forex(self, ak, code: str, start_date: str, end_date: str) -> pd.DataFrame | None:
         """Fetch forex pair via forex_hist_em.
 
         Columns returned are 日期 / 代码 / 名称 / 今开 / 最新价 / 最高 / 最低 / 振幅
@@ -219,7 +217,7 @@ class DataLoader:
         )
         return df.loc[start_date:end_date]
 
-    def _fetch_hk(self, ak, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    def _fetch_hk(self, ak, code: str, start_date: str, end_date: str) -> pd.DataFrame | None:
         """Fetch HK stock via stock_hk_hist."""
         symbol = code.replace(".HK", "").zfill(5)
         df = ak.stock_hk_hist(
@@ -240,6 +238,7 @@ class DataLoader:
         AKShare Chinese column names: 日期, 开盘, 最高, 最低, 收盘, 成交量
         AKShare English column names: date, open, high, low, close, volume
         """
+
         col_map_cn = {"开盘": "open", "最高": "high", "最低": "low", "收盘": "close", "成交量": "volume"}
         col_map_en = {"date": "trade_date", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"}
 

@@ -7,11 +7,9 @@ Validates:
   - run_validation dispatcher
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from backtest.models import TradeRecord
 from backtest.validation import (
@@ -20,7 +18,6 @@ from backtest.validation import (
     run_validation,
     walk_forward_analysis,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -185,6 +182,7 @@ class TestWalkForward:
 
     def test_consistency_rate(self) -> None:
         """Equity with positive drift should have high consistency."""
+
         eq = _make_equity(200, drift=0.003)
         trades = _make_trades([100] * 50)
         result = walk_forward_analysis(eq, trades, n_windows=5)

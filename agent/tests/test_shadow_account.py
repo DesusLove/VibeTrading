@@ -3,7 +3,6 @@
 Fixtures are synthesized in-test via tmp_path; no binary fixtures on disk.
 """
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -32,9 +31,7 @@ from src.shadow_account import (
     validate_generated,
     write_run_dir,
 )
-from src.shadow_account.models import AttributionBreakdown as _AttrCls
 from src.shadow_account.extractor import MIN_PROFITABLE_ROUNDTRIPS
-
 
 # ---------------- Helpers ----------------
 
@@ -1630,6 +1627,7 @@ def test_cluster_to_rule_skips_all_nan_price_feature() -> None:
 @pytest.mark.unit
 def test_conditional_entry_rsi_nan_bars_are_skipped() -> None:
     """Bars where RSI is NaN (warmup) are skipped, then entry fires after warmup."""
+
     rule = _rule_with_rsi(0.0, 100.0)
     idx = _daily_index(periods=30)
     close = pd.Series(
@@ -1645,5 +1643,4 @@ def test_conditional_entry_rsi_nan_bars_are_skipped() -> None:
         assert series.iloc[i] == 0.0, f"bar {i} should be zero (RSI warmup)"
     # At least one entry after warmup.
     assert (series.iloc[14:] > 0).any(), "no entry after RSI warmup"
-
 

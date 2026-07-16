@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared HTTP helpers for direct-API loaders: per-host throttling + JSON/CSV GET.
 
 Several free providers — Eastmoney most notably — rate-limit by source IP and
@@ -16,13 +18,11 @@ All spacing is best-effort and process-local — it does not coordinate across
 machines. For batch jobs raise the relevant ``*_MIN_INTERVAL`` env var.
 """
 
-from __future__ import annotations
 
 import logging
 import random
 import threading
 import time
-from typing import Any
 
 import requests
 
@@ -167,6 +167,7 @@ def throttled_get_json(
     and ``response.json()``. A non-2xx status or undecodable body raises, which
     the caller's bounded-retry wrapper treats as transient.
     """
+
     response = throttled_get(
         url,
         host_key=host_key,

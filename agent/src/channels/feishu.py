@@ -1,6 +1,7 @@
+from typing import TYPE_CHECKING, Any, Literal
+
 """Feishu/Lark channel implementation using lark-oapi SDK with WebSocket long connection."""
 
-from __future__ import annotations
 
 import asyncio
 import importlib.util
@@ -13,20 +14,18 @@ import uuid
 from collections import OrderedDict
 from contextlib import suppress
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from rich.console import Console
 from rich.markup import escape
 from rich.panel import Panel
 from rich.text import Text
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
-from src.channels.utils import safe_filename
+from src.channels.utils import get_media_dir, safe_filename
+
 # logging_bridge not needed (using stdlib logging)
 
 if TYPE_CHECKING:
@@ -647,7 +646,7 @@ class FeishuChannel(BaseChannel):
         # Write credentials back to config
         # VT-TODO: persist feishu credentials via VT config system
         try:
-            from src.config.loader import load_agent_config
+            pass
             # Credentials stored in-memory on self.config; persist via VT config
             # when channel config persistence is wired up.
         except Exception:
@@ -2346,6 +2345,7 @@ class FeishuChannel(BaseChannel):
 
     def _format_tool_hint_delta(self, tool_hint: str) -> str:
         """Format a tool hint string with the 🔧 prefix for each line."""
+
         lines = self.__class__._format_tool_hint_lines(tool_hint).split("\n")
         return "\n".join(
             f"{self.config.tool_hint_prefix} {ln}" for ln in lines if ln.strip()

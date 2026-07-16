@@ -11,7 +11,6 @@ Pre-fix: ``test_error_captured_*`` passes (capture was never broken);
 ``test_*_surfaces_error`` FAIL (the swallow). Post-fix: all pass.
 """
 
-from __future__ import annotations
 
 import json
 import threading
@@ -84,6 +83,7 @@ def test_in_process_tool_surfaces_error(tmp_path, auth_failure):
 
 def test_unset_model_runtime_error_surfaces(tmp_path, monkeypatch):
     """A RuntimeError raised above the worker try/except must surface too."""
+
 
     def boom(*a, **k):
         raise RuntimeError("LANGCHAIN_MODEL_NAME is not set")

@@ -9,14 +9,12 @@ from unittest.mock import patch
 import pytest
 
 from src.tools.skill_writer_tool import (
-    SaveSkillTool,
-    PatchSkillTool,
     DeleteSkillTool,
+    PatchSkillTool,
+    SaveSkillTool,
     SkillFileTool,
     _sanitize_skill_name,
-    USER_SKILLS_DIR,
 )
-
 
 # ---------------------------------------------------------------------------
 # _sanitize_skill_name

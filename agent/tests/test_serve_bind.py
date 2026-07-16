@@ -11,7 +11,6 @@ Warning assertions match the bind warning's own text rather than the bare
 build in CI) cannot satisfy or break them.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
@@ -50,6 +49,7 @@ def _run_serve(argv: list[str]) -> str | None:
     The frontend mount / static-file branches are short-circuited because
     uvicorn.run raises SystemExit before reaching the server loop.
     """
+
     captured: dict[str, object] = {}
 
     def fake_run(*args: object, **kwargs: object) -> None:

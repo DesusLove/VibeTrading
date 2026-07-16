@@ -1,3 +1,5 @@
+from typing import Any
+
 """L6 — real Robinhood catalog + quantity→quote pricing (SPEC.md §4, §7.5).
 
 Covers:
@@ -10,12 +12,10 @@ Covers:
   (the loader path is stubbed).
 """
 
-from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -23,15 +23,14 @@ import src.live.enforcement as enforcement
 import src.live.order_guard as order_guard
 import src.live.paths as paths
 from src.live.classification import ToolClass
-from src.trading.connectors.robinhood.extractor import extract_order_intent
 from src.live.mandate.model import (
     MANDATE_SCHEMA_VERSION,
     AssetClass,
     InstrumentType,
 )
-from src.trading.connectors.robinhood.classification import ROBINHOOD_TOOL_CLASS
 from src.tools.mcp import MCPRemoteToolSpec
-
+from src.trading.connectors.robinhood.classification import ROBINHOOD_TOOL_CLASS
+from src.trading.connectors.robinhood.extractor import extract_order_intent
 
 # --------------------------------------------------------------------------- #
 # C1 / L6 — frozen canonical catalog                                          #
@@ -138,7 +137,7 @@ def _spec() -> MCPRemoteToolSpec:
 def _write_mandate(live_runtime: Path, *, max_order_notional_usd: float = 750.0) -> None:
     broker = live_runtime / "live" / "robinhood"
     broker.mkdir(parents=True, exist_ok=True)
-    created = datetime.now(timezone.utc)
+    created = datetime.now(UTC)
     payload = {
         "schema_version": MANDATE_SCHEMA_VERSION,
         "hard_caps": {
@@ -268,6 +267,7 @@ def test_quantity_no_quote_anywhere_denies_fail_closed(live_runtime: Path, monke
 def test_last_price_usd_fail_closed_on_loader_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
     """The loader-backed price helper denies (returns None) when no loader is
     available — never a network call in tests."""
+
     def _raise(_ac):
         raise enforcement.UniverseDataUnavailable("no loader")
 

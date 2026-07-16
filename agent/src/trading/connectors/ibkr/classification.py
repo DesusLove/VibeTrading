@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated IBKR MCP tool classification overrides.
 
 IBKR's official MCP tool catalog is discovered only after OAuth, so this map is
@@ -7,7 +8,7 @@ WRITE when they appear, and anything not annotated read-only remains UNKNOWN
 and therefore fail-closed by the live registry.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

@@ -9,14 +9,13 @@ Usage (called by pytest, not directly):
     python agent/tests/fixtures/fake_mcp_sse_server.py --port 0 --port-file /tmp/fake-mcp-sse.port
 """
 
-from __future__ import annotations
 
 import argparse
 import asyncio
 from pathlib import Path
 
-from fastmcp import FastMCP
 import uvicorn
+from fastmcp import FastMCP
 
 mcp = FastMCP("fake-mcp-sse-server")
 
@@ -30,6 +29,7 @@ def echo(message: str) -> str:
 @mcp.tool()
 def add(a: int, b: int) -> int:
     """Add two integers."""
+
     return a + b
 
 

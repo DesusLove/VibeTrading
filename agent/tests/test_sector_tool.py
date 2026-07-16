@@ -4,7 +4,6 @@ All HTTP is mocked at the Eastmoney client functions the tool imports
 (:func:`get_json` / :func:`resolve_secid`), so no test touches a live endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -145,6 +144,7 @@ class TestRankingEnvelope:
 
 class TestErrorEnvelope:
     """Validation and request failures return the ok=false envelope."""
+
 
     def test_missing_code_for_membership_rejected(self):
         payload = json.loads(SectorInfoTool().execute())

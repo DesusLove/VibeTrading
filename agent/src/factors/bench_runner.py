@@ -1,3 +1,6 @@
+from collections.abc import Callable, Iterable
+from typing import Any
+
 """Bench runner: compute IC stats for every alpha in a zoo over one universe.
 
 Extracted from ``agent/scripts/w4a_run_benches.py`` so the same pipeline can be
@@ -13,14 +16,12 @@ The math is unchanged — only the carrier moved. Categorisation thresholds:
 - ``dead``      : everything else
 """
 
-from __future__ import annotations
 
 import logging
 import math
 import os
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Any, Callable, Iterable
 
 from src.config.accessor import get_env_config
 from src.factors.factor_analysis_core import compute_ic_series
@@ -160,6 +161,7 @@ def run_bench(
         ``by_theme``, ``top5_by_ir``, ``dead_examples``, ``wall_seconds`` —
         and on failure: ``status="error"``, ``error``.
     """
+
     start = time.monotonic()
     entry: dict[str, Any] = {
         "status": "pending",

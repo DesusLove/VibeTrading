@@ -6,12 +6,11 @@ dexter CLI: the verb is rerolled per agent turn so the user perceives variety
 across runs rather than a single hard-coded label.
 """
 
-from __future__ import annotations
 
 import random
-from typing import Final, Tuple
+from typing import Final
 
-THINKING_VERBS: Final[Tuple[str, ...]] = (
+THINKING_VERBS: Final[tuple[str, ...]] = (
     "Pondering",
     "Analyzing",
     "Reasoning",
@@ -31,6 +30,7 @@ def pick_thinking_verb(*, seed: int | None = None) -> str:
     Returns:
         ``"Pondering…"``, ``"Analyzing…"``, etc.
     """
+
 
     if seed is not None:
         rng = random.Random(seed)

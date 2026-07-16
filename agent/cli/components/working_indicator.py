@@ -10,17 +10,14 @@ ships it) we fall back to ``"Pondering…"`` so the demo build still
 works.
 """
 
-from __future__ import annotations
 
 import random
 from types import TracebackType
-from typing import Optional
 
 from rich.console import Console
 from rich.live import Live
 from rich.spinner import Spinner
 from rich.text import Text
-
 
 _FALLBACK_VERBS: tuple[str, ...] = (
     "Pondering…",
@@ -67,18 +64,18 @@ class ThinkingSpinner:
 
     def __init__(
         self,
-        verb: Optional[str] = None,
+        verb: str | None = None,
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         spinner_name: str = "dots",
     ) -> None:
         self._verb = verb or _pick_verb()
         self._console = console or _resolve_console()
         self._spinner_name = spinner_name
-        self._live: Optional[Live] = None
+        self._live: Live | None = None
 
     # --------------------------------------------------------- lifecycle ----
-    def __enter__(self) -> "ThinkingSpinner":
+    def __enter__(self) -> ThinkingSpinner:
         self._live = Live(
             self._renderable(),
             console=self._console,
@@ -90,9 +87,9 @@ class ThinkingSpinner:
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc: Optional[BaseException],
-        tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         live, self._live = self._live, None
         if live is not None:
@@ -110,7 +107,7 @@ class ThinkingSpinner:
         if self._live is not None:
             self._live.update(self._renderable())
 
-    def pause(self) -> "_SpinnerPause":
+    def pause(self) -> _SpinnerPause:
         """Yield a context manager that hides the spinner inside its block.
 
         Useful when callers need to ``console.print`` a tool-event row
@@ -122,9 +119,10 @@ class ThinkingSpinner:
 class _SpinnerPause:
     """Inner context manager returned by :meth:`ThinkingSpinner.pause`."""
 
+
     def __init__(self, parent: ThinkingSpinner) -> None:
         self._parent = parent
-        self._saved_live: Optional[Live] = None
+        self._saved_live: Live | None = None
 
     def __enter__(self) -> None:
         # Stash the live so __exit__ on the outer spinner does nothing

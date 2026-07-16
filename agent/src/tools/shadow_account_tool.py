@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shadow Account BaseTool wrappers (auto-discovered by `src.tools` registry).
 
 Four tools, all thin — business logic lives in `src.shadow_account`:
@@ -7,16 +9,13 @@ Four tools, all thin — business logic lives in `src.shadow_account`:
     scan_shadow_signals     → scanner.scan_today_signals
 """
 
-from __future__ import annotations
 
 import json
 import logging
 from dataclasses import asdict
 from datetime import date, timedelta
-from typing import Any
 
 from src.agent.tools import BaseTool
-from src.tools.path_utils import safe_user_path
 from src.shadow_account import (
     extract_shadow_profile,
     load_profile,
@@ -26,6 +25,7 @@ from src.shadow_account import (
 )
 from src.shadow_account.backtester import load_cached_result
 from src.shadow_account.scanner import scan_today_signals
+from src.tools.path_utils import safe_user_path
 
 logger = logging.getLogger(__name__)
 
@@ -294,6 +294,7 @@ class RenderShadowReportTool(BaseTool):
 
 class ScanShadowSignalsTool(BaseTool):
     """Scan the market for symbols matching a Shadow Account's rules (research only)."""
+
 
     name = "scan_shadow_signals"
     description = (

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Dhan connector profiles.
 
 Dhan (https://dhan.co) is an Indian discount broker with free API access.
@@ -13,7 +14,7 @@ live is operator-declared (config-trust); the connector's order path is
 structurally capped at paper (see ``sdk.place_order``).
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

@@ -1,3 +1,6 @@
+from collections.abc import Iterable
+from typing import Any
+
 """Prompt-injection warning scanner for external tool content.
 
 The scanner is intentionally conservative in action: it never rewrites or
@@ -6,11 +9,9 @@ returned by reader/search tools so downstream agents can treat external text
 as untrusted instructions.
 """
 
-from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, Iterable
 
 
 @dataclass(frozen=True)
@@ -170,6 +171,7 @@ def _iter_selected_values(
 
 def _compact_match(text: str) -> str:
     """Return a short, single-line match excerpt for warning metadata."""
+
     compact = " ".join(text.split())
     if len(compact) <= 120:
         return compact

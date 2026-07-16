@@ -1,3 +1,6 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """Live-trading channel HTTP routes (consent commit, kill switch, C2 status, runner control).
 
 Mounted by ``agent/api_server.py`` via ``register_live_routes(app)``.
@@ -18,14 +21,12 @@ event through the EXISTING session EventBus, so the frontend's already-wired
 ``/sessions/{id}/events`` SSE stream reflects the state change. No new bus.
 """
 
-from __future__ import annotations
 
 import asyncio
 import logging
 import sys as _sys
 import time
-from datetime import datetime
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from datetime import UTC, datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -49,9 +50,9 @@ class CommitMandateRequest(BaseModel):
     broker: str = Field(..., min_length=1, max_length=64)
     proposal_id: str = Field(..., pattern=r"^mp_[0-9a-f]{32}$")
     selected_ordinal: int = Field(..., ge=1, le=10)
-    adjustments: Optional[Dict[str, Any]] = None
+    adjustments: dict[str, Any | None] = None
     consent_ack: bool = Field(..., description="Explicit affirmative; must be true")
-    session_id: Optional[str] = None
+    session_id: str | None = None
     account_ref: str = Field("", max_length=128)
     lifetime_days: int = Field(30, ge=1, le=365)
 
@@ -63,9 +64,9 @@ class LiveHaltRequest(BaseModel):
     ``broker`` is omitted the GLOBAL switch is used (halts every broker).
     """
 
-    broker: Optional[str] = Field(None, max_length=64)
+    broker: str | None = Field(None, max_length=64)
     reason: str = Field("user requested halt", max_length=500)
-    session_id: Optional[str] = None
+    session_id: str | None = None
 
 
 class LiveAuthorizeRequest(BaseModel):
@@ -89,7 +90,7 @@ class LiveRunnerControlRequest(BaseModel):
     """
 
     broker: str = Field(..., min_length=1, max_length=64)
-    session_id: Optional[str] = None
+    session_id: str | None = None
 
 
 class BrokerAuthState(BaseModel):
@@ -107,7 +108,7 @@ class MandateLimits(BaseModel):
     max_total_exposure_usd: float
     max_leverage: float
     max_trades_per_day: int
-    allowed_instruments: List[str]
+    allowed_instruments: list[str]
     account_funding_usd: float
 
 
@@ -118,7 +119,7 @@ class ActiveMandateState(BaseModel):
     account_ref: str
     created_at: str
     expires_at: str
-    expires_in_seconds: Optional[int] = Field(
+    expires_in_seconds: int | None = Field(
         None, description="Seconds until expiry; negative when already expired"
     )
     expired: bool
@@ -130,15 +131,15 @@ class RunnerLivenessState(BaseModel):
 
     broker: str
     alive: bool
-    last_tick: Optional[float] = Field(None, description="Unix epoch of last heartbeat tick")
-    last_tick_age_seconds: Optional[float] = None
+    last_tick: float | None = Field(None, description="Unix epoch of last heartbeat tick")
+    last_tick_age_seconds: float | None = None
 
 
 class LiveBrokerStatus(BaseModel):
     """Combined live-channel status for a single broker."""
 
     auth: BrokerAuthState
-    mandate: Optional[ActiveMandateState] = None
+    mandate: ActiveMandateState | None = None
     runner: RunnerLivenessState
     halted: bool = Field(..., description="Per-broker OR global kill switch is tripped")
 
@@ -147,15 +148,15 @@ class LiveStatusResponse(BaseModel):
     """Top-level live-channel status (C2)."""
 
     global_halted: bool = Field(..., description="Whether the GLOBAL kill switch is tripped")
-    brokers: List[LiveBrokerStatus]
+    brokers: list[LiveBrokerStatus]
 
 
 # ============================================================================
 # Runner state (module-level; monkeypatched by tests via api_server re-export)
 # ============================================================================
 
-_runner_tasks: Dict[str, "asyncio.Task[Any]"] = {}
-_runner_factory: Optional[Any] = None
+_runner_tasks: dict[str, asyncio.Task[Any]] = {}
+_runner_factory: Any | None = None
 
 
 # ============================================================================
@@ -186,7 +187,7 @@ def _host() -> Any:
 # ============================================================================
 
 
-def _emit_live_event(session_id: Optional[str], event_type: str, data: Dict[str, Any]) -> None:
+def _emit_live_event(session_id: str | None, event_type: str, data: dict[str, Any]) -> None:
     """Best-effort relay of a live-channel event through the existing bus.
 
     The event flows out the existing ``/sessions/{session_id}/events`` SSE
@@ -231,7 +232,7 @@ def _live_broker_adapter(broker: str) -> Any:
     raise LiveRunnerUnavailable(f"no MCP server configured for live broker {broker!r}")
 
 
-def _fetch_broker_ceilings(broker: str) -> Optional[Dict[str, Any]]:
+def _fetch_broker_ceilings(broker: str) -> dict[str, Any | None]:
     """Best-effort fetch of broker-side account ceilings for the commit re-check.
 
     Returns ``None`` on any failure so the caller falls back to the proposal's
@@ -253,7 +254,7 @@ def _fetch_broker_ceilings(broker: str) -> Optional[Dict[str, Any]]:
     if not isinstance(result, dict) or result.get("status") == "error":
         return None
     payload = result.get("result") if isinstance(result.get("result"), dict) else result
-    funding: Optional[float] = None
+    funding: float | None = None
     for key in ("account_funding_usd", "buying_power", "cash", "portfolio_value", "equity"):
         raw = payload.get(key) if isinstance(payload, dict) else None
         try:
@@ -271,7 +272,7 @@ def _fetch_broker_ceilings(broker: str) -> Optional[Dict[str, Any]]:
     }
 
 
-def _known_live_brokers() -> List[str]:
+def _known_live_brokers() -> list[str]:
     """Return the recognized live-broker keys (SPEC §7.2)."""
     from src.config.schema import LIVE_BROKER_SERVER_KEYS
 
@@ -290,7 +291,7 @@ def _oauth_token_present(broker: str) -> bool:
         return False
 
 
-def _active_mandate_state(broker: str) -> Optional[ActiveMandateState]:
+def _active_mandate_state(broker: str) -> ActiveMandateState | None:
     """Build the active-mandate snapshot for a broker, or ``None`` when absent."""
     from src.live.mandate.store import load_mandate
 
@@ -300,15 +301,14 @@ def _active_mandate_state(broker: str) -> Optional[ActiveMandateState]:
 
     consent = mandate.consent
     caps = mandate.hard_caps
-    expires_in: Optional[int] = None
+    expires_in: int | None = None
     expired = False
     try:
         expires_dt = datetime.fromisoformat(consent.expires_at.replace("Z", "+00:00"))
-        from datetime import timezone
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if expires_dt.tzinfo is None:
-            expires_dt = expires_dt.replace(tzinfo=timezone.utc)
+            expires_dt = expires_dt.replace(tzinfo=UTC)
         delta = expires_dt - now
         expires_in = int(delta.total_seconds())
         expired = expires_in <= 0
@@ -336,8 +336,8 @@ def _active_mandate_state(broker: str) -> Optional[ActiveMandateState]:
 def _runner_liveness_state(broker: str) -> RunnerLivenessState:
     """Build the runner-liveness snapshot for a broker (SPEC §7.5 contract)."""
     alive = False
-    tick: Optional[float] = None
-    age: Optional[float] = None
+    tick: float | None = None
+    age: float | None = None
     try:
         from src.live.runtime import liveness
 
@@ -398,7 +398,7 @@ def _build_live_runner(broker: str) -> Any:
     def _read(remote_tool: str):
         return lambda: adapter.call_tool(remote_tool, {})
 
-    def _submit(order: Dict[str, Any]) -> Dict[str, Any]:
+    def _submit(order: dict[str, Any]) -> dict[str, Any]:
         if order.get("action") == "cancel":
             return adapter.call_tool(cancel_order_tool, order)
         return adapter.call_tool(submit_order_tool, order)
@@ -407,16 +407,16 @@ def _build_live_runner(broker: str) -> Any:
     session = svc.create_session(title=f"live-runner:{broker}")
     session_id = session.session_id
 
-    async def _agent_caller(sid: str, prompt: str) -> Dict[str, Any]:
+    async def _agent_caller(sid: str, prompt: str) -> dict[str, Any]:
         return await svc.send_message(sid, prompt)
 
-    def _audit_with_bus(event: Any) -> Dict[str, Any]:
+    def _audit_with_bus(event: Any) -> dict[str, Any]:
         return write_live_action(
             event,
             event_callback=lambda etype, record: svc.event_bus.emit(session_id, etype, record),
         )
 
-    runner_holder: Dict[str, Any] = {}
+    runner_holder: dict[str, Any] = {}
 
     async def _on_fire(_job: Any) -> None:
         runner = runner_holder.get("runner")
@@ -551,7 +551,7 @@ def register_live_routes(
         return result
 
     @app.get("/live/status", response_model=LiveStatusResponse, dependencies=[Depends(require_auth)])
-    async def live_status_endpoint(broker: Optional[str] = Query(None, max_length=64)):
+    async def live_status_endpoint(broker: str | None = Query(None, max_length=64)):
         """Return live-channel status: auth, active mandate, runner liveness, halt (C2)."""
         from src.live.halt import halt_flag_set
 
@@ -565,7 +565,7 @@ def register_live_routes(
 
         known = set(_known_live_brokers())
         h = _host()
-        statuses: List[LiveBrokerStatus] = []
+        statuses: list[LiveBrokerStatus] = []
         for key in brokers:
             statuses.append(
                 LiveBrokerStatus(
@@ -664,6 +664,7 @@ def register_live_routes(
     @app.post("/live/runner/stop", dependencies=[Depends(require_auth)])
     async def stop_runner_endpoint(payload: LiveRunnerControlRequest):
         """Stop the persistent live runner for a broker (SPEC §7.5)."""
+
         from src.trading.service import broker_supports_live_runner
 
         broker = payload.broker.strip().lower()

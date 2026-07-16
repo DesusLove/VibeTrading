@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 import copy
 import json
 import logging
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from datetime import UTC, datetime
 
 from src.agent.memory import WorkspaceMemory
 from src.agent.skills import SkillsLoader
@@ -149,8 +150,8 @@ class ContextBuilder:
     """
 
     def __init__(self, registry: ToolRegistry, memory: WorkspaceMemory,
-                 skills_loader: Optional[SkillsLoader] = None,
-                 persistent_memory: Optional[PersistentMemory] = None) -> None:
+                 skills_loader: SkillsLoader | None = None,
+                 persistent_memory: PersistentMemory | None = None) -> None:
         """Initialize ContextBuilder.
 
         Args:
@@ -176,7 +177,7 @@ class ContextBuilder:
         Returns:
             System prompt text.
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # Build memory section only if there are saved memories
         memory_section = ""
@@ -212,7 +213,7 @@ class ContextBuilder:
         except Exception:  # noqa: BLE001 - prompt count must never break startup
             return 18
 
-    def build_messages(self, user_message: str, history: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
+    def build_messages(self, user_message: str, history: list[dict[str, Any | None]] = None) -> list[dict[str, Any]]:
         """Build full message list.
 
         Auto-recalls relevant persistent memories and injects them into the
@@ -226,7 +227,7 @@ class ContextBuilder:
         Returns:
             OpenAI-format message list.
         """
-        messages: List[Dict[str, Any]] = [
+        messages: list[dict[str, Any]] = [
             {"role": "system", "content": self.build_system_prompt(user_message)},
         ]
         if history:
@@ -265,7 +266,7 @@ class ContextBuilder:
         return "\n\n".join(lines)
 
     @staticmethod
-    def format_tool_result(tool_call_id: str, tool_name: str, result: str) -> Dict[str, Any]:
+    def format_tool_result(tool_call_id: str, tool_name: str, result: str) -> dict[str, Any]:
         """Format a tool execution result as a message."""
         return {
             "role": "tool",
@@ -277,9 +278,9 @@ class ContextBuilder:
     @staticmethod
     def format_assistant_tool_calls(
         tool_calls: list,
-        content: Optional[str] = None,
-        reasoning_content: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        content: str | None = None,
+        reasoning_content: str | None = None,
+    ) -> dict[str, Any]:
         """Format an assistant tool_calls message, preserving thinking text.
 
         Args:

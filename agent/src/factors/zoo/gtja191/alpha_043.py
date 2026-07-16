@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #43 - 收益递归平均
@@ -9,7 +10,7 @@
 Formula: SUM((CLOSE>DELAY(CLOSE,1)?VOLUME:(CLOSE<DELAY(CLOSE,1)?-VOLUME:0)),6)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 43."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

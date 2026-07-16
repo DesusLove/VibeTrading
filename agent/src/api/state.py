@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import os
-
 from fastapi import HTTPException
 
-from src.api._compat import host_attr as _host_attr, set_host_attr as _set_host_attr
+from src.api._compat import host_attr as _host_attr
+from src.api._compat import set_host_attr as _set_host_attr
 from src.api.helpers import RUNS_DIR, SESSIONS_DIR
 from src.config.accessor import get_env_config
-
 
 # ============================================================================
 # Global singletons
@@ -33,7 +31,7 @@ def _get_session_service():
     import sys as _sys
     _host = _sys.modules.get("api_server")
     if _host is not None and hasattr(_host, "_session_service"):
-        host_val = getattr(_host, "_session_service")
+        host_val = _host._session_service
         if host_val is not None:
             return host_val
     elif _session_service is not None:
@@ -77,7 +75,7 @@ def _get_channel_runtime():
     import sys as _sys
     _host = _sys.modules.get("api_server")
     if _host is not None and hasattr(_host, "_channel_runtime"):
-        host_rt = getattr(_host, "_channel_runtime")
+        host_rt = _host._channel_runtime
         if host_rt is not None:
             return host_rt
     elif _channel_runtime is not None:

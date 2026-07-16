@@ -16,7 +16,6 @@ avoiding short-term reversal contamination. Computed directly from prices —
 no fundamental data required — so this matches the original construction
 modulo the cross-sectional z-score wrapper used for long-short ranking.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     Short panels produce all-NaN; the registry surfaces this as >95% NaN
     (RegistryError) rather than returning a misleading shrunk-window value.
     """
+
     close = panel['close']
     ret_long = safe_div(delta(close, 252), close.shift(252))
     ret_short = safe_div(delta(close, 21), close.shift(21))

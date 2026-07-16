@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated read/write classification for Longbridge SDK operations.
 
 Keys are the connector's own operation names (Longbridge is a direct-SDK
@@ -6,7 +7,7 @@ never treats them as plain reads; anything unlisted and not a known read is
 treated as WRITE (fail-closed) by the gate.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

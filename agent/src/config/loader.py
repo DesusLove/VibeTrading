@@ -1,12 +1,13 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Structured agent config loading utilities."""
 
-from __future__ import annotations
 
 import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Mapping
 
 from pydantic import ValidationError
 
@@ -335,6 +336,7 @@ def _merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, An
         A merged dictionary where nested mappings are merged recursively and
         scalar values from ``override`` replace those in ``base``.
     """
+
     merged = dict(base)
     for key, value in override.items():
         current = merged.get(key)

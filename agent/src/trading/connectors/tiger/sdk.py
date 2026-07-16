@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only Tiger Brokers (TigerOpen) connector via the official ``tigeropen`` SDK.
 
 This module wraps Tiger's ``QuoteClient`` / ``TradeClient`` for the five read
@@ -17,14 +20,12 @@ standard/prime account is 5–10 digits; a global account starts with ``U``. The
 profile by mistake.
 """
 
-from __future__ import annotations
 
 import json
 import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -79,7 +80,7 @@ class TigerConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "TigerConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> TigerConfig:
         """Build a config from a JSON-like mapping, normalizing the profile."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
@@ -101,7 +102,7 @@ class TigerConfig:
         private_key_path: str | None = None,
         account: str | None = None,
         profile: str | None = None,
-    ) -> "TigerConfig":
+    ) -> TigerConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if tiger_id is not None:
@@ -123,7 +124,7 @@ class TigerConfig:
 _OVERRIDE_KEYS = ("tiger_id", "private_key_path", "account", "profile")
 
 
-def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> "TigerConfig":
+def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> TigerConfig:
     """Resolve the effective config: saved file ← profile defaults ← CLI overrides.
 
     Credentials (``tiger_id`` / ``private_key_path`` / ``account``) come from the
@@ -727,6 +728,7 @@ def _safe_call(obj: Any, name: str, *args: Any, **kwargs: Any) -> Any:
     call first and fall back to the no-arg form so a signature drift degrades to
     a usable call instead of an error.
     """
+
     fn = getattr(obj, name, None)
     if fn is None:
         return None

@@ -1,9 +1,9 @@
+from typing import Any
+
 """Integration tests for MCP tool injection into the tool registry (Phase 3)."""
 
-from __future__ import annotations
 
 import logging
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -11,7 +11,6 @@ import pytest
 from src.config.schema import AgentConfig, MCPServerConfig
 from src.tools import build_registry
 from src.tools.mcp import MCPRemoteTool
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -266,6 +265,7 @@ def test_warn_callback_omitted_still_logs_collision(
 ) -> None:
     """When warn_callback is absent, logger.warning must still fire for collisions."""
 
+
     def _wrapper_factory(
         server_name: str,
         server_config: MCPServerConfig,
@@ -290,4 +290,3 @@ def test_warn_callback_omitted_still_logs_collision(
     assert any("foo" in record.message for record in caplog.records), (
         "logger.warning must still fire for the collision even without warn_callback"
     )
-

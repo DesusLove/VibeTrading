@@ -1,16 +1,17 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """LLM and data-source settings HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_settings_routes(app, ...)``.
 """
 
-from __future__ import annotations
 
 import importlib.util
 import json
 import os
 import sys as _sys
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
@@ -31,13 +32,13 @@ class LLMProviderOption(BaseModel):
 
     name: str
     label: str
-    api_key_env: Optional[str] = None
+    api_key_env: str | None = None
     base_url_env: str
     default_model: str
     default_base_url: str
     api_key_required: bool = True
     auth_type: str = "api_key"
-    login_command: Optional[str] = None
+    login_command: str | None = None
 
 
 class LLMSettingsResponse(BaseModel):
@@ -46,9 +47,9 @@ class LLMSettingsResponse(BaseModel):
     provider: str
     model_name: str
     base_url: str
-    api_key_env: Optional[str] = None
+    api_key_env: str | None = None
     api_key_configured: bool
-    api_key_hint: Optional[str] = None
+    api_key_hint: str | None = None
     api_key_required: bool
     temperature: float
     timeout_seconds: int
@@ -56,7 +57,7 @@ class LLMSettingsResponse(BaseModel):
     reasoning_effort: str
     sse_timeout_seconds: int
     env_path: str
-    providers: List[LLMProviderOption]
+    providers: list[LLMProviderOption]
 
 
 class UpdateLLMSettingsRequest(BaseModel):
@@ -64,20 +65,20 @@ class UpdateLLMSettingsRequest(BaseModel):
 
     provider: str = Field(..., min_length=1)
     model_name: str = Field(..., min_length=1)
-    base_url: Optional[str] = None
-    api_key: Optional[str] = None
+    base_url: str | None = None
+    api_key: str | None = None
     clear_api_key: bool = False
     temperature: float = 0.0
     timeout_seconds: int = Field(120, ge=1, le=3600)
     max_retries: int = Field(2, ge=0, le=20)
-    reasoning_effort: Optional[str] = None
+    reasoning_effort: str | None = None
 
 
 class DataSourceSettingsResponse(BaseModel):
     """Current data source credential settings."""
 
     tushare_token_configured: bool
-    tushare_token_hint: Optional[str] = None
+    tushare_token_hint: str | None = None
     baostock_supported: bool
     baostock_installed: bool
     baostock_message: str
@@ -87,7 +88,7 @@ class DataSourceSettingsResponse(BaseModel):
 class UpdateDataSourceSettingsRequest(BaseModel):
     """Update project-local data source credentials."""
 
-    tushare_token: Optional[str] = None
+    tushare_token: str | None = None
     clear_tushare_token: bool = False
 
 
@@ -98,7 +99,7 @@ class UpdateDataSourceSettingsRequest(BaseModel):
 LLM_PROVIDER_CONFIG_PATH = _AGENT_DIR / "src" / "providers" / "llm_providers.json"
 
 
-def _load_llm_providers() -> List[LLMProviderOption]:
+def _load_llm_providers() -> list[LLMProviderOption]:
     """Load provider metadata from JSON so additions stay data-driven."""
     try:
         raw = json.loads(LLM_PROVIDER_CONFIG_PATH.read_text(encoding="utf-8"))
@@ -157,7 +158,7 @@ def _baostock_installed() -> bool:
     return importlib.util.find_spec("baostock") is not None
 
 
-def _read_settings_env_values() -> Dict[str, str]:
+def _read_settings_env_values() -> dict[str, str]:
     """Read settings without creating agent/.env.
 
     Prefer the user's active agent/.env.  If it does not exist yet, fall back
@@ -180,7 +181,7 @@ def _read_settings_env_values() -> Dict[str, str]:
 
 
 def _build_llm_settings_response(
-    values: Optional[Dict[str, str]] = None,
+    values: dict[str, str | None] = None,
 ) -> LLMSettingsResponse:
     """Build the public settings payload from dotenv values."""
     host = _host()
@@ -218,7 +219,7 @@ def _build_llm_settings_response(
 
 
 def _build_data_source_settings_response(
-    values: Optional[Dict[str, str]] = None,
+    values: dict[str, str | None] = None,
 ) -> DataSourceSettingsResponse:
     """Build the public data source settings payload."""
     host = _host()
@@ -246,7 +247,7 @@ def _build_data_source_settings_response(
     )
 
 
-def _sync_runtime_env(provider: LLMProviderOption, updates: Dict[str, str]) -> None:
+def _sync_runtime_env(provider: LLMProviderOption, updates: dict[str, str]) -> None:
     """Apply saved LLM settings to the running API process."""
     host = _host()
     for key, value in updates.items():
@@ -361,7 +362,7 @@ def register_settings_routes(
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
                 ) from exc
-        updates: Dict[str, str] = {
+        updates: dict[str, str] = {
             "LANGCHAIN_PROVIDER": provider.name,
             "LANGCHAIN_MODEL_NAME": model_name,
             provider.base_url_env: base_url,
@@ -410,9 +411,10 @@ def register_settings_routes(
     )
     async def update_data_source_settings(payload: UpdateDataSourceSettingsRequest):
         """Persist project-local data source credentials and update the running process."""
+
         host_ref = _host()
         current_values = _read_settings_env_values()
-        updates: Dict[str, str] = {}
+        updates: dict[str, str] = {}
 
         if payload.clear_tushare_token:
             updates["TUSHARE_TOKEN"] = ""

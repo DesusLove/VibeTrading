@@ -1,11 +1,10 @@
+from typing import Any
+
 """Base channel interface for chat platforms."""
 
-from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any
 
 from src.channels.bus.events import InboundMessage, OutboundMessage
 from src.channels.bus.queue import MessageBus
@@ -234,4 +233,5 @@ class BaseChannel(ABC):
     @property
     def is_running(self) -> bool:
         """Check if the channel is running."""
+
         return self._running

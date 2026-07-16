@@ -9,7 +9,6 @@ Usage (called by pytest, not directly):
     python agent/tests/fixtures/fake_mcp_server.py
 """
 
-from __future__ import annotations
 
 from fastmcp import FastMCP
 
@@ -40,6 +39,7 @@ def add(a: int, b: int) -> int:
     Returns:
         The sum a + b.
     """
+
     return a + b
 
 

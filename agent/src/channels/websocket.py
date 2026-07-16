@@ -1,6 +1,7 @@
+from typing import Any, Self
+
 """WebSocket server channel: vibe-trading acts as a WebSocket server and serves connected clients."""
 
-from __future__ import annotations
 
 import asyncio
 import hmac
@@ -11,28 +12,16 @@ import uuid
 from collections.abc import Callable
 from contextlib import suppress
 from pathlib import Path
-from typing import Any, Self
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from websockets.asyncio.server import ServerConnection, serve, unix_serve
 from websockets.exceptions import ConnectionClosed
 from websockets.http11 import Request as WsRequest
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OUTBOUND_META_AGENT_UI, OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
 from src.channels.utils import get_media_dir
-from pydantic import BaseModel
-from src.security.workspace_access import (
-    WORKSPACE_SCOPE_METADATA_KEY,
-    WorkspaceScopeError,
-)
-from src.session.goal_state import goal_state_ws_blob
-from src.session.webui_turns import websocket_turn_wall_started_at
-from src.utils.media_decode import (
-    FileSizeExceeded,
-    save_base64_data_url,
-)
 from src.channelsui.cli_apps_api import normalize_cli_app_mentions
 from src.channelsui.forking import handle_webui_fork_chat
 from src.channelsui.gateway_services import GatewayServices
@@ -48,6 +37,16 @@ from src.channelsui.http_utils import (
 from src.channelsui.mcp_presets_api import normalize_mcp_preset_mentions
 from src.channelsui.transcription_ws import webui_transcription_event
 from src.channelsui.websocket_logging import websockets_server_logger
+from src.security.workspace_access import (
+    WORKSPACE_SCOPE_METADATA_KEY,
+    WorkspaceScopeError,
+)
+from src.session.goal_state import goal_state_ws_blob
+from src.session.webui_turns import websocket_turn_wall_started_at
+from src.utils.media_decode import (
+    FileSizeExceeded,
+    save_base64_data_url,
+)
 
 
 class WebSocketConfig(BaseModel):
@@ -1189,6 +1188,7 @@ class WebSocketChannel(BaseChannel):
         model_preset: Any = None,
     ) -> None:
         """Broadcast runtime model changes to every open websocket connection."""
+
         conns = list(self._conn_chats)
         if not conns or not isinstance(model_name, str) or not model_name.strip():
             return

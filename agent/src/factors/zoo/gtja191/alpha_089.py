@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #89
@@ -9,7 +10,7 @@
 Formula: 2*(SMA(CLOSE,13,2)-SMA(CLOSE,27,2)-SMA(SMA(CLOSE,13,2)-SMA(CLOSE,27,2),10,2))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 89."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

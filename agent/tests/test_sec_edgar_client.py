@@ -10,7 +10,6 @@ import requests
 
 from backtest.loaders import sec_edgar_client as sec
 
-
 _TICKERS_PAYLOAD = {
     "0": {"cik_str": 320193, "ticker": "AAPL", "title": "Apple Inc."},
     "1": {"cik_str": 789019, "ticker": "MSFT", "title": "Microsoft Corp"},
@@ -141,15 +140,13 @@ class TestErrorPath:
             sec,
             "throttled_get_json",
             side_effect=requests.HTTPError("404 Not Found"),
-        ):
-            with pytest.raises(requests.HTTPError):
-                sec.get_submissions(999999)
+        ), pytest.raises(requests.HTTPError):
+            sec.get_submissions(999999)
 
     def test_ticker_fetch_error_propagates(self):
         with patch.object(
             sec,
             "throttled_get_json",
             side_effect=requests.ConnectionError("boom"),
-        ):
-            with pytest.raises(requests.ConnectionError):
-                sec.cik_for("AAPL")
+        ), pytest.raises(requests.ConnectionError):
+            sec.cik_for("AAPL")

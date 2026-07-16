@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for fred_macro_tool: availability gating, success + error envelopes.
 
 All HTTP is mocked — no test ever reaches a live FRED endpoint. The tool imports
@@ -5,10 +7,8 @@ All HTTP is mocked — no test ever reaches a live FRED endpoint. The tool impor
 so we monkeypatch that name on the ``fred_macro_tool`` module.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any, Dict
 
 from src.tools import fred_macro_tool
 from src.tools.fred_macro_tool import FredMacroTool
@@ -167,6 +167,7 @@ class TestExecuteErrors:
 
 class TestParsing:
     """_parse_observations tolerates malformed bodies."""
+
 
     def test_non_dict_payload(self):
         assert fred_macro_tool._parse_observations(None) == []

@@ -10,7 +10,6 @@ Formula (paper appendix): ts_rank(volume/adv20,20) * ts_rank(-1*delta(close,7),8
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 43.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ __alpha_meta__ = {
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     volume = panel["volume"]
     adv20 = ts_mean(volume, 20)

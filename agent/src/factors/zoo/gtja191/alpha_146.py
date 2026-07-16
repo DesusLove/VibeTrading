@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: Standardised return deviation; SMA(.,61,2)=ewm(alpha=2/61).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -61,6 +60,7 @@ def compute(panel):
     """
     def _sma(x, n, m):
         """SMA(x, n, m) per GTJA convention -> ewm with alpha = m/n."""
+
         return x.ewm(alpha=m / n, adjust=False).mean()
     c = panel["close"]
     ret = safe_div(c - c.shift(1), c.shift(1))

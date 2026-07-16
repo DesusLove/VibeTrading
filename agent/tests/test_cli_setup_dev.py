@@ -6,7 +6,6 @@ selection. They do not actually invoke ``npm`` (we mock ``shutil.which``
 and ``subprocess.run``), so they run in any environment.
 """
 
-from __future__ import annotations
 
 import sys
 from pathlib import Path
@@ -199,6 +198,7 @@ def _make_frontend_with_vite(tmp_path: Path) -> Path:
     """Create a fake frontend directory with a placeholder Vite binary so
     that ``cmd_dev``'s pre-flight check (``node_modules/.bin/vite``) passes
     during unit tests. We don't actually invoke the binary."""
+
     frontend_dir = tmp_path / "frontend"
     frontend_dir.mkdir()
     is_windows = sys.platform == "win32"

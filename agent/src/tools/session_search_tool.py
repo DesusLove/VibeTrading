@@ -1,9 +1,9 @@
+from typing import Any
+
 """Session search tool: FTS5 cross-session search for past conversations."""
 
-from __future__ import annotations
 
 import json
-from typing import Any
 
 from src.agent.tools import BaseTool
 
@@ -43,6 +43,7 @@ class SessionSearchTool(BaseTool):
         Returns:
             JSON with search results or error.
         """
+
         query = kwargs.get("query", "")
         if not query:
             return json.dumps({"status": "error", "error": "query required"})

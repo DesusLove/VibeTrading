@@ -12,13 +12,13 @@ Prefers ``questionary`` when available; otherwise drives prompt_toolkit
 directly so Esc / Left-arrow can be bound to a back-step sentinel.
 """
 
-from __future__ import annotations
 
 import os
 import tempfile
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Final, Sequence
+from typing import Final
 
 from rich.console import Console
 from rich.text import Text
@@ -370,6 +370,7 @@ def run_onboarding(*, console: Console | None = None) -> Path | None:
     Returns ``None`` when the user cancels (Ctrl+C / Esc at step 1) so the
     caller can exit cleanly without writing a partial config.
     """
+
     cons = console or get_console()
     _intro_header(cons)
 

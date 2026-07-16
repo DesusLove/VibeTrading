@@ -10,7 +10,6 @@ Formula (paper appendix): (rank(decay_linear(delta(IndNeutralize(close, industry
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 63.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -89,6 +88,7 @@ def _ind_neutralize(x: pd.DataFrame, panel: dict) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     open_ = panel["open"]
     volume = panel["volume"]

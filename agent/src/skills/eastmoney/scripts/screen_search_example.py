@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """代码搜索 + 全市场选股研究示例。
 
 运行前提：在 agent/ 目录下执行（导入根为 agent/）。无需 token。

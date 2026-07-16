@@ -6,7 +6,6 @@ so a regression here catches most operator-mapping mistakes. The seeded
 panel and golden CSVs are reproducible via the docstring of the conftest.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -15,7 +14,6 @@ import pandas as pd
 import pytest
 
 from src.factors.registry import Registry
-
 
 GOLDENS_DIR = Path(__file__).resolve().parent / "fixtures" / "goldens"
 
@@ -55,6 +53,7 @@ def _seeded_panel() -> dict[str, pd.DataFrame]:
 @pytest.mark.parametrize("alpha_id", SAMPLED_IDS)
 def test_gtja191_sample_matches_golden(alpha_id: str) -> None:
     """Recompute the sampled alpha and check it matches the committed golden CSV."""
+
     golden_path = GOLDENS_DIR / f"{alpha_id}.csv"
     assert golden_path.is_file(), f"missing golden fixture: {golden_path}"
 

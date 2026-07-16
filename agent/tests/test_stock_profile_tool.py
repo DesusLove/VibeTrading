@@ -4,7 +4,6 @@ All HTTP is mocked at :func:`get_quote_summary` as it is imported into the tool
 module, so no test touches a live Yahoo Finance endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -155,6 +154,7 @@ class TestStockProfileSuccess:
 
 class TestStockProfileErrors:
     """Error envelopes: missing ticker, bad section, upstream failure."""
+
 
     def test_missing_ticker_returns_error_envelope(self):
         out = sp.StockProfileTool().execute(ticker="  ")

@@ -8,15 +8,14 @@ Market rules:
   - Fractional position sizes allowed
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
-from backtest.engines.base import BaseEngine
 from backtest.engines._market_hooks import (
     calc_crypto_funding_fee,
     check_crypto_liquidation,
 )
+from backtest.engines.base import BaseEngine
 
 
 class CryptoEngine(BaseEngine):
@@ -63,6 +62,7 @@ class CryptoEngine(BaseEngine):
 
     def on_bar(self, symbol: str, bar: pd.Series, timestamp: pd.Timestamp) -> None:
         """Crypto per-bar hooks: funding fee + liquidation check."""
+
         fee = calc_crypto_funding_fee(
             symbol, bar, timestamp, self.positions,
             self.funding_rate, self._funding_applied, self._funding_daily_done,

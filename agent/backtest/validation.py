@@ -1,3 +1,5 @@
+from typing import Any
+
 """Statistical validation for backtest results.
 
 Three independent tools:
@@ -9,18 +11,15 @@ Usage: called automatically by BaseEngine.run_backtest when config[\"validation\
 is present, or invoked directly on backtest outputs.
 """
 
-from __future__ import annotations
 
 import json
 import math
 from pathlib import Path
-from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 
 from backtest.models import TradeRecord
-
 
 # ─── Monte Carlo Permutation Test ───
 
@@ -383,6 +382,7 @@ def main(run_dir: Path) -> Dict[str, Any]:
     Returns:
         Validation results dict.
     """
+
     # Load config for initial_cash
     config_path = run_dir / "config.json"
     if config_path.exists():

@@ -84,7 +84,7 @@ def test_registry_injects_session_id_into_goal_tools() -> None:
     tool = registry.get("start_research_goal")
 
     assert tool is not None
-    assert getattr(tool, "_default_session_id") == "session-xyz"
+    assert tool._default_session_id == "session-xyz"
 
 
 def test_goal_tools_emit_mutation_events(tmp_path: Path) -> None:
@@ -202,7 +202,7 @@ def test_registry_injects_goal_event_callback() -> None:
     tool = registry.get("start_research_goal")
 
     assert tool is not None
-    assert getattr(tool, "_event_callback") is not None
+    assert tool._event_callback is not None
 
 
 def test_research_goal_skill_is_bundled() -> None:

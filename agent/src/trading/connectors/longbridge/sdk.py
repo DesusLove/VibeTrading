@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only Longbridge (LongPort OpenAPI) connector via the official SDK.
 
 Wraps ``TradeContext`` / ``QuoteContext`` for the five read operations the
@@ -15,14 +18,12 @@ label is therefore trust-based and recorded in every payload as
 environment.
 """
 
-from __future__ import annotations
 
 import json
-from decimal import Decimal
 from dataclasses import asdict, dataclass
+from decimal import Decimal
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -73,7 +74,7 @@ class LongbridgeConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "LongbridgeConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> LongbridgeConfig:
         """Build a config from a JSON-like mapping, normalizing the profile."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
@@ -100,7 +101,7 @@ class LongbridgeConfig:
         access_token: str | None = None,
         profile: str | None = None,
         region: str | None = None,
-    ) -> "LongbridgeConfig":
+    ) -> LongbridgeConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if app_key is not None:
@@ -124,7 +125,7 @@ class LongbridgeConfig:
 _OVERRIDE_KEYS = ("app_key", "app_secret", "access_token", "profile", "region")
 
 
-def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> "LongbridgeConfig":
+def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> LongbridgeConfig:
     """Resolve the effective config: saved file ← profile defaults ← CLI overrides.
 
     Credentials (``app_key`` / ``app_secret`` / ``access_token``) come from the
@@ -441,9 +442,9 @@ def place_order(
         from decimal import Decimal
 
         openapi = _require_openapi()
-        order_type_enum = getattr(getattr(openapi, "OrderType"), type_attr)
-        order_side_enum = getattr(getattr(openapi, "OrderSide"), side_attr)
-        tif_enum = getattr(getattr(openapi, "TimeInForceType"), tif_attr)
+        order_type_enum = getattr(openapi.OrderType, type_attr)
+        order_side_enum = getattr(openapi.OrderSide, side_attr)
+        tif_enum = getattr(openapi.TimeInForceType, tif_attr)
 
         kwargs: dict[str, Any] = {
             "symbol": clean_symbol,
@@ -541,7 +542,7 @@ def _require_openapi() -> ModuleType:
 
 def _build_config(cfg: LongbridgeConfig):
     openapi = _require_openapi()
-    config_cls = getattr(openapi, "Config")
+    config_cls = openapi.Config
     # SDK exposes both a keyword constructor and a ``from_apikey`` factory across
     # versions; try the direct constructor, fall back to the factory.
     try:
@@ -556,19 +557,19 @@ def _build_config(cfg: LongbridgeConfig):
 
 def _trade_context(cfg: LongbridgeConfig):
     openapi = _require_openapi()
-    return getattr(openapi, "TradeContext")(_build_config(cfg))
+    return openapi.TradeContext(_build_config(cfg))
 
 
 def _quote_context(cfg: LongbridgeConfig):
     openapi = _require_openapi()
-    return getattr(openapi, "QuoteContext")(_build_config(cfg))
+    return openapi.QuoteContext(_build_config(cfg))
 
 
 def _candlestick_enums(period: str):
     """Map a period string to the SDK ``Period`` and ``AdjustType`` enums."""
     openapi = _require_openapi()
-    period_cls = getattr(openapi, "Period")
-    adjust_cls = getattr(openapi, "AdjustType")
+    period_cls = openapi.Period
+    adjust_cls = openapi.AdjustType
     period_map = {
         "1m": "Min_1",
         "5m": "Min_5",
@@ -581,7 +582,7 @@ def _candlestick_enums(period: str):
         "1M": "Month",
     }
     attr = period_map.get(period.strip(), "Day")
-    period_enum = getattr(period_cls, attr, getattr(period_cls, "Day"))
+    period_enum = getattr(period_cls, attr, period_cls.Day)
     adjust_enum = getattr(adjust_cls, "NoAdjust", getattr(adjust_cls, "ForwardAdjust", None))
     return period_enum, adjust_enum
 
@@ -660,6 +661,7 @@ def _iter_positions(response: Any) -> list[Any]:
 
 def _top_of_book(depth: Any) -> tuple[Any, Any]:
     """Extract best bid/ask price from a depth response."""
+
     if depth is None:
         return None, None
     asks = _as_iter(_obj_get(depth, "asks") or _obj_get(depth, "ask"))

@@ -4,20 +4,16 @@ Uses ChatLLM.chat + manual for-loop directly (without instantiating AgentLoop),
 keeping the worker self-contained and the agent core unchanged.
 """
 
-from __future__ import annotations
 
+from collections.abc import Callable
 import json
 import logging
-import os
 import time
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
 
 from src.agent.context import ContextBuilder
 from src.agent.progress import HeartbeatTimer
 from src.agent.skills import SkillsLoader
-from src.agent.tools import ToolRegistry
 from src.config.schema import AgentConfig
 from src.providers.chat import ChatLLM, LLMResponse, ProviderStreamError
 from src.providers.content_filter import (
@@ -32,266 +28,40 @@ from src.swarm.models import (
     WorkerResult,
 )
 from src.tools import build_swarm_registry
-from src.tools.mcp import MCPRemoteTool
-from src.tools.redaction import is_sensitive_arg, redact_payload
+
+# Re-export symbols moved to sub-modules for backward compatibility.
+from src.swarm.worker_prompt import (  # noqa: F401
+    _default_max_iterations,
+    _default_timeout_seconds,
+    _heartbeat_interval_s,
+    _stream_retry_delay_s,
+    _emit,
+    _filter_skill_descriptions,
+    _estimate_tokens,
+    build_worker_prompt,
+)
+from src.swarm.worker_report import (  # noqa: F401
+    _best_summary,
+    _remote_tool_metadata,
+    _preview_tool_arguments,
+    _preview_tool_result,
+    _truncate_preview,
+    _report_written,
+    _is_data_agent,
+    _is_error_result,
+    _classify_deliverable,
+    _resolve_summary,
+    _persist_messages,
+    _write_summary,
+    _collect_artifacts,
+)
+
 
 logger = logging.getLogger(__name__)
-
-def _default_max_iterations() -> int:
-    from src.config.accessor import get_env_config
-    return get_env_config().swarm.swarm_worker_max_iter
-
-
-def _default_timeout_seconds() -> int:
-    from src.config.accessor import get_env_config
-    return get_env_config().swarm.swarm_worker_timeout
-
-
-def _heartbeat_interval_s() -> float:
-    """Resolve the heartbeat tick interval from env, robust to garbage values.
-
-    Matches the parsing discipline in :func:`SwarmStore.compute_stale_threshold`
-    — both sides use the same env var, so they must fail the same way. A bad
-    value (``"abc"``, empty) falls back to 3.0s instead of crashing import.
-    """
-    from src.config.accessor import get_env_config
-
-    return get_env_config().swarm.swarm_heartbeat_interval_s
-
-
-def _stream_retry_delay_s() -> float:
-    """Resolve the delay before the single stream retry, robust to garbage.
-
-    Returns:
-        Seconds to sleep between a failed ``stream_chat`` attempt and its one
-        retry. Configurable via ``SWARM_STREAM_RETRY_DELAY_S``; a bad value
-        falls back to 1.0s instead of crashing import.
-    """
-    from src.config.accessor import get_env_config
-
-    return get_env_config().swarm.swarm_stream_retry_delay_s
-
 
 _HEARTBEAT_INTERVAL_S = _heartbeat_interval_s()
 _STREAM_RETRY_DELAY_S = _stream_retry_delay_s()
 _MAX_TOKEN_ESTIMATE = 60_000
-
-
-def _emit(
-    callback: Callable[[SwarmEvent], None] | None,
-    event_type: str,
-    agent_id: str,
-    task_id: str,
-    data: dict | None = None,
-) -> None:
-    """Emit a swarm event via callback if provided.
-
-    Args:
-        callback: Optional event callback function.
-        event_type: Event type string.
-        agent_id: Agent identifier.
-        task_id: Task identifier.
-        data: Additional event data.
-    """
-    if callback is None:
-        return
-    event = SwarmEvent(
-        type=event_type,
-        agent_id=agent_id,
-        task_id=task_id,
-        data=data or {},
-        timestamp=datetime.now(timezone.utc).isoformat(),
-    )
-    try:
-        callback(event)
-    except Exception:
-        logger.warning("Event callback failed for %s", event_type, exc_info=True)
-
-
-def _filter_skill_descriptions(loader: SkillsLoader, skill_names: list[str]) -> str:
-    """Return skill descriptions filtered to the given whitelist.
-
-    Args:
-        loader: SkillsLoader instance with all skills loaded.
-        skill_names: Skill names to include. Empty list means include all.
-
-    Returns:
-        Formatted skill descriptions string.
-    """
-    if not skill_names:
-        return loader.get_descriptions()
-    lines: list[str] = []
-    for skill in loader.skills:
-        if skill.name in skill_names:
-            lines.append(f"  - {skill.name}: {skill.description}")
-    return "\n".join(lines) if lines else "(no matching skills)"
-
-
-def _estimate_tokens(
-    messages: list[dict],
-    response: object,
-) -> tuple[int, int]:
-    """Return token usage for a single LLM call, real if available.
-
-    Prefers the provider-reported counts attached to the response by
-    :func:`ChatLLM._parse_response` (``usage_metadata``). Falls back to a
-    character-length heuristic (``len // 4``) only when the provider
-    didn't return usage data — keeps the behaviour contract for legacy
-    or partial responses while making per-run totals (which feed
-    ``SwarmRun.total_input_tokens`` / ``total_output_tokens``) reflect
-    real billing instead of a CJK-hostile char-count guess.
-
-    Args:
-        messages: Messages sent to the LLM for this call. Used only for
-            the fallback estimate when ``response.usage_metadata`` is
-            missing.
-        response: ``LLMResponse`` from ``ChatLLM.chat`` /
-            ``ChatLLM.stream_chat``.
-
-    Returns:
-        Tuple of (input_tokens, output_tokens). Either component may be
-        zero — that simply means the provider didn't report it and the
-        fallback couldn't compute it either (e.g. binary content).
-    """
-    from src.providers.chat import LLMResponse
-
-    if isinstance(response, LLMResponse) and response.usage_metadata:
-        usage = response.usage_metadata
-        real_input = int(usage.get("input_tokens") or 0)
-        real_output = int(usage.get("output_tokens") or 0)
-        if real_input or real_output:
-            return real_input, real_output
-
-    # Fallback: provider didn't return usage_metadata. Estimate from
-    # serialized message length and response content length. ~4 chars per
-    # English token; under-counts for CJK / Thai / emoji-heavy prompts but
-    # at least preserves the prior behaviour.
-    try:
-        input_tokens = len(json.dumps(messages, ensure_ascii=False)) // 4
-    except Exception:
-        input_tokens = 0
-
-    if isinstance(response, LLMResponse):
-        output_tokens = len(response.content or "") // 4
-    else:
-        output_tokens = 0
-
-    return input_tokens, output_tokens
-
-
-def build_worker_prompt(
-    agent_spec: SwarmAgentSpec,
-    upstream_summaries: dict[str, str],
-    skill_descriptions: str,
-    grounding_block: str = "",
-) -> str:
-    """Build the worker's system prompt with role, upstream context, and skills.
-
-    Args:
-        agent_spec: The agent's role specification.
-        upstream_summaries: Mapping of context_key -> upstream task summary.
-        skill_descriptions: Pre-filtered skill description text.
-        grounding_block: Optional "Ground Truth" markdown produced by
-            :func:`src.swarm.grounding.format_grounding_block`. Spliced in
-            ahead of the Execution Rules section so the worker sees real
-            recent prices before any tool decision. Empty string skips the
-            section entirely.
-
-    Returns:
-        Complete system prompt string for the worker LLM.
-    """
-    upstream_block = ""
-    if upstream_summaries:
-        sections = []
-        for key, summary in upstream_summaries.items():
-            sections.append(f"### {key}\n{summary}")
-        upstream_block = (
-            "## Upstream Context (from previous agents)\n\n"
-            + "\n\n".join(sections)
-        )
-
-    prompt_parts = [
-        f"## Role\n\n{agent_spec.role}",
-        agent_spec.system_prompt.replace("{upstream_context}", upstream_block),
-    ]
-
-    if skill_descriptions and skill_descriptions != "(no matching skills)":
-        prompt_parts.append(
-            f"## Available Skills (use load_skill to access full documentation)\n\n{skill_descriptions}"
-        )
-
-    if grounding_block:
-        # Placed before Execution Rules so it's in scope when the worker
-        # plans its first tool call. The block already contains an explicit
-        # instruction to prefer these prices over training data.
-        prompt_parts.append(grounding_block)
-
-    if "get_market_data" in (agent_spec.tools or []):
-        prompt_parts.append(
-            "## Market Data Tool Policy\n\n"
-            "For OHLCV price bars, recent closes, volume, technical indicators, "
-            "or return calculations, call `get_market_data` before writing raw "
-            "provider scripts. It uses the repository loader layer, normalizes "
-            "symbols, drops malformed OHLC rows, and returns strict JSON. Use "
-            "raw yfinance scripts only for fields outside OHLCV coverage, such "
-            "as fundamentals, holders, options, or corporate metadata."
-        )
-
-    # Universal anti-fabrication rule. The grounding_block carries a similar
-    # instruction but only renders when user_vars supplies explicit symbols.
-    # Free-form prompts ("look at A-share short-term sentiment") otherwise
-    # leave the worker with no guardrail and it cheerfully cites training-data
-    # prices and sector weights. This block applies the rule unconditionally
-    # — including to aggregator / synthesis agents that have no data tools
-    # and previously had no instruction against inventing numbers.
-    prompt_parts.append(
-        "## Data Citation Discipline (HARD RULE)\n\n"
-        "Every specific number you cite in your output — prices, percentages, "
-        "volumes, fund flows, market-cap rankings, sector weights, ETF codes, "
-        "ticker recommendations — MUST be traceable to one of:\n"
-        "  (a) a tool call result obtained in THIS run,\n"
-        "  (b) the Ground Truth block above (if present),\n"
-        "  (c) the Upstream Context above (if present and the upstream agent "
-        "itself sourced it from (a) or (b)).\n\n"
-        "You may NOT cite numbers from memory or training data. Markets have "
-        "moved since your cutoff; any specific price/percentage you recall is "
-        "wrong by default.\n\n"
-        "If you cannot back a number with (a), (b), or (c), you have two "
-        "choices:\n"
-        "  - call a data tool to fetch it (preferred), or\n"
-        "  - omit the number and qualify the statement (e.g. \"directional "
-        "only — not verified against live data\").\n\n"
-        "This rule applies equally to synthesis / aggregator / editor roles "
-        "that lack data tools. If upstream did not provide a specific number, "
-        "do NOT introduce one from training data — say the upstream omitted "
-        "it and proceed without."
-    )
-
-    prompt_parts.append(
-        "## Execution Rules\n\n"
-        "You have a HARD LIMIT of 20 tool calls. After that you will be cut off. Work efficiently.\n\n"
-        "**Phase 1 — Plan (0 tool calls):** Before calling any tool, state your plan in 3-5 bullet points.\n\n"
-        "**Phase 2 — Execute (≤15 tool calls):**\n"
-        "- `load_skill` first to get data access methods and analysis patterns.\n"
-        "- Write ONE focused Python script via `write_file`, then run it with `bash python script.py`.\n"
-        "- Do NOT write long Python code inside bash. Use write_file + bash.\n"
-        "- Do NOT fetch data with curl/requests. Use the patterns from load_skill (yfinance, OKX API via Python).\n"
-        "- If a script fails, read the error, fix with `edit_file`, re-run. Max 2 retries per script.\n\n"
-        "**Phase 3 — Summarize (MUST use write_file):**\n"
-        "- You MUST call `write_file` with path `report.md` to save your final report as a markdown file.\n"
-        "- This is REQUIRED, not optional. Your final response MUST include a write_file call for report.md.\n"
-        "- The report must include specific numbers, dates, and actionable conclusions.\n"
-        "- After writing report.md, output a brief 2-3 sentence summary in your text response.\n"
-        "- Respond in the same language as the task prompt."
-    )
-
-    now = datetime.now(timezone.utc)
-    prompt_parts.append(
-        f"## Current Date & Time\n\n"
-        f"Today is {now.strftime('%A, %B %d, %Y %H:%M UTC')}"
-    )
-
-    return "\n\n".join(prompt_parts)
 
 
 def run_worker(
@@ -505,6 +275,7 @@ def run_worker(
                 Raises:
                     ProviderStreamError: When provider streaming fails.
                 """
+
                 remaining_timeout = max(10, int(timeout - (time.monotonic() - t0)))
                 with HeartbeatTimer(
                     tool_name=f"llm:{agent_spec.model_name or 'default'}",
@@ -744,220 +515,3 @@ def run_worker(
         output_tokens=total_output_tokens,
         content_filter_warnings=content_filter_warnings,
     )
-
-
-def _best_summary(messages: list[dict], fallback: str) -> str:
-    """Extract the best summary from all assistant messages."""
-    texts = [
-        m["content"] for m in messages
-        if m.get("role") == "assistant" and m.get("content")
-        and len(m["content"].strip()) > 100
-    ]
-    if texts:
-        return max(texts, key=len)
-    return fallback
-
-
-def _remote_tool_metadata(registry: ToolRegistry, tool_name: str) -> dict[str, str]:
-    """Return MCP routing metadata for ``tool_name`` if it's a remote MCP tool.
-
-    Auditors of ``events.jsonl`` need to tell at a glance which remote MCP
-    server a swarm worker reached and what the *original* (non-prefixed)
-    tool name was. The local-side name is already in ``data["tool"]``; this
-    helper supplies the missing ``server`` + ``remote_tool`` pair when the
-    registered tool is an :class:`MCPRemoteTool`. Local-only tools yield
-    an empty dict so the event payload is unchanged for them.
-    """
-    tool = registry.get(tool_name)
-    if not isinstance(tool, MCPRemoteTool):
-        return {}
-    spec = getattr(tool, "_spec", None)
-    if spec is None:
-        return {}
-    return {"server": spec.server_name, "remote_tool": spec.remote_name}
-
-
-def _preview_tool_arguments(arguments: dict) -> dict[str, str]:
-    """Return a short, redacted argument preview for streamed events."""
-    preview: dict[str, str] = {}
-    for key, value in arguments.items():
-        if key == "run_dir":
-            continue
-        if is_sensitive_arg(key):
-            preview[key] = "[redacted]"
-            continue
-        preview[key] = _truncate_preview(redact_payload(value))
-    return preview
-
-
-def _preview_tool_result(result: str) -> str:
-    """Return a short, redacted result preview for streamed events."""
-    try:
-        parsed = json.loads(result)
-    except (TypeError, ValueError):
-        return _truncate_preview(result)
-    return _truncate_preview(redact_payload(parsed))
-
-
-def _truncate_preview(value: Any, *, limit: int = 200) -> str:
-    """Stringify and truncate an event preview payload."""
-    if isinstance(value, (dict, list)):
-        text = json.dumps(value, ensure_ascii=False, default=str)
-    else:
-        text = str(value)
-    return text if len(text) <= limit else text[:limit] + "..."
-
-
-# Tools that do not themselves fetch/compute market data. An agent whose
-# entire toolset is a subset of these is a synthesis/editor role (e.g. the
-# research editor in equity_research_team) and may legitimately produce a
-# text deliverable with no tool calls — it must NOT be failed for "no tool
-# evidence" (that would regress correct runs; see #115 framing).
-_GENERIC_TOOLS = {"bash", "read_file", "write_file", "load_skill", "edit_file"}
-
-_UNPARSED_TOOL_MARKERS = (
-    "<\uff5ctool\u2581calls\u2581begin\uff5c>",
-    "<tool_calls_begin>",
-    "<tool_call_begin>",
-    "<tool_sep>",
-    "tool\u2581sep",
-)
-_FABRICATION_MARKERS = ("mock data", "without actual data", "fabricated data", "placeholder data")
-_PLAN_PREFIXES = (
-    "# phase 1", "## phase 1", "### phase 1",
-    "phase 1 \u2014 plan", "phase 1 - plan", "phase 1: plan",
-    "# plan", "## plan", "### plan", "**plan**",
-)
-_HANDOFF_TAILS = (
-    "execute", "execute.", "execute:", "skills.", "skills", "proceed?",
-    "proceed.", "without writing files.", "let me adjust the approach",
-    "let me adjust the approach.", "stand by for final synthesis.",
-)
-
-
-def _report_written(artifact_dir: Path) -> bool:
-    """True iff a non-empty report.md was actually produced by the worker."""
-    try:
-        p = artifact_dir / "report.md"
-        return p.is_file() and bool(p.read_text(encoding="utf-8").strip())
-    except Exception:
-        return False
-
-
-def _is_data_agent(agent_spec: SwarmAgentSpec) -> bool:
-    """An agent with at least one data/analysis tool beyond the generic kit."""
-    return bool(set(agent_spec.tools or []) - _GENERIC_TOOLS)
-
-
-def _is_error_result(result: str) -> bool:
-    """Did a tool call return a top-level error envelope?
-
-    Parses the result as JSON and checks for a top-level ``status == "error"``.
-    A nested ``status`` (e.g. inside ``data``) is intentionally ignored — only
-    the envelope matters for the deliverable contract.
-
-    Falls back to a fast substring check on the head for truncated or
-    non-JSON payloads, so the function is robust to streaming / partial
-    output without ever raising.
-    """
-    text = (result or "").strip()
-    if not text or not text.startswith("{"):
-        return False
-    try:
-        parsed = json.loads(text)
-    except (ValueError, TypeError):
-        # Truncated / non-JSON payload — keep the original heuristic so we
-        # never raise from a classifier on the worker hot path.
-        head = text[:160].lower()
-        return '"status": "error"' in head or '"status":"error"' in head
-    return isinstance(parsed, dict) and parsed.get("status") == "error"
-
-
-def _classify_deliverable(
-    summary: str,
-    *,
-    is_data_agent: bool,
-    report_written: bool,
-    data_tool_calls: int,
-) -> str | None:
-    """Hybrid output contract. Return a short reason string when the worker
-    did NOT produce a substantive deliverable, else ``None``.
-
-    Content-sanity applies to every agent; the tool-evidence requirement
-    applies ONLY to data agents so tool-less synthesis/editor roles are
-    not false-rejected.
-    """
-    text = (summary or "").strip()
-    if not text:
-        return "empty deliverable"
-    low = text.lower()
-    if any(m in low for m in _UNPARSED_TOOL_MARKERS):
-        return "unparsed tool-call markup (provider did not parse tool calls)"
-    if any(m in low for m in _FABRICATION_MARKERS):
-        return "explicitly fabricated / mock data"
-    if text.startswith("{") and '"status"' in text[:40] and (
-        '"content"' in text[:300] or '"ok"' in text[:40]
-    ):
-        return "raw tool-result envelope, not analysis"
-    if low.startswith(_PLAN_PREFIXES):
-        tail = low.rsplit("phase 2", 1)[-1].strip() if "phase 2" in low else ""
-        if len(text) < 600 or low.rstrip().endswith(_HANDOFF_TAILS) or (
-            "phase 2" in low and len(tail) < 80
-        ):
-            return "plan-only stub (no executed analysis / conclusion)"
-    if is_data_agent and not report_written and data_tool_calls == 0:
-        return "data agent produced no tool calls and no report.md"
-    return None
-
-
-def _resolve_summary(artifact_dir: Path, fallback: str) -> str:
-    """Return report.md content if it exists, otherwise fall back to text."""
-    report_path = artifact_dir / "report.md"
-    try:
-        if report_path.is_file():
-            content = report_path.read_text(encoding="utf-8").strip()
-            if content:
-                return content
-    except Exception:
-        logger.warning("Failed to read report.md from %s", artifact_dir, exc_info=True)
-    return fallback
-
-
-def _persist_messages(artifact_dir: Path, messages: list[dict]) -> None:
-    """Persist messages to disk for post-mortem analysis."""
-    try:
-        path = artifact_dir / "messages.json"
-        path.write_text(
-            json.dumps(messages, ensure_ascii=False, indent=2, default=str),
-            encoding="utf-8",
-        )
-    except Exception:
-        logger.warning("Failed to persist messages to %s", artifact_dir, exc_info=True)
-
-
-def _write_summary(artifact_dir: Path, summary: str) -> None:
-    """Write worker summary to artifacts directory.
-
-    Args:
-        artifact_dir: Path to artifacts/{agent_id}/ directory.
-        summary: Summary text to write.
-    """
-    try:
-        summary_path = artifact_dir / "summary.md"
-        summary_path.write_text(summary, encoding="utf-8")
-    except Exception:
-        logger.warning("Failed to write summary to %s", artifact_dir, exc_info=True)
-
-
-def _collect_artifacts(artifact_dir: Path) -> list[str]:
-    """Collect all artifact file paths from agent's artifact directory.
-
-    Args:
-        artifact_dir: Path to artifacts/{agent_id}/ directory.
-
-    Returns:
-        List of artifact file path strings.
-    """
-    if not artifact_dir.exists():
-        return []
-    return [str(p) for p in artifact_dir.iterdir() if p.is_file()]

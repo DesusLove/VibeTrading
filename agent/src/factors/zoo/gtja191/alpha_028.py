@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #28 - 量价加速度
@@ -9,7 +10,7 @@
 Formula: 3*SMA((CLOSE-TSMIN(LOW,9))/(TSMAX(HIGH,9)-TSMIN(LOW,9))*100,3,1)-2*SMA(SMA((CLOSE-TSMIN(LOW,9))/(TSMAX(HIGH,9)-TSMIN(LOW,9))*100,3,1),3,1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 28."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

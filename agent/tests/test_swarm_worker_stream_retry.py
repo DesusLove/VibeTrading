@@ -8,14 +8,13 @@ exactly once for ``ProviderStreamError`` — and only for it — before the
 existing failure path.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import patch
 
+import src.swarm.worker as worker_mod
 from src.providers.chat import LLMResponse, ProviderStreamError
 from src.swarm.models import SwarmAgentSpec, SwarmTask, WorkerResult
-import src.swarm.worker as worker_mod
 from src.swarm.worker import run_worker
 
 # Substantive prose so _classify_deliverable accepts the tool-less worker.
@@ -55,7 +54,7 @@ class _FlakyChatLLM:
         self._final = final
         self.calls = 0
 
-    def __call__(self, *args, **kwargs) -> "_FlakyChatLLM":
+    def __call__(self, *args, **kwargs) -> _FlakyChatLLM:
         """Support ``ChatLLM(model_name=...)`` constructor-style patching.
 
         Returns:
@@ -182,6 +181,7 @@ def _bad_request_error() -> ProviderStreamError:
 
 def test_non_retryable_4xx_fails_without_retry(monkeypatch, tmp_path):
     """A deterministic 4xx ProviderStreamError fails immediately (1 call)."""
+
     llm = _FlakyChatLLM([_bad_request_error()], LLMResponse(content=FINAL_TEXT))
 
     result = _run(monkeypatch, tmp_path, llm)

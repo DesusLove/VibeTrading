@@ -8,7 +8,6 @@ invalid inputs are rejected with an error envelope, T=0 is flagged
 the normal path is numerically unchanged.
 """
 
-from __future__ import annotations
 
 import json
 
@@ -80,6 +79,7 @@ def test_invalid_inputs_rejected_with_error(kw):
 )
 def test_non_finite_inputs_rejected_with_error(kw):
     """G2: NaN/Inf in any numeric input is rejected before pricing."""
+
     kw.setdefault("risk_free_rate", 0.05)
     out = _run(**kw)
     assert out["status"] == "error"

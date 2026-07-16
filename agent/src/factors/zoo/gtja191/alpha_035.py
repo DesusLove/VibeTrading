@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #35 - 最高价位置
@@ -9,7 +10,7 @@
 Formula: (MIN(RANK(DECAYLINEAR(DELTA(OPEN,1),15)), RANK(DECAYLINEAR(CORR(VOLUME,((OPEN*0.65)+(OPEN*0.35)),17),7))) * -1)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 35."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

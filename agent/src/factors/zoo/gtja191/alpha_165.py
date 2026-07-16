@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: SUMAC = expanding cumulative sum approximated by rolling 48-day cumulative sum.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -59,6 +58,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     c = panel["close"]
     dev = c - ts_mean(c, 48)
     csum = dev.rolling(48).sum()

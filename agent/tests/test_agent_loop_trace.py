@@ -1,11 +1,12 @@
+from collections.abc import Callable
+from typing import Any
+
 """AgentLoop trace integration tests for PR #206 rebase."""
 
-from __future__ import annotations
 
 import json
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Callable
 
 import pytest
 
@@ -114,6 +115,7 @@ def test_session_trace_uses_session_dir_and_round_trips_long_answer(
     tmp_path: Path,
 ) -> None:
     """Session runs aggregate trace.jsonl under sessions/<id> without truncation."""
+
     monkeypatch.setattr(trace_mod, "TRACE_TEXT_OFFLOAD_THRESHOLD", 16)
     monkeypatch.setattr(loop_mod, "SESSIONS_DIR", tmp_path / "sessions")
     agent = AgentLoop(

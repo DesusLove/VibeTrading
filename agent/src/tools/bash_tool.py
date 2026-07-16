@@ -1,10 +1,11 @@
+from typing import Any
+
 """Bash tool: execute shell commands under run_dir."""
 
-from __future__ import annotations
 
 import json
+import shlex
 import subprocess
-from typing import Any
 
 from src.agent.tools import BaseTool
 
@@ -36,13 +37,14 @@ class BashTool(BaseTool):
         Returns:
             JSON string with stdout, stderr, and exit_code.
         """
+
         command = kwargs["command"]
         cwd = kwargs.get("run_dir")
 
         try:
             result = subprocess.run(
-                command,
-                shell=True,
+                shlex.split(command),
+                shell=False,
                 cwd=cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,

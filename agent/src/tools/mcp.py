@@ -1,6 +1,8 @@
+from collections.abc import Awaitable, Callable, Coroutine, Iterable
+from typing import Any, Protocol, TypeVar
+
 """MCP client adapter and remote tool wrappers."""
 
-from __future__ import annotations
 
 import asyncio
 import hashlib
@@ -11,11 +13,11 @@ import re
 import threading
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Awaitable, Callable, Coroutine, Iterable, Protocol, TypeVar
 
 from fastmcp.client import Client
 from fastmcp.client.auth import OAuth
 from fastmcp.client.client import CallToolResult
+
 try:
     from fastmcp.client.transports.http import StreamableHttpTransport
     from fastmcp.client.transports.sse import SSETransport
@@ -61,7 +63,7 @@ ResultT = TypeVar("ResultT")
 class AsyncMCPClient(Protocol):
     """Protocol for async MCP clients used by the adapter."""
 
-    async def __aenter__(self) -> "AsyncMCPClient":
+    async def __aenter__(self) -> AsyncMCPClient:
         """Enter the async client context."""
         ...
 
@@ -121,7 +123,7 @@ def build_mcp_tool_wrappers(
     local_server_name: str | None = None,
     client_factory: ClientFactory | None = None,
     max_list_tools_attempts: int = 2,
-) -> list["MCPRemoteTool"]:
+) -> list[MCPRemoteTool]:
     """Build local tool wrappers for a configured MCP server.
 
     Args:
@@ -706,7 +708,7 @@ def _dedupe_server_name_segment(base_segment: str, server_name: str, used_segmen
     salt = 1
     while unique_segment in used_segments:
         unique_segment = (
-            f"{base_segment}_{hashlib.sha1(suffix_source + f':{salt}'.encode('utf-8')).hexdigest()[:8]}"
+            f"{base_segment}_{hashlib.sha1(suffix_source + f':{salt}'.encode()).hexdigest()[:8]}"
         )
         salt += 1
     return unique_segment
@@ -734,7 +736,7 @@ def _dedupe_local_tool_name(candidate: str, remote_name: str, seen_names: dict[s
     unique_name = f"{candidate}_{hashlib.sha1(suffix_source).hexdigest()[:8]}"
     salt = 1
     while unique_name in seen_names and seen_names[unique_name] != remote_name:
-        unique_name = f"{candidate}_{hashlib.sha1(suffix_source + f':{salt}'.encode('utf-8')).hexdigest()[:8]}"
+        unique_name = f"{candidate}_{hashlib.sha1(suffix_source + f':{salt}'.encode()).hexdigest()[:8]}"
         salt += 1
 
     logger.warning("Disambiguated MCP tool name collision: %s -> %s", remote_name, unique_name)
@@ -1061,6 +1063,7 @@ def _to_display_text(value: Any) -> str:
     Returns:
         Human-readable string.
     """
+
     jsonable = _make_jsonable(value)
     if isinstance(jsonable, str):
         return jsonable

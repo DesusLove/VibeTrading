@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only news tool: per-stock and global financial headlines.
 
 Two public, no-auth news surfaces are wrapped behind one BaseTool contract:
@@ -25,14 +27,11 @@ A failure for one upstream is reported as an error envelope; the tool never
 raises out of :meth:`StockNewsTool.execute`.
 """
 
-from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
 from backtest.loaders import eastmoney_client, yahoo_client
-
 from src.agent.tools import BaseTool
 
 logger = logging.getLogger(__name__)
@@ -405,4 +404,5 @@ class StockNewsTool(BaseTool):
         Returns:
             ``{"ok": false, "error": message}`` as a JSON string.
         """
+
         return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

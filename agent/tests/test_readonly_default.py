@@ -18,10 +18,9 @@ Reuses the mock-MCP ``client_factory`` seam (``src.tools.mcp``) so no Robinhood
 access is required.
 """
 
-from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -31,16 +30,16 @@ from mcp import types as mcp_types
 import src.live.paths as paths
 from src.config.schema import (
     LIVE_BROKER_SERVER_KEYS,
+    ROBINHOOD_MCP_SERVER_SEED,
     AgentConfig,
     MCPServerConfig,
-    ROBINHOOD_MCP_SERVER_SEED,
 )
+from src.live.classification import ToolClass
 from src.live.mandate.model import MANDATE_SCHEMA_VERSION
 from src.live.order_guard import LiveOrderGuardTool
 from src.live.registry import is_live_broker, wrap_live_broker_tools
-from src.trading.connectors.robinhood.classification import ROBINHOOD_TOOL_CLASS
-from src.live.classification import ToolClass
 from src.tools.mcp import MCPRemoteTool, build_mcp_tool_wrappers
+from src.trading.connectors.robinhood.classification import ROBINHOOD_TOOL_CLASS
 
 pytestmark = pytest.mark.unit
 
@@ -59,7 +58,7 @@ _CATALOG = (
 class _FakeClient:
     """Mock MCP client exposing the full Robinhood catalog."""
 
-    async def __aenter__(self) -> "_FakeClient":
+    async def __aenter__(self) -> _FakeClient:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
@@ -103,7 +102,7 @@ def live_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def _commit_mandate(live_runtime: Path) -> None:
     broker = live_runtime / "live" / "robinhood"
     broker.mkdir(parents=True, exist_ok=True)
-    created = datetime.now(timezone.utc)
+    created = datetime.now(UTC)
     payload = {
         "schema_version": MANDATE_SCHEMA_VERSION,
         "hard_caps": {
@@ -256,6 +255,7 @@ def test_aliased_key_with_robinhood_url_is_gated() -> None:
 
 def test_lookalike_host_is_not_a_live_broker() -> None:
     """A substring/lookalike host must NOT match (no false positive)."""
+
     assert not is_live_broker("rh", "https://robinhood.com.evil.test/mcp")
 
 

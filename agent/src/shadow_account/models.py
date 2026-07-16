@@ -1,13 +1,13 @@
+from typing import Any
+
 """Shadow Account data contracts (frozen dataclasses).
 
 See `docs/shadow-account-spec.md` for the full contract. These types are the
 stable boundary between extractor / codegen / backtester / reporter.
 """
 
-from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Any
 
 #: Deterministic price-context feature names shared across the pipeline.
 #: The extractor computes these as-of ``buy_dt``, codegen flattens their
@@ -99,6 +99,7 @@ class AttributionBreakdown:
 @dataclass(frozen=True)
 class ShadowBacktestResult:
     """Output of multi-market shadow backtest + attribution."""
+
 
     shadow_id: str
     per_market: dict[str, dict[str, float]]

@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shadow Account persistence (~/.vibe-trading/shadow_accounts/).
 
 Layout:
@@ -6,14 +8,12 @@ Layout:
     ~/.vibe-trading/shadow_reports/<shadow_id>.pdf     rendered report
 """
 
-from __future__ import annotations
 
 import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 from src.shadow_account.models import ShadowProfile, ShadowRule
 
@@ -60,7 +60,7 @@ def hash_journal(journal_path: Path | str) -> str:
 
 def now_iso() -> str:
     """UTC ISO8601 timestamp (seconds precision)."""
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def save_profile(profile: ShadowProfile) -> Path:
@@ -114,6 +114,7 @@ def load_profile(shadow_id: str) -> ShadowProfile:
 
 def find_by_journal_hash(journal_hash: str) -> ShadowProfile | None:
     """Return the most recent profile sharing this journal_hash, else None."""
+
     latest: ShadowProfile | None = None
     for path in profiles_dir().glob("*.json"):
         try:

@@ -9,7 +9,6 @@ Covers (live-trading SPEC, Consent §1/§3, Mandate §2):
 * Commit rejected without ``consent_ack=true`` and once a proposal is consumed.
 """
 
-from __future__ import annotations
 
 import ast
 import json
@@ -20,8 +19,8 @@ import pytest
 
 import src.live.paths as paths
 from src.live.mandate.commit import (
-    CommitError,
     DEFAULT_MANDATE_LIFETIME_DAYS,
+    CommitError,
     commit_mandate,
     save_proposal,
 )
@@ -452,8 +451,8 @@ def test_commit_explicit_flatten_param_overrides_profile(live_runtime: Path) -> 
 
 def test_propose_tool_is_a_basetool_but_commit_is_not() -> None:
     """The proposer is a registerable tool; the committer is a plain function."""
-    from src.agent.tools import BaseTool
     import src.live.mandate.commit as commit_mod
+    from src.agent.tools import BaseTool
 
     assert issubclass(ProposeMandateProfilesTool, BaseTool)
     # No BaseTool subclass lives in the commit module — it can never be
@@ -496,6 +495,7 @@ def test_no_registered_tool_references_commit_mandate() -> None:
 
 def test_registry_has_propose_tool_but_no_mandate_writer() -> None:
     """The assembled registry exposes propose_mandate_profiles, no commit tool."""
+
     from src.tools import build_registry
 
     registry = build_registry()

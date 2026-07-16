@@ -20,14 +20,12 @@ from pathlib import Path
 from typing import Any, Literal
 
 import logging; logger = logging.getLogger(__name__)
-from pydantic import Field
+from pydantic import BaseModel, Field
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
-from src.channels.utils import safe_filename
+from src.channels.utils import get_media_dir, safe_filename
 
 
 class EmailConfig(BaseModel):

@@ -1,11 +1,11 @@
+from typing import Any
+
 """Read-only fundamental panel facade backed by the loader layer."""
 
-from __future__ import annotations
 
 import json
 import logging
 import math
-from typing import Any
 
 import pandas as pd
 
@@ -125,6 +125,7 @@ class GetFundamentalsTool(BaseTool):
         Returns:
             Strict JSON envelope with serialized field panels or an error.
         """
+
         symbols = kwargs.get("symbols")
         if not isinstance(symbols, list) or not symbols:
             return _error("symbols must be a non-empty list of strings")

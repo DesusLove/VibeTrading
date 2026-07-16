@@ -1,3 +1,5 @@
+from typing import Any
+
 """Finnhub loader: key-gated US-equity OHLCV via the public stock-candle API.
 
 Finnhub (https://finnhub.io) serves daily stock candles from a single REST
@@ -19,10 +21,8 @@ No market data is ever persisted in the repo; settled ranges may be cached to
 the user-home loader cache via :func:`cached_loader_fetch`.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -239,6 +239,7 @@ class DataLoader:
             A normalized OHLCV DataFrame, or ``None`` when Finnhub reports no
             usable data for the window.
         """
+
         payload = throttled_get_json(
             _CANDLE_URL,
             host_key=_HOST_KEY,

@@ -1,6 +1,8 @@
+from collections.abc import Callable, Iterator
+from typing import Any
+
 """Shared helpers for HTTP-based MCP integration tests."""
 
-from __future__ import annotations
 
 import json
 import os
@@ -12,7 +14,6 @@ import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Iterator
 
 import requests
 
@@ -396,6 +397,7 @@ def running_http_mcp_server_on_random_port(
     max_attempts: int = 5,
 ) -> Iterator[HttpMCPServerHandle]:
     """Context manager that runs a FastMCP HTTP server on a retryable free port."""
+
     with _loopback_proxy_bypass():
         handle = start_http_mcp_server_on_random_port(
             fixture_server,

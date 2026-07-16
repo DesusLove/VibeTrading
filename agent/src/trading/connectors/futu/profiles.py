@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Built-in Futu (moomoo) connector profiles.
 
 Read-only paper and live profiles sit alongside order-placing paper and live
@@ -7,7 +8,7 @@ trade environment (``SIMULATE`` vs ``REAL``) and the account is resolved by its
 ("orders.place.requires_mandate") and requires an OpenD trade-password unlock.
 """
 
-from __future__ import annotations
+
 
 from src.trading.types import READ_CAPABILITIES, TradingProfile
 

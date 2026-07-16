@@ -1,3 +1,6 @@
+from collections.abc import Iterable, Mapping
+from typing import Any
+
 """Local read-only Interactive Brokers connector via TWS / IB Gateway.
 
 This module intentionally connects only to a user-owned local TWS or IB Gateway
@@ -5,14 +8,12 @@ session. It does not handle IBKR credentials, does not talk to cloud broker
 endpoints directly, and exposes no order-placement method.
 """
 
-from __future__ import annotations
 
 import json
 import socket
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Iterable, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -66,7 +67,7 @@ class IBKRLocalConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "IBKRLocalConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> IBKRLocalConfig:
         """Build a config from a JSON-like mapping.
 
         Args:
@@ -98,7 +99,7 @@ class IBKRLocalConfig:
         client_id: int | None = None,
         profile: str | None = None,
         account: str | None = None,
-    ) -> "IBKRLocalConfig":
+    ) -> IBKRLocalConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if profile is not None:
@@ -358,6 +359,7 @@ def get_historical_bars(
     use_rth: bool = True,
 ) -> dict[str, Any]:
     """Fetch historical bars from local TWS / IB Gateway."""
+
     cfg = config or load_config()
     ib = _connect(cfg)
     try:

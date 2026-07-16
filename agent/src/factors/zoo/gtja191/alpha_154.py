@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: Original returns boolean; we cast to float and multiply by -1.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -60,6 +59,7 @@ def compute(panel):
     Returns:
         pd.DataFrame with index = panel["close"].index, columns = panel["close"].columns.
     """
+
     v = panel["volume"]
     vw = vwap(panel, "equity_cn")
 

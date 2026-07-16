@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #23 - 条件相关系数
@@ -9,7 +10,7 @@
 Formula: SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)/(SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1) + SMA((CLOSE<=DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)) * 100
 Source: 国泰君安 191 alpha 研报 (2014), alpha 23."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

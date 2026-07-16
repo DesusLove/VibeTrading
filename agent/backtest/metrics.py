@@ -1,11 +1,10 @@
+from typing import Any
+
 """Shared backtest metrics, extracted from daily_portfolio.py for reuse.
 
 Provides annualisation helpers, trade statistics, and full metric calculation.
 """
 
-from __future__ import annotations
-
-from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -236,6 +235,7 @@ def calc_metrics(
 
 def _empty_metrics(initial_cash: float) -> Dict[str, Any]:
     """Return zero-valued metrics when no data is available."""
+
     return {
         "final_value": initial_cash,
         "total_return": 0, "annual_return": 0, "max_drawdown": 0,

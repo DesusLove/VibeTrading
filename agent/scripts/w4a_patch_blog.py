@@ -15,7 +15,6 @@ TBD that depends on it becomes a "bench failed" note instead. The script is
 idempotent — re-running with the same summary produces the same HTML.
 """
 
-from __future__ import annotations
 
 import html
 import json
@@ -198,6 +197,7 @@ def _patch_dead(text: str, entry: dict[str, Any]) -> str:
 
 def _patch_bench_failed_note(text: str) -> str:
     """Replace the W4-roadmap placeholder callout with a real timestamp note."""
+
     return text.replace(
         "Numbers will be filled in once the full bench finishes (Vibe-Trading\n        roadmap W4.a). "
         "This post is published as a methodology preview &mdash; the structure, definitions\n        and caveats are final.",

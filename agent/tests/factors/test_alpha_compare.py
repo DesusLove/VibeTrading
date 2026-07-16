@@ -1,3 +1,5 @@
+from typing import Any
+
 """Unit + integration tests for ``vibe-trading alpha compare``.
 
 Two layers are covered:
@@ -13,11 +15,9 @@ Two layers are covered:
    the handler logic is tested in isolation from the bench math.
 """
 
-from __future__ import annotations
 
 import argparse
 import json
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,6 @@ import pytest
 
 from src.factors import cli_handlers, compare_runner
 from src.factors.bench_runner import run_bench
-
 
 # ── run_bench(only=...) integration ─────────────────────────────────────────
 
@@ -136,6 +135,7 @@ class _FakeRegistry:
 
 def _fake_run_bench(metrics: dict[str, dict[str, Any]], *, status_by_zoo: dict[str, str] | None = None):
     """Build a ``run_bench`` double returning canned rows for the ``only`` ids."""
+
 
     def _fake(*, zoo: str, universe: str, period: str, top: int, only: list[str], registry: Any, on_progress: Any = None) -> dict[str, Any]:  # noqa: ARG001
         if status_by_zoo and zoo in status_by_zoo:

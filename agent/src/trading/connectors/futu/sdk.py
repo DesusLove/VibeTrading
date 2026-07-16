@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only Futu (moomoo) connector via the official ``futu-api`` SDK.
 
 This module wraps Futu's ``OpenSecTradeContext`` / ``OpenQuoteContext`` for the
@@ -24,15 +27,12 @@ returns a 3-tuple ``(ret, df, page_key)``); ``data`` is typically a pandas
 DataFrame which we convert with ``to_dict("records")`` before field mapping.
 """
 
-from __future__ import annotations
 
 import json
-import os
 import socket
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -93,7 +93,7 @@ class FutuConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "FutuConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> FutuConfig:
         """Build a config from a JSON-like mapping, normalizing the profile.
 
         Args:
@@ -129,7 +129,7 @@ class FutuConfig:
         security_firm: str | None = None,
         filter_trdmarket: str | None = None,
         acc_id: int | None = None,
-    ) -> "FutuConfig":
+    ) -> FutuConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if host is not None:
@@ -160,7 +160,7 @@ class FutuConfig:
 _OVERRIDE_KEYS = ("host", "port", "profile", "security_firm", "filter_trdmarket", "acc_id")
 
 
-def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> "FutuConfig":
+def build_config(profile_config: Mapping[str, Any] | None = None, overrides: Mapping[str, Any] | None = None) -> FutuConfig:
     """Resolve the effective config: saved file ← profile defaults ← CLI overrides.
 
     Gateway endpoint and account settings come from the saved
@@ -365,7 +365,7 @@ def get_historical_bars(
     cfg = config or load_config()
     futu = _require_futu()
     ktype_name = _KLTYPE_MAP.get(period.strip(), "K_DAY")
-    ktype = getattr(futu.KLType, ktype_name, getattr(futu.KLType, "K_DAY"))
+    ktype = getattr(futu.KLType, ktype_name, futu.KLType.K_DAY)
     quote_ctx = _quote_ctx(cfg)
     try:
         code = symbol.strip().upper()
@@ -670,8 +670,8 @@ def _trade_ctx(cfg: FutuConfig):
     """Open an ``OpenSecTradeContext`` against the local OpenD gateway."""
     _assert_gateway(cfg)
     futu = _require_futu()
-    trd_market = getattr(futu.TrdMarket, cfg.filter_trdmarket, getattr(futu.TrdMarket, "HK"))
-    security_firm = getattr(futu.SecurityFirm, cfg.security_firm, getattr(futu.SecurityFirm, "FUTUSECURITIES"))
+    trd_market = getattr(futu.TrdMarket, cfg.filter_trdmarket, futu.TrdMarket.HK)
+    security_firm = getattr(futu.SecurityFirm, cfg.security_firm, futu.SecurityFirm.FUTUSECURITIES)
     try:
         return futu.OpenSecTradeContext(
             filter_trdmarket=trd_market,
@@ -793,6 +793,7 @@ def _records(data: Any) -> list[dict[str, Any]]:
     Returns:
         A list of plain row dicts (possibly empty).
     """
+
     if data is None:
         return []
     to_dict = getattr(data, "to_dict", None)

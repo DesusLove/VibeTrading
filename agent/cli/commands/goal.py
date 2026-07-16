@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import os
 from typing import Any
 
 from rich import box
-from rich.console import Console
-from rich.console import Group
+from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -62,7 +60,7 @@ def _create_cli_session(ctx: Any, title: str) -> str | None:
         SessionStore(base_dir=SESSIONS_DIR).create_session(session)
         get_shared_index().index_session(session.session_id, session.title)
         if ctx is not None:
-            setattr(ctx, "session_id", session.session_id)
+            ctx.session_id = session.session_id
         return session.session_id
     except Exception:  # noqa: BLE001
         return None

@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING, Any
+
 """Microsoft Teams channel MVP using a tiny built-in HTTP webhook server.
 
 Scope:
@@ -9,7 +11,6 @@ Scope:
 - no attachments/cards/polls yet
 """
 
-from __future__ import annotations
 
 import asyncio
 import html
@@ -23,7 +24,6 @@ import time
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
 
 try:  # pragma: no cover - Windows fallback path
@@ -32,13 +32,12 @@ except ImportError:  # pragma: no cover
     fcntl = None
 
 import httpx
-from pydantic import Field
+from pydantic import BaseModel, Field
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
 from src.config.paths import get_workspace_path
-from pydantic import BaseModel
 
 MSTEAMS_AVAILABLE = (
     importlib.util.find_spec("jwt") is not None
@@ -798,6 +797,7 @@ class MSTeamsChannel(BaseChannel):
 
     async def _get_access_token(self) -> str:
         """Fetch an access token for Bot Framework / Azure Bot auth."""
+
 
         now = time.time()
         if self._token and now < self._token_expires_at - 60:

@@ -1,6 +1,7 @@
+from typing import Any
+
 """IM channel runtime that connects MessageBus traffic to SessionService."""
 
-from __future__ import annotations
 
 import asyncio
 import json
@@ -9,7 +10,6 @@ import time
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from src.channels.bus.events import InboundMessage, OutboundMessage
 from src.channels.bus.queue import MessageBus
@@ -245,6 +245,7 @@ class ChannelRuntime:
     @staticmethod
     def _is_new_session_command(content: str) -> bool:
         """Check if the message is a session reset command (/new, /reset, /newsession)."""
+
         return content.strip().lower() in ("/new", "/reset", "/newsession")
 
 
@@ -253,4 +254,4 @@ def _session_id(session: Session | dict[str, Any] | Any) -> str:
         return session.session_id
     if isinstance(session, dict):
         return str(session["session_id"])
-    return str(getattr(session, "session_id"))
+    return str(session.session_id)

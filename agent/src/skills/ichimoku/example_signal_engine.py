@@ -4,7 +4,6 @@
 纯 pandas 实现，无外部技术分析库依赖。
 """
 
-from typing import Dict, Optional
 
 import pandas as pd
 
@@ -67,8 +66,8 @@ class SignalEngine:
         return (high.rolling(period).max() + low.rolling(period).min()) / 2
 
     def generate(
-        self, data_map: Dict[str, pd.DataFrame]
-    ) -> Dict[str, pd.Series]:
+        self, data_map: dict[str, pd.DataFrame]
+    ) -> dict[str, pd.Series]:
         """根据一目均衡表五线系统生成交易信号。
 
         Args:

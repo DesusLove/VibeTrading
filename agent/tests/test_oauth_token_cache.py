@@ -10,7 +10,6 @@ These guard the security-critical invariants of the live-channel token cache:
 * URL/path-shaped cache keys are neutralized into cache-root-local filenames.
 """
 
-from __future__ import annotations
 
 import asyncio
 import json
@@ -257,6 +256,7 @@ def test_cache_expiry_surfaces_reauth_no_silent_stale_call() -> None:
     result returned off a stale token (SPEC Transport §5 / §7.4). The mutating
     path must NOT be retried either (no duplicate side effect).
     """
+
     from fastmcp.exceptions import McpError
     from mcp import types as mcp_types
 

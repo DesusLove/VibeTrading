@@ -1,12 +1,12 @@
+from typing import Any
+
 """MCP preset mention normalization for the WebSocket channel."""
 
-from __future__ import annotations
-
-from typing import Any
 
 
 def normalize_mcp_preset_mentions(content: Any, metadata: dict[str, Any] | None = None) -> list[str]:
     """Normalize MCP preset mentions into a stable list of names."""
+
     del metadata
     if content is None:
         return []

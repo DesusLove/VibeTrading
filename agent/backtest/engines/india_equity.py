@@ -27,7 +27,6 @@ broker schedule before relying on absolute cost figures:
   - DP charge: flat per-scrip on sell (default ₹0)          [in_dp_charge]
 """
 
-from __future__ import annotations
 
 import pandas as pd
 
@@ -131,6 +130,7 @@ class IndiaEquityEngine(BaseEngine):
 
 def _bar_date(bar: pd.Series):
     """Extract date from bar, handling various column names."""
+
     for col in ("trade_date", "date"):
         if col in bar.index:
             val = bar[col]

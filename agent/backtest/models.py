@@ -3,7 +3,6 @@
 Immutable dataclasses for positions, trades, and equity snapshots.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 
@@ -81,6 +80,7 @@ class EquitySnapshot:
         equity: capital + margin_in_use + unrealized.
         positions: Number of open positions.
     """
+
 
     timestamp: pd.Timestamp
     capital: float

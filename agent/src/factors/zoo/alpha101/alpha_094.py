@@ -10,7 +10,6 @@ Formula (paper appendix): (rank(vwap-ts_min(vwap,12))^Ts_Rank(correlation(Ts_Ran
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 94.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -53,6 +52,7 @@ __alpha_meta__ = {
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     volume = panel["volume"]
     vwap = panel["vwap"]
     adv60 = ts_mean(volume, 60)

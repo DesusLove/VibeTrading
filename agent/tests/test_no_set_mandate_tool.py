@@ -15,7 +15,6 @@ Mirrors the BROKERS.md method-name-regex gate. Two checks:
    module exposes no ``save``/``set`` symbol.
 """
 
-from __future__ import annotations
 
 import ast
 import re
@@ -104,6 +103,7 @@ def test_agent_reachable_modules_never_open_mandate_for_write() -> None:
 
 def test_registry_has_no_mandate_write_tool() -> None:
     """The assembled tool registry exposes no tool that can write a mandate."""
+
     from src.tools import build_registry
 
     registry = build_registry()

@@ -1,9 +1,10 @@
+from typing import Any
+
 """Equal-volatility (inverse-volatility) weighting.
 
 Higher weight on lower-volatility names so each asset contributes similar vol.
 """
 
-from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd

@@ -4,7 +4,6 @@ All HTTP is mocked at the Eastmoney client function the tool imports
 (:func:`get_json`), so no test touches a live endpoint.
 """
 
-from __future__ import annotations
 
 import json
 from unittest.mock import patch
@@ -124,6 +123,7 @@ class TestSuccessEnvelope:
 
 class TestErrorEnvelope:
     """Validation and request failures return the ok=false envelope."""
+
 
     def test_missing_market_rejected(self):
         payload = json.loads(MarketScreenerTool().execute())

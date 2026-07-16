@@ -14,7 +14,6 @@ The chosen alphas span the operator surface:
 * alpha101_054 — ``safe_div`` over a degree-5 polynomial ratio
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -23,7 +22,6 @@ import pandas as pd
 import pytest
 
 from src.factors.registry import Registry
-
 
 GOLDEN_DIR = Path(__file__).parent / "fixtures" / "goldens"
 
@@ -129,6 +127,7 @@ def test_alpha101_sample_matches_golden(
 
 def test_all_sampled_goldens_exist() -> None:
     """Sanity gate: every sampled alpha must have a corresponding golden CSV."""
+
     missing = [
         alpha_id
         for alpha_id in SAMPLED_ALPHAS

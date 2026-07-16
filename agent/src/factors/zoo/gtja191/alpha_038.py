@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #38 - 夏普比信号
@@ -9,7 +10,7 @@
 Formula: (((SUM(HIGH,20)/20)<HIGH)?(-1*DELTA(HIGH,2)):0)
 Source: 国泰君安 191 alpha 研报 (2014), alpha 38."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

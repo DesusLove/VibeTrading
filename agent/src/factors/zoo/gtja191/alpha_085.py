@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #85
@@ -9,7 +10,7 @@
 Formula: (TSRANK((VOLUME/MEAN(VOLUME,20)),20)*TSRANK((-1*DELTA(CLOSE,7)),8))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 85."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

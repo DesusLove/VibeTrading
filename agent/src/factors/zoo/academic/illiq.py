@@ -16,7 +16,6 @@ Illiquid stocks (high ILLIQ) command a return premium. Computed over a 21-day
 window then cross-sectional z-scored per date. Higher z-scores = less liquid
 names (the long leg of the illiquidity premium).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -54,6 +53,7 @@ def _cross_sectional_zscore(df: pd.DataFrame) -> pd.DataFrame:
 
 def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Return 21-day Amihud illiquidity cross-sectional z-score per stock."""
+
     close = panel['close']
     volume = panel['volume']
     daily_ret = safe_div(close - close.shift(1), close.shift(1))

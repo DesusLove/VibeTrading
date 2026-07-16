@@ -4,9 +4,7 @@
 需要恰好两个标的，等权分配。纯 pandas 实现。
 """
 
-from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 
@@ -43,7 +41,7 @@ class SignalEngine:
         self.entry_z = entry_z
         self.exit_z = exit_z
 
-    def generate(self, data_map: Dict[str, pd.DataFrame]) -> Dict[str, pd.Series]:
+    def generate(self, data_map: dict[str, pd.DataFrame]) -> dict[str, pd.Series]:
         """根据价格比值 Z-score 生成配对交易信号。
 
         Args:

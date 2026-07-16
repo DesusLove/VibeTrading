@@ -1,3 +1,5 @@
+from typing import Any
+
 """Local data loader: reads CSV, Parquet, and DuckDB files from user config.
 
 Configuration lives at ``~/.vibe-trading/data-bridge/config.yaml``.
@@ -29,11 +31,9 @@ Example config::
         query: "SELECT * FROM prices WHERE ticker = 'MYINDEX'"
 """
 
-from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 import pandas as pd
 import yaml
@@ -126,7 +126,7 @@ def _resample_to_interval(df: pd.DataFrame, interval: str, symbol: str) -> pd.Da
 def _load_config() -> dict[str, Any] | None:
     if not _CONFIG_PATH.exists():
         return None
-    with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(_CONFIG_PATH, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
@@ -264,6 +264,7 @@ class DataLoader:
         Returns:
             Mapping clean_symbol -> OHLCV DataFrame.
         """
+
         validate_date_range(start_date, end_date)
         self._ensure_config()
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA Alpha #86
@@ -9,7 +10,7 @@
 Formula: ((0.25 < (((DELAY(CLOSE,20)-DELAY(CLOSE,10))/10) - ((DELAY(CLOSE,10)-CLOSE)/10))) ? -1 : (((((DELAY(CLOSE,20)-DELAY(CLOSE,10))/10) - ((DELAY(CLOSE,10)-CLOSE)/10)) < 0) ? 1 : (-1*(CLOSE-DELAY(CLOSE,1)))))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 86."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd
@@ -51,7 +52,7 @@ def compute(panel: dict) -> pd.DataFrame:
     b = (c.shift(10) - c) / 10.0
     diff = a - b
     last = -1.0 * (c - c.shift(1))
-    out = pd.DataFrame(np.where(0.25 < diff, -1.0,
+    out = pd.DataFrame(np.where(diff > 0.25, -1.0,
                                 np.where(diff < 0, 1.0, last.to_numpy())),
                        index=c.index, columns=c.columns)
     return out

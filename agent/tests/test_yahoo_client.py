@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for yahoo_client: symbol mapping, payload parsing, crumb retry, errors.
 
 All HTTP is mocked — no test ever reaches a live Yahoo endpoint. The client
@@ -6,9 +8,6 @@ imports ``throttled_get`` / ``throttled_get_json`` from
 names on the ``yahoo_client`` module.
 """
 
-from __future__ import annotations
-
-from typing import Any, Dict, List, Optional
 
 import pytest
 import requests
@@ -352,6 +351,7 @@ class TestGetOptions:
 
 class TestSearch:
     """v1 search."""
+
 
     def test_filters_to_dict_quotes(self, monkeypatch):
         def fake_get_json(url, **kwargs):

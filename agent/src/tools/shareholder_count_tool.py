@@ -1,3 +1,5 @@
+from typing import Any
+
 """Read-only tool: A-share quarterly shareholder count via Eastmoney datacenter.
 
 Eastmoney's datacenter report API publishes the periodic "股东户数" (number of
@@ -11,10 +13,8 @@ Only mainland A-shares (``.SH`` / ``.SZ`` / ``.BJ``) carry this disclosure;
 other markets return an error envelope.
 """
 
-from __future__ import annotations
 
 import json
-from typing import Any
 
 from backtest.loaders.eastmoney_client import get_json, resolve_secid
 from src.agent.tools import BaseTool
@@ -215,4 +215,5 @@ def _to_number(value: Any) -> float | None:
 
 def _error(message: str) -> str:
     """Render a failure envelope as a JSON string."""
+
     return json.dumps({"ok": False, "error": message}, ensure_ascii=False)

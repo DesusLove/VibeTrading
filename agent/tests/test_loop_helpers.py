@@ -2,23 +2,20 @@
 
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 
-import pytest
-
 from src.agent.loop import (
-    KEEP_RECENT,
     COLLAPSE_PRESERVE_RECENT,
     COLLAPSE_TEXT_MIN,
+    KEEP_RECENT,
     MICROCOMPACT_THRESHOLD,
-    estimate_tokens,
-    _microcompact,
     _context_collapse,
     _fix_tool_pairs,
     _is_tool_success,
+    _microcompact,
     _normalize_tool_run_dir,
+    estimate_tokens,
 )
 
 

@@ -16,7 +16,6 @@ trailing 252-day return — value names tend to be long-term underperformers
 whose prices have declined relative to book value. Higher z-scores = larger
 long-term drawdowns (deeper value).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -61,6 +60,7 @@ def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     >95% NaN error (RegistryError) so the user sees "insufficient history"
     instead of a misleading shrunk-window value.
     """
+
     close = panel['close']
     ret = safe_div(delta(close, 252), close.shift(252))
     return _cross_sectional_zscore(-ret)

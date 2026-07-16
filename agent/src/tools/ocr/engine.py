@@ -1,13 +1,13 @@
+from typing import Protocol, runtime_checkable
+
 """Pluggable OCR engine interface and factory.
 
 Allows users to swap between local OCR (RapidOCR) and cloud vision models
 (Qwen-VL, etc.) via environment variable VIBE_TRADING_OCR_ENGINE.
 """
 
-from __future__ import annotations
 
 import logging
-from typing import Protocol, runtime_checkable
 
 import numpy as np
 
@@ -92,6 +92,7 @@ def _try_qwen_vl() -> OcrEngine | None:
 
 def get_ocr_install_hint(engine: OcrEngine | None) -> str:
     """Return an actionable install message for the missing OCR engine."""
+
     if engine is not None:
         return ""
 

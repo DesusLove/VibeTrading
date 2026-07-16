@@ -12,7 +12,6 @@ All functions are pure and tolerate ``None`` / negative inputs so callers can
 hand them raw counter values without pre-validation.
 """
 
-from __future__ import annotations
 
 from typing import Union
 
@@ -126,6 +125,7 @@ def abbreviate_num(value: Number | None, *, currency: str | None = None) -> str:
             abbreviate_num(0.003, currency="$") → "$0.003"
             abbreviate_num(1.42,  currency="$") → "$1.42"
     """
+
 
     if value is None:
         return "—"

@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 # ============================================================
 # 中文名称: GTJA #33 - 量价秩相关
@@ -9,7 +10,7 @@
 Formula: ((((-1*TSMIN(LOW,5))+DELAY(TSMIN(LOW,5),5))*RANK(((SUM(RET,240)-SUM(RET,20))/220)))*TSRANK(VOLUME,5))
 Source: 国泰君安 191 alpha 研报 (2014), alpha 33."""
 
-from __future__ import annotations
+
 
 import numpy as np
 import pandas as pd

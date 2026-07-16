@@ -12,12 +12,10 @@ Like Eastmoney, Sina rate-limits by source IP, so every request routes through
 the shared per-host throttle in :mod:`backtest.loaders._http`.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import re
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -72,7 +70,7 @@ def _strip_jsonp(raw: str) -> list:
     return bars
 
 
-def _bars_to_frame(bars: list, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+def _bars_to_frame(bars: list, start_date: str, end_date: str) -> pd.DataFrame | None:
     """Reshape Sina ``{d,o,h,l,c,v}`` bars into the standard OHLCV frame.
 
     Args:
@@ -136,13 +134,13 @@ class DataLoader:
 
     def fetch(
         self,
-        codes: List[str],
+        codes: list[str],
         start_date: str,
         end_date: str,
         *,
         interval: str = "1D",
-        fields: Optional[List[str]] = None,
-    ) -> Dict[str, pd.DataFrame]:
+        fields: list[str | None] = None,
+    ) -> dict[str, pd.DataFrame]:
         """Fetch US daily OHLCV for each code; skip and log per-symbol failures.
 
         Args:
@@ -162,7 +160,7 @@ class DataLoader:
             raise ValueError(f"Unsupported interval {interval!r}; sina is daily-only")
         validate_date_range(start_date, end_date)
 
-        result: Dict[str, pd.DataFrame] = {}
+        result: dict[str, pd.DataFrame] = {}
         for code in codes:
             try:
                 df = cached_loader_fetch(
@@ -182,8 +180,9 @@ class DataLoader:
 
     def _fetch_one(
         self, code: str, start_date: str, end_date: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """Fetch and parse one symbol's daily bars, or ``None`` if non-US/empty."""
+
         if not _is_us_equity(code):
             return None
 

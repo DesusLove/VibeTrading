@@ -13,7 +13,6 @@ minimum row count that lets all five sample alphas produce a non-trivial
 output. The seed (``np.random.RandomState(42)``) is unchanged.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -22,7 +21,6 @@ import pandas as pd
 import pytest
 
 from src.factors.registry import Registry
-
 
 GOLDENS_DIR = Path(__file__).parent / "fixtures" / "goldens"
 SAMPLED_ALPHAS = (
@@ -101,6 +99,7 @@ def test_gtja191_sample_matches_golden(
     registry: Registry,
 ) -> None:
     """Each sample alpha must reproduce its pinned CSV golden bit-equivalently."""
+
     out = registry.compute(alpha_id, panel)
     golden_path = GOLDENS_DIR / f"{alpha_id}.csv"
     assert golden_path.is_file(), f"golden fixture missing: {golden_path}"

@@ -7,7 +7,6 @@ names straight from the markdown and asserts they form a strict **subset** of
 the code does not actually register (code-first invariant).
 """
 
-from __future__ import annotations
 
 import re
 from pathlib import Path
@@ -130,6 +129,7 @@ def test_capability_market_coverage_matches_tool_descriptions() -> None:
     expected markets from the tools themselves so the doc can never under-state
     coverage again.
     """
+
     from src.tools.financial_statements_tool import FinancialStatementsTool
     from src.tools.stock_news_tool import StockNewsTool
 

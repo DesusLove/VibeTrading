@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Regression tests for /upload streaming + size enforcement.
 
 Pinned by PR #53 (fix: stream uploads while enforcing API size limit). The previous
@@ -6,7 +7,7 @@ oversized payloads could exhaust server memory before being rejected. These test
 shrink the limit so they exercise the streaming/cleanup paths without allocating 50 MB.
 """
 
-from __future__ import annotations
+
 
 from pathlib import Path
 

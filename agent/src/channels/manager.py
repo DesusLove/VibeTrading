@@ -1,14 +1,12 @@
+from typing import Any
+
 """Channel manager for coordinating chat channels."""
 
-from __future__ import annotations
 
 import asyncio
 import hashlib
 import logging
-from collections.abc import Callable
 from contextlib import suppress
-from pathlib import Path
-from typing import Any
 
 from src.channels.base import BaseChannel
 from src.channels.bus.events import OutboundMessage
@@ -342,7 +340,7 @@ class ChannelManager:
                 else:
                     logger.warning("Unknown channel: %s", msg.channel)
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 continue
             except asyncio.CancelledError:
                 break
@@ -475,4 +473,5 @@ class ChannelManager:
     @property
     def enabled_channels(self) -> list[str]:
         """Get list of enabled channel names."""
+
         return list(self.channels.keys())

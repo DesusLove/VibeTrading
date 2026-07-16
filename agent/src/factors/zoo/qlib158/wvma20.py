@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import pandas as pd
+
 from src.factors.base import safe_div, ts_mean, ts_std
 
 __alpha_meta__ = {

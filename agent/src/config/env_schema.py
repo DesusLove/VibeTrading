@@ -1,3 +1,5 @@
+from typing import Annotated, Any
+
 """Single source of truth for all Vibe-Trading environment variable defaults.
 
 This module defines Pydantic models for every environment variable consumed by
@@ -17,10 +19,8 @@ Usage::
     cfg.data.tushare_token     # ""
 """
 
-from __future__ import annotations
 
 import os
-from typing import Annotated, Any
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
@@ -348,7 +348,7 @@ class EnvConfig(_EnvBase):
     ocr: OcrConfig = Field(default_factory=OcrConfig)
 
     @model_validator(mode="after")
-    def _resolve_api_key_alias(self) -> "EnvConfig":
+    def _resolve_api_key_alias(self) -> EnvConfig:
         """Copy ``VIBE_TRADING_API_KEY`` to ``api_auth_key`` when only the alias is set.
 
         The CLI historically reads ``VIBE_TRADING_API_KEY`` first and falls back to
@@ -356,6 +356,7 @@ class EnvConfig(_EnvBase):
         ``API_AUTH_KEY`` (``src/api/security.py:126``).  This validator closes
         the semantic gap so both surfaces agree.
         """
+
         if self.api.vibe_trading_api_key and not self.api.api_auth_key:
             self.api.api_auth_key = self.api.vibe_trading_api_key
         return self

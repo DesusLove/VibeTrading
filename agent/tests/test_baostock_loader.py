@@ -59,6 +59,7 @@ class TestFetchOneCodeHandling:
     def test_baostock_native_passthrough(self):
         """baostock native format (sh.601398) should pass through unchanged."""
         from unittest.mock import MagicMock
+
         from backtest.loaders.baostock_loader import DataLoader
 
         loader = DataLoader()
@@ -76,6 +77,7 @@ class TestFetchOneCodeHandling:
     def test_tushare_style_converted(self):
         """tushare-style format (601398.SH) should be converted to sh.601398."""
         from unittest.mock import MagicMock
+
         from backtest.loaders.baostock_loader import DataLoader
 
         loader = DataLoader()
@@ -93,6 +95,7 @@ class TestFetchOneCodeHandling:
     def test_tushare_sz_style_converted(self):
         """tushare-style SZ (000001.SZ) should be converted to sz.000001."""
         from unittest.mock import MagicMock
+
         from backtest.loaders.baostock_loader import DataLoader
 
         loader = DataLoader()

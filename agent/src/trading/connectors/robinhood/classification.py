@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Curated read/write classification map for Robinhood Agentic Trading.
 
 Tier 2 of the classification ladder (:mod:`src.live.classification`): an
@@ -17,7 +18,7 @@ slip through as a plain read. Adding a tool here is a localized edit to this one
 dict plus the classification test parametrize list.
 """
 
-from __future__ import annotations
+
 
 from src.live.classification import ToolClass
 

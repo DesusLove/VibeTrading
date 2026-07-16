@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import time
 from pathlib import Path
 
 import pytest
 
-from src.session.search import SessionSearchIndex, SearchMatch
+from src.session.search import SearchMatch, SessionSearchIndex
 
 
 @pytest.fixture()

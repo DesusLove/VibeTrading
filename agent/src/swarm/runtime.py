@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 """Swarm DAG orchestration runtime.
 
 Core orchestrator: schedules workers by topological layer, parallel within each
@@ -5,20 +7,19 @@ layer and serial between layers. Execution runs in a background daemon thread
 with cancellation and event callback support.
 """
 
-from __future__ import annotations
 
 import logging
-import os
 import threading
 from concurrent.futures import (
     Future,
     ThreadPoolExecutor,
-    TimeoutError as FuturesTimeoutError,
     as_completed,
 )
-from datetime import datetime, timezone
+from concurrent.futures import (
+    TimeoutError as FuturesTimeoutError,
+)
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable
 
 from src.config.accessor import get_env_config
 from src.config.schema import AgentConfig
@@ -40,8 +41,8 @@ from src.swarm.task_store import (
     topological_layers,
     validate_dag,
 )
-from src.tools.redaction import redact_internal_paths
 from src.swarm.worker import run_worker
+from src.tools.redaction import redact_internal_paths
 
 logger = logging.getLogger(__name__)
 
@@ -205,7 +206,7 @@ class SwarmRuntime:
             agent_id=agent_id,
             task_id=task_id,
             data=data or {},
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def _execute_run(
@@ -297,7 +298,7 @@ class SwarmRuntime:
 
                     if result.status == "completed":
                         task_summaries[tid] = result.summary
-                        now_iso = datetime.now(timezone.utc).isoformat()
+                        now_iso = datetime.now(UTC).isoformat()
                         task_store.update_status(
                             tid,
                             TaskStatus.completed,
@@ -327,7 +328,7 @@ class SwarmRuntime:
                             TaskStatus.failed,
                             error=redact_internal_paths(result.error)
                             or f"worker did not complete (status={result.status})",
-                            completed_at=datetime.now(timezone.utc).isoformat(),
+                            completed_at=datetime.now(UTC).isoformat(),
                             worker_iterations=result.iterations,
                         )
                         self._emit_event(
@@ -370,7 +371,7 @@ class SwarmRuntime:
             RunStatus.cancelled if cancel_event.is_set() else RunStatus.completed if all_succeeded else RunStatus.failed
         )
         run.status = final_status
-        run.completed_at = datetime.now(timezone.utc).isoformat()
+        run.completed_at = datetime.now(UTC).isoformat()
 
         # Sync tasks back to run model
         run.tasks = task_store.load_all()
@@ -532,7 +533,7 @@ class SwarmRuntime:
                         TaskStatus.blocked,
                         error=f"Blocked: upstream not completed ({reason})",
                         blocked_by=blocked_by_ids,
-                        completed_at=datetime.now(timezone.utc).isoformat(),
+                        completed_at=datetime.now(UTC).isoformat(),
                     )
                     self._emit_event(
                         run.id,
@@ -558,7 +559,7 @@ class SwarmRuntime:
                 task_store.update_status(
                     tid,
                     TaskStatus.in_progress,
-                    started_at=datetime.now(timezone.utc).isoformat(),
+                    started_at=datetime.now(UTC).isoformat(),
                 )
                 self._emit_event(
                     run.id,
@@ -738,6 +739,7 @@ class SwarmRuntime:
             current_layer_ids: Task IDs in the current (interrupted) layer.
             all_tasks: All tasks in the run.
         """
+
         for task in all_tasks:
             if task.status not in (TaskStatus.completed, TaskStatus.failed):
                 try:

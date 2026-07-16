@@ -6,7 +6,6 @@ unrecognized code to stock_zh_a_hist, masking ETFs (518880.SH) and forex pairs
 network — real-data smoke is in tests/_smoke_akshare_real.py if/when needed.
 """
 
-from __future__ import annotations
 
 import sys
 from types import SimpleNamespace
@@ -17,13 +16,9 @@ import pytest
 
 from backtest.loaders.akshare_loader import (
     DataLoader,
-    _is_a_share,
     _is_etf_listed,
     _is_forex,
-    _is_hk,
-    _is_us,
 )
-
 
 # ---------------------------------------------------------------------------
 # Predicate tests
@@ -115,6 +110,7 @@ def _stub_a_share_response() -> pd.DataFrame:
 @pytest.fixture
 def fake_akshare(monkeypatch: pytest.MonkeyPatch) -> SimpleNamespace:
     """Install a stub `akshare` module with mocked endpoints."""
+
     fake = SimpleNamespace(
         fund_etf_hist_sina=MagicMock(return_value=_stub_etf_response()),
         forex_hist_em=MagicMock(return_value=_stub_forex_response()),

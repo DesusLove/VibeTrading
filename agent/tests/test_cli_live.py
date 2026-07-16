@@ -1,3 +1,5 @@
+from typing import Any
+
 """Tests for the connector-first live CLI surface + REPL intercepts (P6).
 
 Covers SPEC.md §9 Decision 1 (CLI surface table) and Consent §2/§4:
@@ -12,16 +14,13 @@ Covers SPEC.md §9 Decision 1 (CLI surface table) and Consent §2/§4:
   switch without entering the agent loop.
 """
 
-from __future__ import annotations
 
+import importlib
 import json
 from pathlib import Path
-from typing import Any, Dict
 from unittest.mock import patch
 
 import pytest
-
-import importlib
 
 import src.live.paths as live_paths
 
@@ -767,6 +766,7 @@ class TestHaltIntercept:
         Mirrors the ``_interactive_loop`` guard: a halt turn is consumed before
         ``_run_one_turn`` (the only path into ``_run_agent``) is ever called.
         """
+
         from src.live.halt import halt_flag_set
 
         text = "停"

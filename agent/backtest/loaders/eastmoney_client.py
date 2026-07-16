@@ -1,3 +1,5 @@
+from typing import Any
+
 """Shared Eastmoney HTTP client: secid resolution + push2his kline fetch.
 
 Eastmoney exposes free, no-auth quote endpoints but rate-limits aggressively by
@@ -18,12 +20,10 @@ Eastmoney addresses every instrument by a ``secid`` of the form ``<market>.<code
   Eastmoney's search/suggest endpoint and cached for the life of the process.
 """
 
-from __future__ import annotations
 
 import json
 import logging
 import re
-from typing import Any
 
 from backtest.loaders._http import resolve_min_interval, throttled_get_json
 
@@ -290,6 +290,7 @@ def fetch_kline(
         requests.HTTPError: Non-2xx response status.
         ValueError: Body is not valid JSON.
     """
+
     payload = get_json(
         _KLINE_URL,
         params={

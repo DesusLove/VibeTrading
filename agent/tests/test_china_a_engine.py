@@ -10,7 +10,6 @@ Validates:
   - Price limit detection helper
 """
 
-from __future__ import annotations
 
 import pandas as pd
 import pytest
@@ -22,7 +21,6 @@ from backtest.engines.china_a import (
     _price_limit,
 )
 from backtest.models import Position
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -217,6 +215,7 @@ class TestCommission:
 
     def test_leverage_forced_one(self) -> None:
         """A-share engine forces leverage=1."""
+
         engine = _make_engine(leverage=10.0)
         assert engine.default_leverage == 1.0
 

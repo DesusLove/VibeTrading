@@ -10,7 +10,6 @@ Formula (paper appendix): Ts_Rank(decay_linear(correlation(low, adv10, 7), 6), 4
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 89.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -84,6 +83,7 @@ def _ind_neutralize(x: pd.DataFrame, panel: dict) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     low = panel["low"]
     volume = panel["volume"]
     vwap = panel["vwap"]

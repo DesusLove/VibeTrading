@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any
+
 """Tests for the ``alpha_compare`` agent tool.
 
 Covers id coercion, the tool's JSON-Schema contract, ``execute`` happy/error
@@ -5,16 +8,14 @@ paths (with ``compare_alphas`` stubbed so no bench/network runs), and that the
 tool is auto-discovered into the default registry.
 """
 
-from __future__ import annotations
+
 
 import json
-from typing import Any
 
 import pytest
 
 from src.tools import build_registry
 from src.tools.alpha_compare_tool import AlphaCompareTool, _coerce_ids
-
 
 # ── _coerce_ids ─────────────────────────────────────────────────────────────
 

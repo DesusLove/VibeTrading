@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Tests for IndiaEquityEngine (NSE / BSE delivery) market rules.
 
 Validates:
@@ -9,9 +10,7 @@ Validates:
   - Engine routing (runner single-market + composite cross-market)
 """
 
-from __future__ import annotations
 
-import datetime as dt
 
 import pandas as pd
 import pytest

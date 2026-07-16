@@ -10,7 +10,6 @@ Formula (paper appendix): min(product(rank(rank(scale(log(sum(ts_min(rank(rank(-
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 29.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -70,6 +69,7 @@ def _delay(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     returns = close.pct_change()
     # Helper aliases (local closures keep the file standalone & purity-safe).

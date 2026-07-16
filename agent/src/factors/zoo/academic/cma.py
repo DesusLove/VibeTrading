@@ -16,7 +16,6 @@ log-volume change — firms aggressively scaling activity tend to show rising
 trading volume; conservative firms show stable / shrinking volume. Higher
 z-scores = volume contraction (conservative).
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -61,6 +60,7 @@ def compute(panel: dict[str, pd.DataFrame]) -> pd.DataFrame:
     registry surfaces this as >95% NaN (RegistryError) so the user sees
     "insufficient history" rather than a misleading shrunk-window value.
     """
+
     volume = panel['volume']
     log_avg_vol = np.log(ts_mean(volume, 60) + 1.0)
     growth = delta(log_avg_vol, 60)

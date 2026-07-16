@@ -1,13 +1,14 @@
+from collections.abc import Callable
+from typing import Any
+
 """Shadow Account — today signals scanner.
 
 Deterministic research scanner: evaluate each Shadow rule against injected
 recent OHLCV bars. The scanner never fabricates matches when data is absent.
 """
 
-from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Callable
 
 import pandas as pd
 
@@ -296,6 +297,7 @@ def _int_condition_value(condition: Any, default: int) -> int:
 
 def _to_float(value: Any) -> float | None:
     """Best-effort numeric parsing for rule thresholds."""
+
     try:
         return float(value)
     except (TypeError, ValueError):

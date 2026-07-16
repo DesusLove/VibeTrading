@@ -1,10 +1,11 @@
+from __future__ import annotations
 """Tests for get_shareholder_count: success + error envelopes, HTTP mocked.
 
 The Eastmoney datacenter call is mocked at ``get_json`` (imported into the tool
 module), so no test reaches a live endpoint.
 """
 
-from __future__ import annotations
+
 
 import json
 from unittest.mock import patch

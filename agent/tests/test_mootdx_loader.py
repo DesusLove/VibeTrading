@@ -9,7 +9,6 @@ import pytest
 
 from backtest.loaders.mootdx_loader import DataLoader, _is_a_share, _is_bj
 
-
 # ---------------------------------------------------------------------------
 # Symbol detection
 # ---------------------------------------------------------------------------
@@ -198,7 +197,7 @@ def test_is_available_true_when_mootdx_present(fake_client: _FakeStdQuotes) -> N
 
 
 def test_registry_lists_mootdx_in_a_share_chain() -> None:
-    from backtest.loaders.registry import FALLBACK_CHAINS, _ensure_registered, LOADER_REGISTRY
+    from backtest.loaders.registry import FALLBACK_CHAINS, LOADER_REGISTRY, _ensure_registered
 
     _ensure_registered()
     assert "mootdx" in LOADER_REGISTRY

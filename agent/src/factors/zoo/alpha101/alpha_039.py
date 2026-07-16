@@ -10,7 +10,6 @@ Formula (paper appendix): (-1*rank(delta(close,7)*(1-rank(decay_linear(volume/ad
 Source: Kakushadze (2015), "101 Formulaic Alphas", arXiv:1601.00991, eq. 39.
 """
 
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -58,6 +57,7 @@ def _rolling_sum(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 def compute(panel: dict) -> pd.DataFrame:
     """Compute the alpha on the OHLCV+ panel and return a wide DataFrame."""
+
     close = panel["close"]
     volume = panel["volume"]
     adv20 = ts_mean(volume, 20)

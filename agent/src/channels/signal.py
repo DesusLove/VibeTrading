@@ -1,6 +1,7 @@
+from typing import Any
+
 """Signal channel implementation using signal-cli daemon JSON-RPC interface."""
 
-from __future__ import annotations
 
 import asyncio
 import json
@@ -12,18 +13,15 @@ from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 import httpx
-from pydantic import Field, computed_field, field_validator
+from pydantic import BaseModel, Field, computed_field, field_validator
 
+from src.channels.base import BaseChannel
 from src.channels.bus.events import InboundMessage, OutboundMessage
 from src.channels.bus.queue import MessageBus
-from src.channels.base import BaseChannel
-from src.channels.utils import get_media_dir
-from pydantic import BaseModel
 from src.channels.pairing import is_approved
-from src.channels.utils import safe_filename, split_message
+from src.channels.utils import get_media_dir, safe_filename, split_message
 
 
 @dataclass
@@ -1390,6 +1388,7 @@ class SignalChannel(BaseChannel):
 
     async def _send_http_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Send JSON-RPC request via HTTP."""
+
         if not self._http:
             raise RuntimeError("Not connected to signal-cli daemon")
 

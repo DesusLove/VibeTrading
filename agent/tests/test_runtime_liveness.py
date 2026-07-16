@@ -7,7 +7,6 @@ injected via ``now_ms`` so the tests are deterministic and never sleep; the
 runtime root is redirected to a tmp dir.
 """
 
-from __future__ import annotations
 
 from pathlib import Path
 
@@ -28,6 +27,7 @@ from src.live.runtime.liveness import (
 @pytest.fixture
 def live_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Point the live runtime root at an isolated tmp dir."""
+
     monkeypatch.setattr(paths, "get_runtime_root", lambda: tmp_path)
     return tmp_path
 

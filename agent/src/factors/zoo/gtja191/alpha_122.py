@@ -11,7 +11,6 @@ Formula (verbatim from the report):
 
 Notes: Triple SMA of log close.
 """
-from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -61,6 +60,7 @@ def compute(panel):
     """
     def _sma(x, n, m):
         """SMA(x, n, m) per GTJA convention -> ewm with alpha = m/n."""
+
         return x.ewm(alpha=m / n, adjust=False).mean()
     c = panel["close"]
     s = _sma(_sma(_sma(np.log(c), 13, 2), 13, 2), 13, 2)

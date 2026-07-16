@@ -1,16 +1,16 @@
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 """Scheduled research HTTP routes.
 
 Mounted by ``agent/api_server.py`` via ``register_scheduled_routes(app, ...)``.
 """
 
-from __future__ import annotations
 
 import logging
-import os
 import sys as _sys
 import time
 import uuid
-from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -111,7 +111,7 @@ async def _stop_scheduled_research_executor() -> None:
 class CreateScheduledRunRequest(BaseModel):
     """Request body for POST /scheduled-runs."""
 
-    id: Optional[str] = Field(
+    id: str | None = Field(
         None, description="Job id; auto-generated UUID when omitted"
     )
     prompt: str = Field(
@@ -120,10 +120,10 @@ class CreateScheduledRunRequest(BaseModel):
     schedule: str = Field(
         ..., min_length=1, description="Interval-ms or 5-field cron expression"
     )
-    next_run_at: Optional[int] = Field(
+    next_run_at: int | None = Field(
         None, description="Epoch-ms for next run; defaults to now"
     )
-    config: Dict[str, Any] = Field(
+    config: dict[str, Any] = Field(
         default_factory=dict, description="Optional backtest parameters"
     )
 
@@ -137,7 +137,7 @@ class ScheduledRunResponse(BaseModel):
     next_run_at: int
     status: str
     created_at: int
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -212,13 +212,13 @@ def register_scheduled_routes(
 
     @app.get(
         "/scheduled-runs",
-        response_model=List[ScheduledRunResponse],
+        response_model=list[ScheduledRunResponse],
         dependencies=[Depends(require_auth)],
     )
     async def list_scheduled_runs(
-        status_filter: Optional[str] = Query(None, alias="status"),
+        status_filter: str | None = Query(None, alias="status"),
         limit: int = Query(50, ge=1, le=200),
-    ) -> List[ScheduledRunResponse]:
+    ) -> list[ScheduledRunResponse]:
         """List scheduled research jobs, optionally filtered by status."""
         jobs = _get_scheduled_research_store().list_jobs(
             status=status_filter, limit=limit
@@ -232,6 +232,7 @@ def register_scheduled_routes(
     )
     async def delete_scheduled_run(job_id: str) -> None:
         """Cancel (delete) a scheduled research job by id."""
+
         _host_validate_path_param(job_id, "job_id")
         removed = _get_scheduled_research_store().delete(job_id)
         if not removed:

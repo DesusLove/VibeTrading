@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 """Read-only + order Dhan connector via the official ``dhanhq`` SDK.
 
 Wraps ``DhanHQ`` client for account, positions, orders, quotes, and historical
@@ -8,13 +11,12 @@ for market data reads but simulates orders locally. Live mode places real orders
 through Dhan's production API.
 """
 
-from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
+from datetime import UTC
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
 
 from src.config.paths import get_runtime_root
 
@@ -85,7 +87,7 @@ class DhanConfig:
     readonly: bool = True
 
     @classmethod
-    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> "DhanConfig":
+    def from_mapping(cls, data: Mapping[str, Any] | None = None) -> DhanConfig:
         """Build a config from a JSON-like mapping."""
         payload = dict(data or {})
         profile = str(payload.get("profile") or "paper").strip().lower()
@@ -105,7 +107,7 @@ class DhanConfig:
         client_id: str | None = None,
         access_token: str | None = None,
         profile: str | None = None,
-    ) -> "DhanConfig":
+    ) -> DhanConfig:
         """Return a copy with CLI/tool overrides applied."""
         payload = asdict(self)
         if client_id is not None:
@@ -131,7 +133,7 @@ _OVERRIDE_KEYS = ("client_id", "access_token", "profile")
 def build_config(
     profile_config: Mapping[str, Any] | None = None,
     overrides: Mapping[str, Any] | None = None,
-) -> "DhanConfig":
+) -> DhanConfig:
     """Resolve config: saved file ← profile defaults ← CLI overrides."""
     base = asdict(load_config())
     for key, value in dict(profile_config or {}).items():
@@ -365,9 +367,9 @@ def get_historical_bars(
     sec_id = str(security_id or symbol).strip()
     segment = exchange_segment.strip().upper()
 
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
-    to_date = datetime.now(timezone.utc)
+    to_date = datetime.now(UTC)
     # Intraday: max 5 days back; daily: use limit
     if period in ("1m", "5m", "15m", "30m"):
         from_date = to_date - timedelta(days=5)
@@ -576,6 +578,7 @@ def _as_list(value: Any) -> list[Any]:
 
 def _safe_get(data: Any, *keys: str) -> Any:
     """Safely traverse nested dicts."""
+
     for key in keys:
         if isinstance(data, Mapping):
             data = data.get(key)
